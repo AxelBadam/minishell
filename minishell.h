@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/03 17:27:38 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/03 17:30:24 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,3 +36,7 @@ typedef struct s_command
 	char				*filename;
 	struct s_command	*next;
 }						t_command;
+
+t_command	*parse_list(char *line);
+void	print_list(t_command **head);
+#endif
