@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/04/26 17:49:34 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/03 13:32:03 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,10 @@ void	*init_resources(void)
 
 int	main()
 {
+	/*(void)argc;
+	(void)argv;
+	while (*env)
+		printf("%s\n", *env++);*/
 	t_resrc	*resrc;
 
 	resrc = init_resources();
