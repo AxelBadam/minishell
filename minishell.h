@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/03 14:15:57 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/03 14:31:05 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ typedef struct s_command
 {
 	char				*command;
 	char				*command_argument;
-	char				*redirection;
+	char				*operator;
 	char				*filename;
 	struct s_command	*next;
 }						t_command;

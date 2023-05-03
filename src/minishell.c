@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/03 14:16:20 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/03 16:37:35 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	ft_lstadd_back(t_command **head, t_command *new)
 	new->next = NULL;
 }
 
-char	**check_for_redirection(char **s_line)
+char	**check_for_operator(char **s_line)
 {
 	int	counter;
 
@@ -81,7 +81,7 @@ char	**check_for_redirection(char **s_line)
 	return (NULL);
 }
 
-t_command	*create_node(char **s_line, char **redirect)
+t_command	*create_node(char **s_line, char **operator)
 {
 	t_command *new_node;
 
@@ -89,17 +89,17 @@ t_command	*create_node(char **s_line, char **redirect)
 	if (!new_node)
 		return (NULL);
 	new_node->command = s_line[0];
-	if (redirect)
+	if (operator)
 	{
-		new_node->redirection = *redirect;
-		if (redirect[1])
-			new_node->filename = redirect[1];
+		new_node->operator = *operator;
+		if (operator[1])
+			new_node->filename = operator[1];
 		else
 			new_node->filename = NULL;
 	}
 	else
 	{
-		new_node->redirection = NULL;
+		new_node->operator = NULL;
 		new_node->filename = NULL;
 	}
 	new_node->next = NULL;
@@ -110,21 +110,21 @@ t_command	*parse_list(char *line)
 {
 	t_command	*head;
 	char		**s_line;
-	char		**redirect;
+	char		**operator;
 
 	head = NULL;
 	s_line = ft_split(line, ' ');
-	redirect = check_for_redirection(s_line);
-	if (redirect)
+	operator = check_for_operator(s_line);
+	if (operator)
 	{
-		while (redirect)
+		while (operator)
 		{
-			ft_lstadd_back(&head, create_node(s_line, redirect));
-			redirect = check_for_redirection(redirect + 1);
+			ft_lstadd_back(&head, create_node(s_line, operator));
+			operator = check_for_operator(operator + 1);
 		}
 	}
 	else
-		ft_lstadd_back(&head, create_node(s_line, redirect));
+		ft_lstadd_back(&head, create_node(s_line, operator));
 	return (head);
 }
 
@@ -136,7 +136,7 @@ void	print_list(t_command **head)
 	tmp = *head;
 	while (tmp)
 	{
-		printf("NODE %i\nCMD: %s\nREDIRECT: %s\nFILENAME: %s\n\n", counter++, tmp->command, tmp->redirection, tmp->filename);
+		printf("NODE %i\nCMD: %s\nOPERATOR: %s\nFILENAME: %s\n\n", counter++, tmp->command, tmp->operator, tmp->filename);
 		tmp = tmp->next;
 	}
 }
@@ -149,3 +149,5 @@ int	main()
 	minishell(resrc);
 	return (0);
 }
+
+//hello man
