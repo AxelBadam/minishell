@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/03 17:18:34 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/04 12:59:57 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ t_command	*create_node(char **s_line, char **operator)
 	return (new_node);
 }
 
-t_command	*parse_list(char *line)
+/*t_command	*parse_list(char *line)
 {
 	t_command	*head;
 	char		**s_line;
@@ -125,6 +125,39 @@ t_command	*parse_list(char *line)
 	}
 	else
 		ft_lstadd_back(&head, create_node(s_line, operator));
+	return (head);
+}*/
+
+void	parse_line(char *line, t_command **head)
+{
+	char		**s_line;
+	char		**operator;
+
+	s_line = ft_split(line, ' ');
+	operator = check_for_operator(s_line);
+	if (operator)
+	{
+		while (operator)
+		{
+			ft_lstadd_back(head, create_node(s_line, operator));
+			operator = check_for_operator(operator + 1);
+		}
+	}
+	else
+		ft_lstadd_back(head, create_node(s_line, operator));
+}
+
+t_command	*parse_list(char *line)
+{
+	t_command	*head;
+	int			counter;
+	char		**s_line;
+
+	counter = 0;
+	head = NULL;
+	s_line = ft_split(line, '|');
+	while (s_line[counter])
+		parse_line(s_line[counter++], &head);
 	return (head);
 }
 
