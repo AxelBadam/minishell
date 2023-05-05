@@ -1,5 +1,5 @@
 NAME = minishell
-SRC = minishell.c parsing.c utils.c linked_list.c
+SRC = main.c parsing.c utils.c linked_list.c exec.c
 LIBFT = libft
 OBJECT = $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 CC = cc

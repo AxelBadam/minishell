@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.c                                        :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/05 13:57:06 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/05 16:30:27 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,9 +55,10 @@ void handle_input(const char *input)
 		linked_list_append(command_types, (void *)(intptr_t)type);
 		current_node = current_node->next;
 	}
-	linked_list_print(tokens);
+	//linked_list_print(tokens);
 	LinkedList *commands = build_command_structure(tokens, command_types);
-	print_commands(commands);
+	//print_commands(commands);
+	execute_commands(commands);
 	
 	// Iterate through the tokens and execute appropriate actions
     // based on the type of token (command, argument, I/O redirection, pipeline, etc.)

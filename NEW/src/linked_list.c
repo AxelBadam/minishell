@@ -2,6 +2,18 @@
 #include <stdlib.h>
 #include "linked_list.h"
 
+int linked_list_count(LinkedList *list) {
+    size_t count = 0;
+    LinkedListNode *current_node = list->head;
+
+    while (current_node != NULL) {
+        count++;
+        current_node = current_node->next;
+    }
+
+    return count;
+}
+
 LinkedList *linked_list_create() {
     LinkedList *list = malloc(sizeof(LinkedList));
     list->head = NULL;

@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 14:23:41 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/05 12:33:00 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/05 15:28:14 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,6 @@ LinkedList *parse_tokens(const char *input, const char *delimiter) {
             token[token_len++] = c;
             state = (state == ESCAPE) ? NORMAL : DOUBLE_QUOTE;
         }
-
         input++;
     }
 
