@@ -6,11 +6,174 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/04 12:59:57 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/05 17:29:49 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	len_ctr(char *line)
+{
+	int	ctr;
+	int	len;
+
+	len = 0;
+	ctr = 0;
+	while (line[ctr] == ' ')
+		ctr++;
+	if (line[ctr] == '"')
+	{
+		ctr++;
+		while (line[ctr] && line[ctr] != '"')
+		{
+			len++;
+			ctr++;
+		}
+		if (line[ctr] == '"')
+			len += 2;
+		else
+			len += 1;
+	}
+	else
+	{
+		while (line[ctr] && line[ctr] != ' ')
+		{
+			ctr++;
+			len++;
+			if (line[ctr] == '"')
+				break ;
+		}
+	}
+	printf("%i\n", len);
+	return (len);
+}
+
+int	count_words(char *line)
+{
+	int	ctr;
+	int	word;
+	ctr = 0;
+	word = 0;
+	while (line[ctr])
+	{
+		while (line[ctr] == ' ')
+			ctr++;
+		while (line[ctr] && line[ctr] != ' ')
+		{
+			ctr++;
+			if (line[ctr - 1] == '"')
+			{
+				if (ctr > 1)
+				{
+					if (line[ctr - 2] != ' ' && line[ctr - 2] != '"')
+						word++;
+				}
+				while (line[ctr] && line[ctr] != '"')
+				{
+					ctr++;
+					if (!line[ctr] || line[ctr] == '"')
+						word++;
+				}
+				if (!line[++ctr])
+					break ;
+			}
+			if (line[ctr] == ' ' || !line[ctr])
+			{
+				if (line[ctr - 1] != '"')
+					word++;
+			}
+		}
+	}
+	return (word);
+}
+
+char	**make_array(char *line)
+{
+	int		words;
+	int		tmp;
+	int		ctr;
+	int		len;
+	char	**array;
+
+	ctr = 0;
+	tmp = 0;
+	len = 0;
+	words = count_words(line);
+	array = (char **)malloc(sizeof(char *) * (words + 1));
+	if (!array)
+		return (NULL);
+	while (words > 0)
+	{
+		len = len_ctr(&line[tmp]);
+		tmp += len;
+		array[ctr] = (char *)malloc(sizeof(char) * (len + 1));
+		if (!array[ctr])
+			return (NULL);
+		ctr++;
+		words--;
+	}
+	return (array);
+}
+
+void	fill_array(char *line, char **array)
+{
+	int	row;
+	int	clm;
+	int	words;
+	int	len;
+	int	tmp;
+	int	tmp2;
+
+	tmp = 0;
+	len = 0;
+	clm = 0;
+	words = count_words(line);
+	row = 0;
+	while (words > row)
+	{
+		len = len_ctr(&line[tmp]);
+		tmp2 = tmp;
+		tmp += len;
+		while (line[tmp2] == ' ')
+			tmp2++;
+		while (len > 0)
+		{
+			array[row][clm++] = line[tmp2++];
+			len--;
+		}
+		array[row][clm] = 0;
+		clm = 0;
+		row++;
+	}
+	array[row] = 0;
+}
+
+char	**split_command(char *line)
+{
+	char	**array;
+
+	array = make_array(line);
+	fill_array(line, array);
+	while (*array)
+		printf("%s\n", *array++);
+	return (NULL);
+}
+
+/*void	separate_operators(t_command *head, char **s_line)
+{
+	int	ctr;
+
+	ctr = 0;
+	while (s_line[ctr])
+	{
+		
+	}
+}*/
+
+void	parse_command(char *line)
+{
+	split_command(line);
+}
 
 void	minishell(t_resrc *resrc)
 {
@@ -21,11 +184,9 @@ void	minishell(t_resrc *resrc)
 	while (resrc->line)
 	{
 		add_history(resrc->line);
-		head = parse_list(resrc->line);
-		print_list(&head);
-		break ;
-		//free(resrc->line);
-		//resrc->line = readline("minishell: ");
+		parse_command(resrc->line);
+		free(resrc->line);
+		resrc->line = readline("minishell: ");
 	}
 }
 
@@ -59,119 +220,6 @@ void	ft_lstadd_back(t_command **head, t_command *new)
 	tmp = ft_lst_last(*head);
 	tmp->next = new;
 	new->next = NULL;
-}
-
-char	**check_for_operator(char **s_line)
-{
-	int	counter;
-
-	counter = 0;
-	while (s_line[counter])
-	{
-		if (ft_strncmp(s_line[counter], ">", SIZE_MAX) == 0)
-			return(&s_line[counter]);
-		if (ft_strncmp(s_line[counter], ">>", SIZE_MAX) == 0)
-			return(&s_line[counter]);
-		if (ft_strncmp(s_line[counter], "<", SIZE_MAX) == 0)
-			return(&s_line[counter]);
-		if (ft_strncmp(s_line[counter], "<<", SIZE_MAX) == 0)
-			return(&s_line[counter]);
-		counter++;
-	}
-	return (NULL);
-}
-
-t_command	*create_node(char **s_line, char **operator)
-{
-	t_command *new_node;
-
-	new_node = (t_command *)malloc(sizeof(t_command));
-	if (!new_node)
-		return (NULL);
-	new_node->command = s_line[0];
-	if (operator)
-	{
-		new_node->operator = *operator;
-		if (operator[1])
-			new_node->filename = operator[1];
-		else
-			new_node->filename = NULL;
-	}
-	else
-	{
-		new_node->operator = NULL;
-		new_node->filename = NULL;
-	}
-	new_node->next = NULL;
-	return (new_node);
-}
-
-/*t_command	*parse_list(char *line)
-{
-	t_command	*head;
-	char		**s_line;
-	char		**operator;
-
-	head = NULL;
-	s_line = ft_split(line, ' ');
-	operator = check_for_operator(s_line);
-	if (operator)
-	{
-		while (operator)
-		{
-			ft_lstadd_back(&head, create_node(s_line, operator));
-			operator = check_for_operator(operator + 1);
-		}
-	}
-	else
-		ft_lstadd_back(&head, create_node(s_line, operator));
-	return (head);
-}*/
-
-void	parse_line(char *line, t_command **head)
-{
-	char		**s_line;
-	char		**operator;
-
-	s_line = ft_split(line, ' ');
-	operator = check_for_operator(s_line);
-	if (operator)
-	{
-		while (operator)
-		{
-			ft_lstadd_back(head, create_node(s_line, operator));
-			operator = check_for_operator(operator + 1);
-		}
-	}
-	else
-		ft_lstadd_back(head, create_node(s_line, operator));
-}
-
-t_command	*parse_list(char *line)
-{
-	t_command	*head;
-	int			counter;
-	char		**s_line;
-
-	counter = 0;
-	head = NULL;
-	s_line = ft_split(line, '|');
-	while (s_line[counter])
-		parse_line(s_line[counter++], &head);
-	return (head);
-}
-
-void	print_list(t_command **head)
-{
-	t_command *tmp;
-	int counter = 0;
-
-	tmp = *head;
-	while (tmp)
-	{
-		printf("NODE %i\nCMD: %s\nOPERATOR: %s\nFILENAME: %s\n\n", counter++, tmp->command, tmp->operator, tmp->filename);
-		tmp = tmp->next;
-	}
 }
 
 int	main()

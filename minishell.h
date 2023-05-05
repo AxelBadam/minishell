@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/03 17:28:18 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/04 17:15:56 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,11 @@ typedef struct s_resrc
 typedef struct s_command
 {
 	char				*command;
-	char				*command_argument;
-	char				*operator;
-	char				*filename;
+	char				*command_option;
+	char				*string;
+	int					output_fd;
 	struct s_command	*next;
 }						t_command;
 
-t_command	*parse_list(char *line);
 void	print_list(t_command **head);
 #endif
