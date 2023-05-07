@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/05 17:29:49 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/07 13:54:43 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,13 @@ int	len_ctr(char *line)
 	if (line[ctr] == '"')
 	{
 		ctr++;
+		len++;
 		while (line[ctr] && line[ctr] != '"')
 		{
 			len++;
 			ctr++;
 		}
 		if (line[ctr] == '"')
-			len += 2;
-		else
 			len += 1;
 	}
 	else
@@ -109,6 +108,8 @@ char	**make_array(char *line)
 		array[ctr] = (char *)malloc(sizeof(char) * (len + 1));
 		if (!array[ctr])
 			return (NULL);
+		while (line[tmp] == ' ')
+			tmp++;
 		ctr++;
 		words--;
 	}
@@ -135,7 +136,10 @@ void	fill_array(char *line, char **array)
 		tmp2 = tmp;
 		tmp += len;
 		while (line[tmp2] == ' ')
+		{
 			tmp2++;
+			printf("yeah\n");
+		}
 		while (len > 0)
 		{
 			array[row][clm++] = line[tmp2++];
@@ -143,6 +147,8 @@ void	fill_array(char *line, char **array)
 		}
 		array[row][clm] = 0;
 		clm = 0;
+		while (line[tmp] == ' ')
+			tmp++;
 		row++;
 	}
 	array[row] = 0;
@@ -177,9 +183,9 @@ void	parse_command(char *line)
 
 void	minishell(t_resrc *resrc)
 {
-	t_command *head;
+	//t_command *head;
 
-	head = NULL;
+	//head = NULL;
 	resrc->line = readline("minishell: ");
 	while (resrc->line)
 	{
