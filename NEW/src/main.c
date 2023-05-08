@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/05 16:30:27 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/08 12:46:29 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,6 @@ CommandType identify_command_type(const char *token) {
         return CMD_NORMAL;
     }
 }
-
-
 
 void handle_input(const char *input) 
 {
