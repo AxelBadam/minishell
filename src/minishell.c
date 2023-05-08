@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/08 13:33:03 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/08 15:17:04 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ void	count_quotes(char *line, int *ctr, char d)
 	}
 }
 
-int	count_words(char *line)
+/*int	count_words(char *line)
 {
 	int	ctr[2];
 	ctr[0] = 0;
@@ -118,6 +118,39 @@ int	count_words(char *line)
 			if (line[ctr[0]] == ' ' || !line[ctr[0]])
 			{
 				if (line[ctr[0] - 1] != '"' && line[ctr[0] - 1] != '\'')
+					ctr[1]++;
+			}
+		}
+	}
+	return (ctr[1]);
+}*/
+
+int	count_words(char *line)
+{
+	int	ctr[2];
+	int	check;
+
+	check = 0;
+	ctr[0] = 0;
+	ctr[1] = 0;
+	while (line[ctr[0]])
+	{
+		if (!check)
+			while (line[ctr[0]] == ' ')
+				ctr[0]++;
+		while (line[ctr[0]] && line[ctr[0]] != ' ')
+		{
+			ctr[0]++;
+			if (line[ctr[0] - 1] == '"' || line[ctr[0] - 1] == '\'')
+			{
+				if (check)
+					check = 0;
+				if (ft_strchr(&line[ctr[0] + 1], '"') || ft_strchr(&line[ctr[0] + 1], '\''))
+					check = 1;
+			}
+			if (!check)
+			{
+				if (line[ctr[0]] == ' ' || !line[ctr[0]])
 					ctr[1]++;
 			}
 		}
@@ -188,12 +221,13 @@ void	fill_array(char *line, char **array)
 
 char	**split_command(char *line)
 {
-	char	**array;
+	//char	**array;
 
-	array = make_array(line);
+	/*array = make_array(line);
 	fill_array(line, array);
 	while (*array)
-		printf("%s\n", *array++);
+		printf("%s\n", *array++);*/
+	printf("%i\n", count_words(line));
 	return (NULL);
 }
 
