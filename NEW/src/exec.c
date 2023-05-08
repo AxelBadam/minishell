@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/05 15:36:40 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/08 14:06:18 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/08 15:23:25 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,47 +22,29 @@ int execute_builtin_cd(Command *cmd) {
     }*/
 
     // Change the working directory
-    const char *path = cmd->args->head->value;
-    if (chdir(path) == -1) {
+    const char *path = cmd->args->head->next->value;
+    if (chdir(path) == -1) 
+	{
         perror("cd");
         return 1;
     }
-
     return 0;
 }
 
 int execute_builtin_echo(Command *cmd) {
-    LinkedListNode *arg_node = cmd->args->head;
+    
+	LinkedListNode *arg_node = cmd->args->head;
 
     // Iterate through the command arguments and print them
-    while (arg_node != NULL) {
-        // Check if there is an output redirection
-        if (cmd->output_fd > 0) {
-            // Write the argument to the output file
-            write(cmd->output_fd, arg_node->next->value, strlen(arg_node->next->value));
-            if (arg_node->next != NULL) {
-                write(cmd->output_fd, " ", 1);
-            }
-        } else {
-            // Print the argument to stdout
-            printf("%s", (char *)arg_node->value);
-            if (arg_node->next != NULL) {
-                printf(" ");
-            }
-        }
-        arg_node = arg_node->next;
-    }
-
-    // Print a newline character
-    if (cmd->output_fd > 0) {
-        write(cmd->output_fd, "\n", 1);
-    } else {
-        printf("\n");
-    }
-
-    return 0;
+    while (arg_node->next != NULL) 
+	{
+        ft_putstr_fd(arg_node->next->value, cmd->output_fd);
+            if (arg_node->next != NULL) 
+				write(cmd->output_fd, " ", 1);        
+			arg_node = arg_node->next;
+	}
+    	return 0;
 }
-
 
 int execute_builtin_pwd(Command *cmd) {
    char cwd[4096];
@@ -79,18 +61,6 @@ int execute_builtin_pwd(Command *cmd) {
     }
 	return (1);
 }
-
-bool execute_builtin_command(Command *cmd) {
-    if (strcmp(cmd->name, "cd") == 0) {
-        return 1;
-    } else if (strcmp(cmd->name, "pwd") == 0) {
-        return 1;
-    } else if (strcmp(cmd->name, "echo") == 0) {
-        return(1);
-    }
-    return 0;
-}
-
 
 void setup_pipes(int pipefds[], int current_command, int total_commands) {
     if (current_command > 0) {
@@ -123,8 +93,21 @@ int setup_redirections(Command *cmd) {
     return 0;
 }
 
-void execute_commands(LinkedList *commands) 
-{
+bool execute_builtin_command(Command *cmd) {
+    
+	
+	if (strcmp(cmd->name, "cd") == 0) {
+        return execute_builtin_cd(cmd);
+    } else if (strcmp(cmd->name, "pwd") == 0) {
+        return execute_builtin_pwd(cmd);
+    } else if (strcmp(cmd->name, "echo") == 0) {
+        return execute_builtin_echo(cmd);
+    }
+    return 0;
+}
+
+
+void execute_commands(LinkedList *commands) {
     size_t num_commands = linked_list_count(commands);
     int pipefds[num_commands * 2];
 
@@ -135,27 +118,29 @@ void execute_commands(LinkedList *commands)
             return;
         }
     }
+
     size_t i = 0;
     LinkedListNode *current_node = commands->head;
     while (current_node != NULL) {
         Command *cmd = (Command *)current_node->value;
+        pid_t pid = fork();
 
-        if (!execute_builtin_command(cmd))
-		{
-            // Execute external command
-            pid_t pid = fork();
+        if (pid == 0) {
+            // Child process
+            setup_pipes(pipefds, i, num_commands);
+            setup_redirections(cmd);
 
-            if (pid == 0) {
-                // Child process
-                setup_pipes(pipefds, i, num_commands);
-                setup_redirections(cmd);
+            // Execute built-in command or external command
+            if (!execute_builtin_command(cmd)) {
                 execvp(cmd->name, &cmd->args->head->value);
-                //perror("execvp");
+                perror("execvp");
                 exit(1);
-            } else if (pid < 0) {
-                perror("fork");
-                exit(1);
+            } else {
+                exit(0); // Exit with success status for built-in commands
             }
+        } else if (pid < 0) {
+            perror("fork");
+            exit(1);
         }
 
         current_node = current_node->next;
@@ -172,6 +157,7 @@ void execute_commands(LinkedList *commands)
         wait(NULL);
     }
 }
+
 
 
 

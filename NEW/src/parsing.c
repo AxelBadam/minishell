@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 14:23:41 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/05 15:28:14 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/08 14:42:55 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,17 +23,21 @@ typedef enum {
     ESCAPE
 } ParseState;
 
-LinkedList *parse_tokens(const char *input, const char *delimiter) {
+LinkedList *parse_tokens(const char *input, const char *delimiter) 
+{
     ParseState state = NORMAL;
     LinkedList *tokens = linked_list_create();
     char *token = malloc(ft_strlen(input) + 1);
     size_t token_len = 0;
 
-    while (*input) {
+    while (*input) 
+	{
         char c = *input;
 
-        if (state == NORMAL) {
-            if (ft_strchr(delimiter, c)) {
+        if (state == NORMAL) 
+		{
+            if (ft_strchr(delimiter, c)) 
+			{
                 if (token_len > 0) {
                     token[token_len] = '\0';
                     linked_list_append(tokens, token);
@@ -100,7 +104,8 @@ LinkedList *parse_tokens(const char *input, const char *delimiter) {
     return tokens;
 }
 
-LinkedList *build_command_structure(LinkedList *tokens, LinkedList *command_types) {
+LinkedList *build_command_structure(LinkedList *tokens, LinkedList *command_types) 
+{
     LinkedList *commands = linked_list_create();
     Command *current_command = NULL;
 
@@ -131,7 +136,7 @@ LinkedList *build_command_structure(LinkedList *tokens, LinkedList *command_type
                 current_command->input_file = (char *)current_node->value;
             }
         } else if (cmd_type == CMD_REDIRECT_OUT || cmd_type == CMD_REDIRECT_APPEND_OUT) {
-            current_node = current_node->next;
+             current_node = current_node->next;
             current_type_node = current_type_node->next;
             if (current_node != NULL) {
                 current_command->output_file = (char *)current_node->value;

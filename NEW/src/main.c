@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/08 12:46:29 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/08 14:30:41 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,9 @@ void handle_input(const char *input)
 		linked_list_append(command_types, (void *)(intptr_t)type);
 		current_node = current_node->next;
 	}
-	//linked_list_print(tokens);
+	linked_list_print(tokens);
 	LinkedList *commands = build_command_structure(tokens, command_types);
-	//print_commands(commands);
+	print_commands(commands);
 	execute_commands(commands);
 	
 	// Iterate through the tokens and execute appropriate actions
