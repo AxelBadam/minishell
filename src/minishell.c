@@ -6,110 +6,148 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/07 13:54:43 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/08 13:33:03 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+void	len_quotes(char *line, int *ctr, char d)
+{
+	ctr[0]++;
+	ctr[1]++;
+	while (line[ctr[0]] && line[ctr[0]] != d)
+	{
+		ctr[1]++;
+		ctr[0]++;
+	}
+	if (line[ctr[0]] == d)
+		ctr[1]++;
+}
+
+int	check_for_end_quote(char *line, char d)
+{
+	int ctr;
+
+	ctr = 0;
+	while (line[ctr])
+	{
+		ctr++;
+		if (line[ctr] == d)
+			return (1);
+	}
+	return (0);
+}
+
+
 int	len_ctr(char *line)
 {
-	int	ctr;
+	int	ctr[2];
 	int	len;
 
 	len = 0;
-	ctr = 0;
-	while (line[ctr] == ' ')
-		ctr++;
-	if (line[ctr] == '"')
-	{
-		ctr++;
-		len++;
-		while (line[ctr] && line[ctr] != '"')
-		{
-			len++;
-			ctr++;
-		}
-		if (line[ctr] == '"')
-			len += 1;
-	}
+	ctr[0] = 0;
+	ctr[1] = 0;
+	while (line[ctr[0]] == ' ')
+		ctr[0]++;
+	if (line[ctr[0]] == '"')
+		len_quotes(line, ctr, '"');
+	else if (line[ctr[0]] == '\'')
+		len_quotes(line, ctr, '\'');
 	else
 	{
-		while (line[ctr] && line[ctr] != ' ')
+		while (line[ctr[0]] && line[ctr[0]] != ' ')
 		{
-			ctr++;
-			len++;
-			if (line[ctr] == '"')
-				break ;
+			ctr[0]++;
+			ctr[1]++;
+			if (line[ctr[0]] == '"')
+			{
+				if (check_for_end_quote(&line[ctr[0]], '"'))
+					break ;
+			}
+			if (line[ctr[0]] == '\'')
+			{
+				if (check_for_end_quote(&line[ctr[0]], '\''))
+					break ;
+			}
 		}
 	}
-	printf("%i\n", len);
-	return (len);
+	printf("%i\n", ctr[1]);
+	return (ctr[1]);
+}
+
+void	count_quotes(char *line, int *ctr, char d)
+{
+	if (ctr[0] > 1)
+	{
+		if (line[ctr[0] - 2] != ' ' && line[ctr[0] - 2] != d)
+			ctr[1]++;
+	}
+	while (line[ctr[0]] && line[ctr[0]] != d)
+	{
+		ctr[0]++;
+		if (!line[ctr[0]] || line[ctr[0]] == d)
+			ctr[1]++;
+	}
 }
 
 int	count_words(char *line)
 {
-	int	ctr;
-	int	word;
-	ctr = 0;
-	word = 0;
-	while (line[ctr])
+	int	ctr[2];
+	ctr[0] = 0;
+	ctr[1] = 0;
+	while (line[ctr[0]])
 	{
-		while (line[ctr] == ' ')
-			ctr++;
-		while (line[ctr] && line[ctr] != ' ')
+		while (line[ctr[0]] == ' ')
+			ctr[0]++;
+		while (line[ctr[0]] && line[ctr[0]] != ' ')
 		{
-			ctr++;
-			if (line[ctr - 1] == '"')
+			ctr[0]++;
+			if (line[ctr[0] - 1] == '"')
 			{
-				if (ctr > 1)
-				{
-					if (line[ctr - 2] != ' ' && line[ctr - 2] != '"')
-						word++;
-				}
-				while (line[ctr] && line[ctr] != '"')
-				{
-					ctr++;
-					if (!line[ctr] || line[ctr] == '"')
-						word++;
-				}
-				if (!line[++ctr])
+				count_quotes(line, ctr, '"');
+				if (!line[++ctr[0]])
 					break ;
 			}
-			if (line[ctr] == ' ' || !line[ctr])
+			else if (line[ctr[0] - 1] == '\'')
 			{
-				if (line[ctr - 1] != '"')
-					word++;
+				count_quotes(line, ctr, '\'');
+				if (!line[++ctr[0]])
+					break ;
+			}
+			if (line[ctr[0]] == ' ' || !line[ctr[0]])
+			{
+				if (line[ctr[0] - 1] != '"' && line[ctr[0] - 1] != '\'')
+					ctr[1]++;
 			}
 		}
 	}
-	return (word);
+	return (ctr[1]);
 }
 
 char	**make_array(char *line)
 {
 	int		words;
-	int		tmp;
+	int		tmp[2];
 	int		ctr;
-	int		len;
 	char	**array;
 
 	ctr = 0;
-	tmp = 0;
-	len = 0;
+	tmp[0] = 0;
+	tmp[1] = 0;
 	words = count_words(line);
 	array = (char **)malloc(sizeof(char *) * (words + 1));
 	if (!array)
 		return (NULL);
 	while (words > 0)
 	{
-		len = len_ctr(&line[tmp]);
-		tmp += len;
-		array[ctr] = (char *)malloc(sizeof(char) * (len + 1));
+		tmp[1] = len_ctr(&line[tmp[0]]);
+		tmp[0] += tmp[1];
+		array[ctr] = (char *)malloc(sizeof(char) * (tmp[1] + 1));
 		if (!array[ctr])
 			return (NULL);
-		while (line[tmp] == ' ')
-			tmp++;
+		while (line[tmp[0]] == ' ')
+			tmp[0]++;
 		ctr++;
 		words--;
 	}
@@ -118,40 +156,34 @@ char	**make_array(char *line)
 
 void	fill_array(char *line, char **array)
 {
-	int	row;
-	int	clm;
+	int	index[2];
 	int	words;
 	int	len;
-	int	tmp;
-	int	tmp2;
+	int	tmp[2];
 
-	tmp = 0;
+	tmp[0] = 0;
+	tmp[1] = 0;
+	index[0] = 0;
+	index[1] = 0;
 	len = 0;
-	clm = 0;
 	words = count_words(line);
-	row = 0;
-	while (words > row)
+	while (words > index[0])
 	{
-		len = len_ctr(&line[tmp]);
-		tmp2 = tmp;
-		tmp += len;
-		while (line[tmp2] == ' ')
-		{
-			tmp2++;
-			printf("yeah\n");
-		}
+		len = len_ctr(&line[tmp[0]]);
+		tmp[1] = tmp[0];
+		tmp[0] += len;
 		while (len > 0)
 		{
-			array[row][clm++] = line[tmp2++];
+			array[index[0]][index[1]++] = line[tmp[1]++];
 			len--;
 		}
-		array[row][clm] = 0;
-		clm = 0;
-		while (line[tmp] == ' ')
-			tmp++;
-		row++;
+		array[index[0]][index[1]] = 0;
+		index[1] = 0;
+		while (line[tmp[0]] == ' ')
+			tmp[0]++;
+		index[0]++;
 	}
-	array[row] = 0;
+	array[index[0]] = 0;
 }
 
 char	**split_command(char *line)
