@@ -6,94 +6,32 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/08 15:17:04 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/08 17:43:36 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	len_quotes(char *line, int *ctr, char d)
+void	iterate_quotes(char *line, int *ctr, char d, int count)
 {
-	ctr[0]++;
-	ctr[1]++;
-	while (line[ctr[0]] && line[ctr[0]] != d)
+	if (ft_strchr(&line[ctr[0]], d))
 	{
-		ctr[1]++;
+		while (line[ctr[0]] != d)
+		{
+			ctr[0]++;
+			if (count)
+				ctr[1]++;
+		}
 		ctr[0]++;
+		if (count)
+			ctr[1]++;
 	}
-	if (line[ctr[0]] == d)
-		ctr[1]++;
 }
-
-int	check_for_end_quote(char *line, char d)
-{
-	int ctr;
-
-	ctr = 0;
-	while (line[ctr])
-	{
-		ctr++;
-		if (line[ctr] == d)
-			return (1);
-	}
-	return (0);
-}
-
 
 int	len_ctr(char *line)
 {
 	int	ctr[2];
-	int	len;
 
-	len = 0;
-	ctr[0] = 0;
-	ctr[1] = 0;
-	while (line[ctr[0]] == ' ')
-		ctr[0]++;
-	if (line[ctr[0]] == '"')
-		len_quotes(line, ctr, '"');
-	else if (line[ctr[0]] == '\'')
-		len_quotes(line, ctr, '\'');
-	else
-	{
-		while (line[ctr[0]] && line[ctr[0]] != ' ')
-		{
-			ctr[0]++;
-			ctr[1]++;
-			if (line[ctr[0]] == '"')
-			{
-				if (check_for_end_quote(&line[ctr[0]], '"'))
-					break ;
-			}
-			if (line[ctr[0]] == '\'')
-			{
-				if (check_for_end_quote(&line[ctr[0]], '\''))
-					break ;
-			}
-		}
-	}
-	printf("%i\n", ctr[1]);
-	return (ctr[1]);
-}
-
-void	count_quotes(char *line, int *ctr, char d)
-{
-	if (ctr[0] > 1)
-	{
-		if (line[ctr[0] - 2] != ' ' && line[ctr[0] - 2] != d)
-			ctr[1]++;
-	}
-	while (line[ctr[0]] && line[ctr[0]] != d)
-	{
-		ctr[0]++;
-		if (!line[ctr[0]] || line[ctr[0]] == d)
-			ctr[1]++;
-	}
-}
-
-/*int	count_words(char *line)
-{
-	int	ctr[2];
 	ctr[0] = 0;
 	ctr[1] = 0;
 	while (line[ctr[0]])
@@ -103,27 +41,18 @@ void	count_quotes(char *line, int *ctr, char d)
 		while (line[ctr[0]] && line[ctr[0]] != ' ')
 		{
 			ctr[0]++;
+			ctr[1]++;
 			if (line[ctr[0] - 1] == '"')
-			{
-				count_quotes(line, ctr, '"');
-				if (!line[++ctr[0]])
-					break ;
-			}
-			else if (line[ctr[0] - 1] == '\'')
-			{
-				count_quotes(line, ctr, '\'');
-				if (!line[++ctr[0]])
-					break ;
-			}
+				iterate_quotes(line, ctr, '"' , 1);
+			if (line[ctr[0] - 1] == '\'')
+				iterate_quotes(line, ctr, '\'', 1);
 			if (line[ctr[0]] == ' ' || !line[ctr[0]])
-			{
-				if (line[ctr[0] - 1] != '"' && line[ctr[0] - 1] != '\'')
-					ctr[1]++;
-			}
+				return (ctr[1]);
 		}
 	}
 	return (ctr[1]);
-}*/
+}
+
 
 int	count_words(char *line)
 {
@@ -135,24 +64,17 @@ int	count_words(char *line)
 	ctr[1] = 0;
 	while (line[ctr[0]])
 	{
-		if (!check)
-			while (line[ctr[0]] == ' ')
-				ctr[0]++;
+		while (line[ctr[0]] == ' ')
+			ctr[0]++;
 		while (line[ctr[0]] && line[ctr[0]] != ' ')
 		{
 			ctr[0]++;
-			if (line[ctr[0] - 1] == '"' || line[ctr[0] - 1] == '\'')
-			{
-				if (check)
-					check = 0;
-				if (ft_strchr(&line[ctr[0] + 1], '"') || ft_strchr(&line[ctr[0] + 1], '\''))
-					check = 1;
-			}
-			if (!check)
-			{
-				if (line[ctr[0]] == ' ' || !line[ctr[0]])
-					ctr[1]++;
-			}
+			if (line[ctr[0] - 1] == '"')
+				iterate_quotes(line, ctr, '"' , 0);
+			if (line[ctr[0] - 1] == '\'')
+				iterate_quotes(line, ctr, '\'', 0);
+			if (line[ctr[0]] == ' ' || !line[ctr[0]])
+				ctr[1]++;
 		}
 	}
 	return (ctr[1]);
@@ -205,11 +127,8 @@ void	fill_array(char *line, char **array)
 		len = len_ctr(&line[tmp[0]]);
 		tmp[1] = tmp[0];
 		tmp[0] += len;
-		while (len > 0)
-		{
+		while (--len > -1)
 			array[index[0]][index[1]++] = line[tmp[1]++];
-			len--;
-		}
 		array[index[0]][index[1]] = 0;
 		index[1] = 0;
 		while (line[tmp[0]] == ' ')
@@ -221,33 +140,48 @@ void	fill_array(char *line, char **array)
 
 char	**split_command(char *line)
 {
-	//char	**array;
+	char	**array;
 
-	/*array = make_array(line);
+	array = make_array(line);
 	fill_array(line, array);
 	while (*array)
-		printf("%s\n", *array++);*/
-	printf("%i\n", count_words(line));
+		printf("%s\n", *array++);
+	//printf("%i\n", len_ctr(line));
 	return (NULL);
 }
 
-/*void	separate_operators(t_command *head, char **s_line)
+void	expand(char **array, char **env)
 {
-	int	ctr;
+	int		ctr[2];
+	int		len[2];
+	char	*ptr;
 
-	ctr = 0;
-	while (s_line[ctr])
+	len[0] = 0;
+	len[1] = 0;
+	ctr[0] = 0;
+	ctr[1] = 0;
+	while (array[ctr[0]])
 	{
-		
+		while (array[ctr[0]][ctr[1]])
+		{
+			if (array[ctr[0]][ctr[1]] == '$')
+			{
+				while (array[ctr[0]][ctr[1]] && array[ctr[0]][ctr[1]] != ' ')
+				
+			}
+		}
 	}
-}*/
-
-void	parse_command(char *line)
-{
-	split_command(line);
 }
 
-void	minishell(t_resrc *resrc)
+void	parse_command(char *line, char **env)
+{
+	char	*array;
+
+	array = split_command(line);
+	expand(array, env);
+}
+
+void	minishell(t_resrc *resrc, char **env)
 {
 	//t_command *head;
 
@@ -256,7 +190,7 @@ void	minishell(t_resrc *resrc)
 	while (resrc->line)
 	{
 		add_history(resrc->line);
-		parse_command(resrc->line);
+		parse_command(resrc->line, env);
 		free(resrc->line);
 		resrc->line = readline("minishell: ");
 	}
@@ -294,10 +228,15 @@ void	ft_lstadd_back(t_command **head, t_command *new)
 	new->next = NULL;
 }
 
-int	main()
+int	main(int argc, char **argv, char **env)
 {
 	t_resrc	*resrc;
 
+	argc = 0;
+	(void)argv;
+	(void)env;
+	/*while (*env)
+		printf("%s\n", *env++);*/
 	resrc = init_resources();
 	minishell(resrc);
 	return (0);
