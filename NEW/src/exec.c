@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/05 15:36:40 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/08 15:23:25 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/08 17:01:59 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,9 @@ int execute_builtin_cd(Command *cmd) {
     }*/
 
     // Change the working directory
+	
     const char *path = cmd->args->head->next->value;
+		
     if (chdir(path) == -1) 
 	{
         perror("cd");
@@ -31,19 +33,28 @@ int execute_builtin_cd(Command *cmd) {
     return 0;
 }
 
-int execute_builtin_echo(Command *cmd) {
+int execute_builtin_echo(Command *cmd) 
+{
     
 	LinkedListNode *arg_node = cmd->args->head;
-
-    // Iterate through the command arguments and print them
-    while (arg_node->next != NULL) 
+	int newline;
+	newline = 1;
+	
+	if (ft_strncmp(arg_node->next->value, "-n", 2) == 0)
 	{
-        ft_putstr_fd(arg_node->next->value, cmd->output_fd);
-            if (arg_node->next != NULL) 
-				write(cmd->output_fd, " ", 1);        
-			arg_node = arg_node->next;
+		arg_node = arg_node->next;
+		newline = 0;
 	}
-    	return 0;
+    while (arg_node->value != NULL) 
+	{
+        ft_putstr_fd(arg_node->next->value, cmd->output_fd);        
+		arg_node = arg_node->next;
+		if (arg_node->next)
+			write(cmd->output_fd, " ", 1);
+		else if (newline)
+            ft_putstr_fd("\n", cmd->output_fd);
+	}
+    return 0;
 }
 
 int execute_builtin_pwd(Command *cmd) {
