@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/08 17:43:36 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/09 16:08:41 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,16 +138,70 @@ void	fill_array(char *line, char **array)
 	array[index[0]] = 0;
 }
 
-char	**split_command(char *line)
+char	*get_env(char *d_string, char **env, int l)
 {
-	char	**array;
+	int		ctr[3];
+	int		len;
+	char	*str;
 
-	array = make_array(line);
-	fill_array(line, array);
-	while (*array)
-		printf("%s\n", *array++);
-	//printf("%i\n", len_ctr(line));
-	return (NULL);
+	ctr[0] = 0;
+	ctr[1] = 0;
+	ctr[2] = 0;
+	len = 0;
+	str = NULL;
+	while (env[ctr[0]] && ft_strncmp(&d_string[1], env[ctr[0]], l - 1) != 0)
+		ctr[0]++;
+	if (env[ctr[0]])
+	{
+		while (env[ctr[0]][ctr[1]] != '=')
+			ctr[1]++;
+		ctr[1]++;
+		len = ft_strlen(&env[ctr[0]][ctr[1]]);
+		str = (char *)malloc(sizeof(char) * (len + 1));
+		if (!str)
+			return (NULL);
+		while (env[ctr[0]][ctr[1]])
+			str[ctr[2]++] = env[ctr[0]][ctr[1]++];
+		str[ctr[2]] = 0;
+		printf("(%s)\n", str);
+	}
+	return (str);
+}
+
+void	add_expansion(char **array, char *dst, char *src, int rm_len)
+{
+	int		ctr[4];
+	int		s_len;
+	char	*new_str;
+
+	ctr[0] = 0;
+	ctr[1] = 0;
+	ctr[2] = 0;
+	ctr[3] = 0;
+	s_len = ft_strlen(dst) + ft_strlen(src) - rm_len;
+	while (array[ctr[0]] && array[ctr[0]] != dst)
+		ctr[0]++;
+	new_str = (char *)malloc(sizeof(char) * (s_len + 1));
+	while (dst[ctr[1]])
+	{
+		if (!ctr[3])
+		{
+			if (dst[ctr[1]] == '$')
+			{
+				while (src[ctr[3]])
+					new_str[ctr[2]++] = src[ctr[3]++];
+				while (rm_len > 0)
+				{
+					ctr[1]++;
+					rm_len--;
+				}
+			}
+		}
+		if (dst[ctr[1]])
+			new_str[ctr[2]++] = dst[ctr[1]++];
+	}
+	new_str[ctr[2]] = 0;
+	printf("%s\n", new_str);
 }
 
 void	expand(char **array, char **env)
@@ -155,6 +209,7 @@ void	expand(char **array, char **env)
 	int		ctr[2];
 	int		len[2];
 	char	*ptr;
+	char	*e;
 
 	len[0] = 0;
 	len[1] = 0;
@@ -162,20 +217,46 @@ void	expand(char **array, char **env)
 	ctr[1] = 0;
 	while (array[ctr[0]])
 	{
+		len[1] = ft_strlen(array[ctr[0]]);
 		while (array[ctr[0]][ctr[1]])
 		{
-			if (array[ctr[0]][ctr[1]] == '$')
+			ctr[1]++;
+			if (array[ctr[0]][ctr[1] - 1] == '$')
 			{
-				while (array[ctr[0]][ctr[1]] && array[ctr[0]][ctr[1]] != ' ')
-				
+				len[0]++;
+				while (array[ctr[0]][ctr[1]] && array[ctr[0]][ctr[1]] != ' ' && array[ctr[0]][ctr[1]] != '$')
+				{
+					ctr[1]++;
+					len[0]++;
+				}
+				ptr = ft_substr(array[ctr[0]], ctr[1] - len[0], len[0]);
+				printf("%s\n", ptr);
+				len[1] -= len[0];
+				e = get_env(ptr, env, len[0]);
+				//add_expansion(array, array[ctr[0]], e, len[0]);
 			}
+			len[0] = 0;
 		}
+		ctr[1] = 0;
+		ctr[0]++;
 	}
+}
+
+char	**split_command(char *line)
+{
+	char	**array;
+
+	array = make_array(line);
+	fill_array(line, array);
+	/*while (*array)
+		printf("%s\n", *array++);*/
+	//printf("%i\n", len_ctr(line));
+	return (array);
 }
 
 void	parse_command(char *line, char **env)
 {
-	char	*array;
+	char	**array;
 
 	array = split_command(line);
 	expand(array, env);
@@ -186,14 +267,16 @@ void	minishell(t_resrc *resrc, char **env)
 	//t_command *head;
 
 	//head = NULL;
-	resrc->line = readline("minishell: ");
+	(void)resrc;
+	parse_command("\"asd $PWD\"", env);
+	/*resrc->line = readline("minishell: ");
 	while (resrc->line)
 	{
 		add_history(resrc->line);
 		parse_command(resrc->line, env);
 		free(resrc->line);
 		resrc->line = readline("minishell: ");
-	}
+	}*/
 }
 
 void	*init_resources(void)
@@ -234,11 +317,10 @@ int	main(int argc, char **argv, char **env)
 
 	argc = 0;
 	(void)argv;
-	(void)env;
 	/*while (*env)
 		printf("%s\n", *env++);*/
 	resrc = init_resources();
-	minishell(resrc);
+	minishell(resrc, env);
 	return (0);
 }
 

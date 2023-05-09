@@ -3,7 +3,7 @@ SRC = minishell.c
 LIBFT = libft
 OBJECT = $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I. -I/Users/ekoljone/.brew/opt/readline/include
+CFLAGS = -Wall -Wextra -Werror -I. -g -I/Users/ekoljone/.brew/opt/readline/include
 #CFLAGS = -Wall -Wextra -Werror -I. -I/opt/homebrew/opt/readline/include
 RM = rm -f
 OBJDIR = obj
