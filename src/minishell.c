@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/09 16:08:41 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/09 18:25:53 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,6 @@ char	*get_env(char *d_string, char **env, int l)
 		while (env[ctr[0]][ctr[1]])
 			str[ctr[2]++] = env[ctr[0]][ctr[1]++];
 		str[ctr[2]] = 0;
-		printf("(%s)\n", str);
 	}
 	return (str);
 }
@@ -173,12 +172,17 @@ void	add_expansion(char **array, char *dst, char *src, int rm_len)
 	int		ctr[4];
 	int		s_len;
 	char	*new_str;
+	int		src_len;
 
 	ctr[0] = 0;
 	ctr[1] = 0;
 	ctr[2] = 0;
 	ctr[3] = 0;
-	s_len = ft_strlen(dst) + ft_strlen(src) - rm_len;
+	if (!src)
+		src_len = 0;
+	else
+		src_len = ft_strlen(src);
+	s_len = (ft_strlen(dst) - rm_len + src_len);
 	while (array[ctr[0]] && array[ctr[0]] != dst)
 		ctr[0]++;
 	new_str = (char *)malloc(sizeof(char) * (s_len + 1));
@@ -188,8 +192,9 @@ void	add_expansion(char **array, char *dst, char *src, int rm_len)
 		{
 			if (dst[ctr[1]] == '$')
 			{
-				while (src[ctr[3]])
-					new_str[ctr[2]++] = src[ctr[3]++];
+				if (src)
+					while (src[ctr[3]])
+						new_str[ctr[2]++] = src[ctr[3]++];
 				while (rm_len > 0)
 				{
 					ctr[1]++;
@@ -201,7 +206,9 @@ void	add_expansion(char **array, char *dst, char *src, int rm_len)
 			new_str[ctr[2]++] = dst[ctr[1]++];
 	}
 	new_str[ctr[2]] = 0;
-	printf("%s\n", new_str);
+	free (array[ctr[0]]);
+	array[ctr[0]] = new_str;
+	printf("%s\n", array[ctr[0]]);
 }
 
 void	expand(char **array, char **env)
@@ -230,11 +237,14 @@ void	expand(char **array, char **env)
 					len[0]++;
 				}
 				ptr = ft_substr(array[ctr[0]], ctr[1] - len[0], len[0]);
-				printf("%s\n", ptr);
 				len[1] -= len[0];
 				e = get_env(ptr, env, len[0]);
-				//add_expansion(array, array[ctr[0]], e, len[0]);
+				add_expansion(array, array[ctr[0]], e, len[0]);
+				ctr[1] = 0;
+				free(e);
 			}
+			if (array[ctr[0]][ctr[1]] == '\'')
+				iterate_quotes(array[ctr[0]], &ctr[1], '\'', 0);
 			len[0] = 0;
 		}
 		ctr[1] = 0;
@@ -268,7 +278,7 @@ void	minishell(t_resrc *resrc, char **env)
 
 	//head = NULL;
 	(void)resrc;
-	parse_command("\"asd $PWD\"", env);
+	parse_command("\"asd $PWD $ASD \"", env);
 	/*resrc->line = readline("minishell: ");
 	while (resrc->line)
 	{
