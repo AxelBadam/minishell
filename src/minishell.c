@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/09 18:25:53 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/10 14:34:41 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,7 +243,7 @@ void	expand(char **array, char **env)
 				ctr[1] = 0;
 				free(e);
 			}
-			if (array[ctr[0]][ctr[1]] == '\'')
+			if (array[ctr[0]][ctr[1] - 1] == '\'')
 				iterate_quotes(array[ctr[0]], &ctr[1], '\'', 0);
 			len[0] = 0;
 		}
@@ -278,7 +278,7 @@ void	minishell(t_resrc *resrc, char **env)
 
 	//head = NULL;
 	(void)resrc;
-	parse_command("\"asd $PWD $ASD \"", env);
+	parse_command("$P", env);
 	/*resrc->line = readline("minishell: ");
 	while (resrc->line)
 	{
@@ -321,16 +321,53 @@ void	ft_lstadd_back(t_command **head, t_command *new)
 	new->next = NULL;
 }
 
+char	**create_env(char **env)
+{
+	int		ctr[2];
+	char	**envp;
+	int		lvl;
+
+	ctr[0] = 0;
+	ctr[1] = 0;
+	while (env[ctr[0]])
+		ctr[0]++;
+	envp = (char **)malloc(sizeof(char *) * (ctr[0] + 1));
+	if (!envp)
+		return (NULL);
+	ctr[0] = 0;
+	while (env[ctr[0]])
+	{
+		if (ft_strncmp("SHLVL", env[ctr[0]], 5) == 0)
+		{
+			while (env[ctr[0]][ctr[1]] != '=')
+				ctr[1]++;
+			ctr[1]++;
+			lvl = ft_atoi(&env[ctr[0]][ctr[1]]);
+			lvl++;
+			printf("%i\n", lvl);
+			env[ctr[0]] = ft_strjoin(env[0], ft_itoa(lvl));
+			printf("lolol %s\n", env[ctr[0]]);
+		}
+		envp[ctr[0]] = ft_strdup(env[ctr[0]]);
+		ctr[0]++;
+	}
+	envp[ctr[0]] = 0;
+	while (*envp)
+		printf("%s\n", *envp++);
+	return (envp);
+}
+
 int	main(int argc, char **argv, char **env)
 {
-	t_resrc	*resrc;
+	//t_resrc	*resrc;
 
 	argc = 0;
 	(void)argv;
 	/*while (*env)
 		printf("%s\n", *env++);*/
-	resrc = init_resources();
-	minishell(resrc, env);
+	create_env(env);
+	//resrc = init_resources();
+	//minishell(resrc, env);
 	return (0);
 }
 
