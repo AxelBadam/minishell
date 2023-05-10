@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/08 16:21:22 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/10 15:25:37 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ void handle_input(const char *input)
     LinkedList *tokens = parse_tokens(input, " \t\n");
 	LinkedListNode *current_node = tokens->head;
 	LinkedList *command_types = linked_list_create();
+	int command_count;
 	
     while (current_node != NULL) 
 	{
@@ -56,37 +57,33 @@ void handle_input(const char *input)
 	//linked_list_print(tokens);
 	LinkedList *commands = build_command_structure(tokens, command_types);
 	//print_commands(commands);
-	execute_commands(commands);
+	command_count = linked_list_count(commands);
+	execute_commands(commands, command_count);
 	
 	// Iterate through the tokens and execute appropriate actions
     // based on the type of token (command, argument, I/O redirection, pipeline, etc.)
     linked_list_free(tokens);
 }
 
-int main() {
+int main() 
+{
     char *input;
     char *prompt = "minishell> ";
 
-    // Main loop
-    while (1) {
-        // Display prompt and read user input
+    while (1) 
+	{
         input = readline(prompt);
-
-        // Check if input is NULL (EOF was encountered)
-        if (!input) {
+        if (!input) 
+		{
             printf("\n");
             break;
         }
-
-        // Handle the input
-        if (input[0] != '\0') {
-            add_history(input); // Add input to history
-            handle_input(input); // Process the input (parse and execute commands)
+        if (input[0] != '\0') 
+		{
+            add_history(input);
+            handle_input(input);
         }
-
-        // Free the input memory
         free(input);
     }
-
     return 0;
 }

@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/05 15:36:16 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/10 15:27:37 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,5 @@ typedef struct s_command
 */
 void handle_input(const char *input);
 CommandType identify_command_type(const char *token);
-void execute_commands(LinkedList *commands);
+void execute_commands(LinkedList *commands, int command_count);
 #endif
