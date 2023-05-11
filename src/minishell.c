@@ -6,13 +6,13 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/10 14:34:41 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/11 14:34:47 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	iterate_quotes(char *line, int *ctr, char d, int count)
+int	iterate_quotes(char *line, int *ctr, char d, int count)
 {
 	if (ft_strchr(&line[ctr[0]], d))
 	{
@@ -25,7 +25,10 @@ void	iterate_quotes(char *line, int *ctr, char d, int count)
 		ctr[0]++;
 		if (count)
 			ctr[1]++;
+		return (1);
 	}
+	ft_putstr_fd("\033[0;31mERROR: Unclosed quotes\n\033[0m", 2);
+	return (0);
 }
 
 int	len_ctr(char *line)
@@ -57,9 +60,7 @@ int	len_ctr(char *line)
 int	count_words(char *line)
 {
 	int	ctr[2];
-	int	check;
 
-	check = 0;
 	ctr[0] = 0;
 	ctr[1] = 0;
 	while (line[ctr[0]])
@@ -70,9 +71,11 @@ int	count_words(char *line)
 		{
 			ctr[0]++;
 			if (line[ctr[0] - 1] == '"')
-				iterate_quotes(line, ctr, '"' , 0);
+				if (!iterate_quotes(line, ctr, '"' , 0))
+					return (0);
 			if (line[ctr[0] - 1] == '\'')
-				iterate_quotes(line, ctr, '\'', 0);
+				if (!iterate_quotes(line, ctr, '\'', 0))
+					return (0);
 			if (line[ctr[0]] == ' ' || !line[ctr[0]])
 				ctr[1]++;
 		}
@@ -91,6 +94,8 @@ char	**make_array(char *line)
 	tmp[0] = 0;
 	tmp[1] = 0;
 	words = count_words(line);
+	if (!words)
+		return (NULL);
 	array = (char **)malloc(sizeof(char *) * (words + 1));
 	if (!array)
 		return (NULL);
@@ -190,7 +195,7 @@ void	add_expansion(char **array, char *dst, char *src, int rm_len)
 	{
 		if (!ctr[3])
 		{
-			if (dst[ctr[1]] == '$')
+			if (dst[ctr[1]] == '$' || (dst[ctr[1]] == '~' && (array[ctr[0]][ctr[1] + 1] == '/' || !array[ctr[0]][ctr[1]] + 1)))
 			{
 				if (src)
 					while (src[ctr[3]])
@@ -208,56 +213,63 @@ void	add_expansion(char **array, char *dst, char *src, int rm_len)
 	new_str[ctr[2]] = 0;
 	free (array[ctr[0]]);
 	array[ctr[0]] = new_str;
-	printf("%s\n", array[ctr[0]]);
 }
 
 void	expand(char **array, char **env)
 {
 	int		ctr[2];
-	int		len[2];
+	int		len;
 	char	*ptr;
 	char	*e;
 
-	len[0] = 0;
-	len[1] = 0;
+	len = 0;
 	ctr[0] = 0;
 	ctr[1] = 0;
+	(void)env;
 	while (array[ctr[0]])
 	{
-		len[1] = ft_strlen(array[ctr[0]]);
 		while (array[ctr[0]][ctr[1]])
 		{
 			ctr[1]++;
 			if (array[ctr[0]][ctr[1] - 1] == '$')
 			{
-				len[0]++;
-				while (array[ctr[0]][ctr[1]] && array[ctr[0]][ctr[1]] != ' ' && array[ctr[0]][ctr[1]] != '$')
+				len++;
+				while (array[ctr[0]][ctr[1]] && array[ctr[0]][ctr[1]] != ' ' && array[ctr[0]][ctr[1]] != '$'
+					&& array[ctr[0]][ctr[1]] != '\'' && array[ctr[0]][ctr[1]] != '"')
 				{
 					ctr[1]++;
-					len[0]++;
+					len++;
 				}
-				ptr = ft_substr(array[ctr[0]], ctr[1] - len[0], len[0]);
-				len[1] -= len[0];
-				e = get_env(ptr, env, len[0]);
-				add_expansion(array, array[ctr[0]], e, len[0]);
+				ptr = ft_substr(array[ctr[0]], ctr[1] - len, len);
+				//e = get_env(ptr, env, len[0]);
+				e = getenv(ptr + 1);
+				add_expansion(array, array[ctr[0]], e, len);
 				ctr[1] = 0;
-				free(e);
+				if (ptr)
+					free(ptr);
 			}
+			if (array[ctr[0]][ctr[1] - 1] == '~' && (array[ctr[0]][ctr[1]] == '/' || !array[ctr[0]][ctr[1]]))
+				add_expansion(array, array[ctr[0]], getenv("HOME"), 1);
 			if (array[ctr[0]][ctr[1] - 1] == '\'')
 				iterate_quotes(array[ctr[0]], &ctr[1], '\'', 0);
-			len[0] = 0;
+			if (array[ctr[0]][ctr[1] - 1] == '"')
+				iterate_quotes(array[ctr[0]], &ctr[1], '"', 0);	
+			len = 0;
 		}
 		ctr[1] = 0;
 		ctr[0]++;
 	}
 }
 
-char	**split_command(char *line)
+char	**split_command(char *line, char **env)
 {
 	char	**array;
 
 	array = make_array(line);
+	if (!array)
+		return (NULL);
 	fill_array(line, array);
+	expand(array, env);
 	/*while (*array)
 		printf("%s\n", *array++);*/
 	//printf("%i\n", len_ctr(line));
@@ -268,8 +280,12 @@ void	parse_command(char *line, char **env)
 {
 	char	**array;
 
-	array = split_command(line);
-	expand(array, env);
+	array = split_command(line, env);
+	if (array)
+	{
+		while (*array)
+			printf("%s\n", *array++);
+	}
 }
 
 void	minishell(t_resrc *resrc, char **env)
@@ -277,16 +293,14 @@ void	minishell(t_resrc *resrc, char **env)
 	//t_command *head;
 
 	//head = NULL;
-	(void)resrc;
-	parse_command("$P", env);
-	/*resrc->line = readline("minishell: ");
+	resrc->line = readline("minishell: ");
 	while (resrc->line)
 	{
 		add_history(resrc->line);
 		parse_command(resrc->line, env);
 		free(resrc->line);
 		resrc->line = readline("minishell: ");
-	}*/
+	}
 }
 
 void	*init_resources(void)
@@ -325,7 +339,7 @@ char	**create_env(char **env)
 {
 	int		ctr[2];
 	char	**envp;
-	int		lvl;
+	//int		lvl;
 
 	ctr[0] = 0;
 	ctr[1] = 0;
@@ -337,37 +351,32 @@ char	**create_env(char **env)
 	ctr[0] = 0;
 	while (env[ctr[0]])
 	{
-		if (ft_strncmp("SHLVL", env[ctr[0]], 5) == 0)
+		/*if (ft_strncmp("SHLVL", env[ctr[0]], 5) == 0)
 		{
 			while (env[ctr[0]][ctr[1]] != '=')
 				ctr[1]++;
 			ctr[1]++;
 			lvl = ft_atoi(&env[ctr[0]][ctr[1]]);
 			lvl++;
-			printf("%i\n", lvl);
-			env[ctr[0]] = ft_strjoin(env[0], ft_itoa(lvl));
-			printf("lolol %s\n", env[ctr[0]]);
-		}
+		}*/
 		envp[ctr[0]] = ft_strdup(env[ctr[0]]);
 		ctr[0]++;
 	}
 	envp[ctr[0]] = 0;
-	while (*envp)
-		printf("%s\n", *envp++);
 	return (envp);
 }
 
 int	main(int argc, char **argv, char **env)
 {
-	//t_resrc	*resrc;
+	t_resrc	*resrc;
 
-	argc = 0;
+	(void)argc;
 	(void)argv;
 	/*while (*env)
 		printf("%s\n", *env++);*/
 	create_env(env);
-	//resrc = init_resources();
-	//minishell(resrc, env);
+	resrc = init_resources();
+	minishell(resrc, env);
 	return (0);
 }
 
