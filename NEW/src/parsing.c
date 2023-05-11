@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 14:23:41 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/08 14:42:55 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/11 16:02:58 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,8 @@ LinkedList *build_command_structure(LinkedList *tokens, LinkedList *command_type
             } else {
                 linked_list_append(current_command->args, token);
             }
-        } else if (cmd_type == CMD_PIPE) {
+        } else if (cmd_type == CMD_PIPE) 
+		{
             current_command = NULL;
         } else if (cmd_type == CMD_REDIRECT_IN) {
             current_node = current_node->next;
