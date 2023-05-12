@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/04 17:15:56 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/12 13:22:42 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ typedef struct s_resrc
 	char	**s_line;
 	char	*buf;
 	char	*history;
+	char	**envp;
 }			t_resrc;
 
 typedef struct s_command

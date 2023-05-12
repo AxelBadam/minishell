@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/11 14:34:47 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/12 13:39:33 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,19 +143,39 @@ void	fill_array(char *line, char **array)
 	array[index[0]] = 0;
 }
 
-char	*get_env(char *d_string, char **env, int l)
+void	iterate_env(char **env, char *d_string, int *ctr)
+{
+	char	*str;
+
+	ctr[1] = 0;
+	while (env[ctr[0]])
+	{
+		while (env[ctr[0]][ctr[1]] != '=')
+			ctr[1]++;
+		str = ft_substr(env[ctr[0]], 0, ctr[1]);
+		if (ft_strncmp(str, d_string, ctr[1]) == 0)
+		{
+			free(str);
+			break ;
+		}
+		free(str);
+		ctr[0]++;
+		ctr[1] = 0;
+	}
+}
+
+char	*get_env(char *d_string, char **env)
 {
 	int		ctr[3];
 	int		len;
 	char	*str;
 
 	ctr[0] = 0;
-	ctr[1] = 0;
 	ctr[2] = 0;
 	len = 0;
 	str = NULL;
-	while (env[ctr[0]] && ft_strncmp(&d_string[1], env[ctr[0]], l - 1) != 0)
-		ctr[0]++;
+	iterate_env(env, d_string, ctr);
+	ctr[1] = 0;
 	if (env[ctr[0]])
 	{
 		while (env[ctr[0]][ctr[1]] != '=')
@@ -195,7 +215,7 @@ void	add_expansion(char **array, char *dst, char *src, int rm_len)
 	{
 		if (!ctr[3])
 		{
-			if (dst[ctr[1]] == '$' || (dst[ctr[1]] == '~' && (array[ctr[0]][ctr[1] + 1] == '/' || !array[ctr[0]][ctr[1]] + 1)))
+			if (dst[ctr[1]] == '$' || (dst[ctr[1]] == '~' && (array[ctr[0]][ctr[1] + 1] == '/' || !array[ctr[0]][ctr[1] + 1])))
 			{
 				if (src)
 					while (src[ctr[3]])
@@ -211,7 +231,8 @@ void	add_expansion(char **array, char *dst, char *src, int rm_len)
 			new_str[ctr[2]++] = dst[ctr[1]++];
 	}
 	new_str[ctr[2]] = 0;
-	free (array[ctr[0]]);
+	free(array[ctr[0]]);
+	free(src);
 	array[ctr[0]] = new_str;
 }
 
@@ -220,7 +241,6 @@ void	expand(char **array, char **env)
 	int		ctr[2];
 	int		len;
 	char	*ptr;
-	char	*e;
 
 	len = 0;
 	ctr[0] = 0;
@@ -234,26 +254,21 @@ void	expand(char **array, char **env)
 			if (array[ctr[0]][ctr[1] - 1] == '$')
 			{
 				len++;
-				while (array[ctr[0]][ctr[1]] && array[ctr[0]][ctr[1]] != ' ' && array[ctr[0]][ctr[1]] != '$'
-					&& array[ctr[0]][ctr[1]] != '\'' && array[ctr[0]][ctr[1]] != '"')
+				while (ft_isalpha(array[ctr[0]][ctr[1]]) || array[ctr[0]][ctr[1]] == '_')
 				{
 					ctr[1]++;
 					len++;
 				}
 				ptr = ft_substr(array[ctr[0]], ctr[1] - len, len);
-				//e = get_env(ptr, env, len[0]);
-				e = getenv(ptr + 1);
-				add_expansion(array, array[ctr[0]], e, len);
+				add_expansion(array, array[ctr[0]], get_env(ptr + 1, env), len);
 				ctr[1] = 0;
 				if (ptr)
 					free(ptr);
 			}
-			if (array[ctr[0]][ctr[1] - 1] == '~' && (array[ctr[0]][ctr[1]] == '/' || !array[ctr[0]][ctr[1]]))
-				add_expansion(array, array[ctr[0]], getenv("HOME"), 1);
+			if (!array[ctr[0]][ctr[1] - 2] && array[ctr[0]][ctr[1] - 1] == '~' && (array[ctr[0]][ctr[1]] == '/' || !array[ctr[0]][ctr[1]]))
+				add_expansion(array, array[ctr[0]], get_env("HOME", env), 1);
 			if (array[ctr[0]][ctr[1] - 1] == '\'')
 				iterate_quotes(array[ctr[0]], &ctr[1], '\'', 0);
-			if (array[ctr[0]][ctr[1] - 1] == '"')
-				iterate_quotes(array[ctr[0]], &ctr[1], '"', 0);	
 			len = 0;
 		}
 		ctr[1] = 0;
@@ -270,9 +285,6 @@ char	**split_command(char *line, char **env)
 		return (NULL);
 	fill_array(line, array);
 	expand(array, env);
-	/*while (*array)
-		printf("%s\n", *array++);*/
-	//printf("%i\n", len_ctr(line));
 	return (array);
 }
 
