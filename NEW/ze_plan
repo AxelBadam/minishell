@@ -21,12 +21,15 @@ shell functionality
 	-ctrl-C, ctrl-D, ctrl-\
 	-builtins
 	{
+		/w child
 		echo with option -n
-		cd with only a relative or absolute path, what other paths there is?
 		pwd with no options
-		export with no options
-		unset with no options
+		
+		/w parent
+		export with no options, modifies the enviroment of the process - if I want to modi the parent process' env? just copy the env from the child? 
+		unset with no options, also modifies the env. 
 		env with no options or arguments
+		cd with only a relative or absolute path, what other paths there is?
 		exit with no options
 	}
 
@@ -105,3 +108,7 @@ Use signal(), sigaction(), sigemptyset(), and sigaddset() to catch and handle ct
 11. Implement $ and $? variables
 12. Handle ctrl-C, ctrl-D, and ctrl-\
 13. Built-in commands
+
+
+RNOW
+-

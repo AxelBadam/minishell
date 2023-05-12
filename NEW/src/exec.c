@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/05 15:36:40 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/11 17:09:31 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/12 10:40:08 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ int execute_builtin_pwd()
     return (1);
 }
 
-
 int setup_redirections(Command *cmd) {
     if (cmd->input_file) 
 	{
@@ -83,7 +82,8 @@ int setup_redirections(Command *cmd) {
         dup2(cmd->input_fd, STDIN_FILENO);
     }
 
-    if (cmd->output_file) {
+    if (cmd->output_file) 
+	{
         cmd->output_fd = open(cmd->output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
         if (cmd->output_fd == -1) {
             perror("open");
@@ -131,21 +131,6 @@ int is_builtin(Command *cmd)
      	return (1);
     return 0;
 }
-/*
-void execute_cmd(Command *cmd)
-{
-	pid_t pid;
-	
-	pid = fork();
-	
-	if (!execute_builtin(cmd))
-    	execvp(cmd->name, &cmd->args->head->value);
-	if (pid < 0) 
-	{
-		write(1, "fork error", 9);
-    	exit(1);
-	}
-}*/
 
 void wait_for_child(int command_count)
 {
@@ -154,39 +139,6 @@ void wait_for_child(int command_count)
 	i = -1;
 	while (++i < command_count)
 		wait(NULL); // store the value in an int
-}
-
-void close_pipes(int command_count, int *pipefds)
-{
-	int i;
-
-	i = -1;
-	while (++i < command_count * 2)
-		close(pipefds[i]);
-}
-
-void setup_pipes(int pipefds[], int current_command, int total_commands) 
-{
-    if (current_command > 0) // check if first
-        dup2(pipefds[(current_command - 1) * 2], STDIN_FILENO);
-    if (current_command < total_commands - 1) // check if not last
-        dup2(pipefds[current_command * 2 + 1], STDOUT_FILENO);
-}
-
-void create_pipes(int command_count, int *pipefds)
-{
-	int i;
-	
-	i = 0;
-	while (i < command_count - 1)
-	{
-		if (pipe(&pipefds[i * 2]) < 0)
-		{
-			write(1, "error pipe", 10);
-			return ;
-		}
-		i++;
-	}
 }
 
 void execute_commands(LinkedList *commands, int command_count)
@@ -212,26 +164,9 @@ void execute_commands(LinkedList *commands, int command_count)
         }
 
         if (pid == 0)
-        { 
-            // Child process
-            if (i != 0) 
-            {
-                // If not the first command, need to get input from previous command
-                dup2(pipefds[(i - 1) * 2], STDIN_FILENO);
-            }
-
-            if (i != command_count - 1) 
-            {
-                // If not the last command, need to send output to next command
-                dup2(pipefds[i * 2 + 1], STDOUT_FILENO);
-            }
-
-            // Close all pipes in child process
-            for (int j = 0; j < 2 * command_count; j++)
-            {
-                close(pipefds[j]);
-            }
-
+        {
+			setup_redirections(cmd);
+			setup_pipes(pipefds, i, command_count);
             if (is_builtin(cmd))
             {
                 execute_builtin(cmd);
@@ -244,29 +179,12 @@ void execute_commands(LinkedList *commands, int command_count)
             }
         }
         else 
-        {
-            // Parent process
-            // Close unused ends of pipes
             if (i != 0) 
-            {
-                close(pipefds[(i - 1) * 2]);
-            }
-
-            if (i != command_count - 1) 
-            {
-                close(pipefds[i * 2 + 1]);
-            }
-        }
-
+				close_pipes(command_count, pipefds);
         current_node = current_node->next;
         i++;
     }
-
-    // Wait for all child processes to finish
-    for (i = 0; i < command_count; i++) 
-    {
-        wait(NULL);
-    }
+	wait_for_child(command_count);
 }
 
 /*
