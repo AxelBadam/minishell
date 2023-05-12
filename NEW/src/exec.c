@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/05 15:36:40 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/12 10:40:08 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/12 14:51:50 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,11 @@ int execute_builtin_echo(Command *cmd)
     return 0;
 }
 
+int execute_builtin_exit()
+{
+	write(1, "exit\n", 5);
+	exit (0);
+} 
 
 int execute_builtin_pwd() 
 {
@@ -71,74 +76,37 @@ int execute_builtin_pwd()
     return (1);
 }
 
-int setup_redirections(Command *cmd) {
-    if (cmd->input_file) 
-	{
-        cmd->input_fd = open(cmd->input_file, O_RDONLY);
-        if (cmd->input_fd == -1) {
-            perror("open");
-            return -1;
-        }
-        dup2(cmd->input_fd, STDIN_FILENO);
-    }
-
-    if (cmd->output_file) 
-	{
-        cmd->output_fd = open(cmd->output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (cmd->output_fd == -1) {
-            perror("open");
-            return -1;
-        }
-        dup2(cmd->output_fd, STDOUT_FILENO);
-    }
-    return 0;
-}
-
 bool execute_builtin(Command *cmd) 
 {
-	if (ft_strncmp(cmd->name, "cd", 2) == 0)
-        return (execute_builtin_cd(cmd));
-    else if (ft_strncmp(cmd->name, "pwd", 3) == 0)
+    if (ft_strncmp(cmd->name, "pwd", 3) == 0)
         return (execute_builtin_pwd());
  	else if (ft_strncmp(cmd->name, "echo", 4) == 0) 
         return (execute_builtin_echo(cmd));
-	else if (ft_strncmp(cmd->name, "exit", 4) == 0) 
-        		exit(0);
+    return 0;
+}
+
+int is_builtin(Command *cmd)
+{
+	if (ft_strncmp(cmd->name, "pwd", 3) == 0)
+   	  	return (1);
+   	else if (ft_strncmp(cmd->name, "echo", 4) == 0)
+        return (1);
+    return 0;
+}
+
+int check_for_parent_builtin(Command *cmd)
+{
+	if (ft_strncmp(cmd->name, "cd", 2) == 0)
+        return (execute_builtin_cd(cmd));
+	else if (ft_strncmp(cmd->name, "exit", 4) == 0)
+       	return (execute_builtin_exit());
     /*else if (ft_strncmp(cmd->name, "unset", 5) == 0)
         return (execute_builtin_unset(cmd));
     else if (ft_strncmp(cmd->name, "env", 3) == 0)
         return (execute_builtin_env(cmd));
 	else if (ft_strncmp(cmd->name, "export", 6) == 0)
         return (execute_builtin_export(cmd));*/
-    return 0;
-}
-
-int is_builtin(Command *cmd)
-{
-	if (ft_strncmp(cmd->name, "cd", 2) == 0)
-    	return (1);
-	else if (ft_strncmp(cmd->name, "exit", 4) == 0)
-        return (1);
-	else if (ft_strncmp(cmd->name, "pwd", 3) == 0)
-   	  	return (1);
-   	else if (ft_strncmp(cmd->name, "echo", 4) == 0)
-        return (1);
-	else if (ft_strncmp(cmd->name, "export", 6) == 0)
-        return (1);
-    else if (ft_strncmp(cmd->name, "unset", 5) == 0)
-     	return (1);
-	else if (ft_strncmp(cmd->name, "env", 3) == 0)
-     	return (1);
-    return 0;
-}
-
-void wait_for_child(int command_count)
-{
-	int i;
-
-	i = -1;
-	while (++i < command_count)
-		wait(NULL); // store the value in an int
+	return 0;
 }
 
 void execute_commands(LinkedList *commands, int command_count)
@@ -148,21 +116,22 @@ void execute_commands(LinkedList *commands, int command_count)
     Command *cmd;
     pid_t pid;
 
+	// might have to create pipes on the spot according to the command line...
     create_pipes(command_count, pipefds);
     i = 0;
-
     LinkedListNode *current_node = commands->head;
     while (current_node != NULL) 
     {
         cmd = (Command *)current_node->value;
+		(check_for_parent_builtin(cmd) && has_no_pipes)
+			do built_in and move on;
+		//if has a pipe or redir, make a process
         pid = fork();
-
         if (pid < 0) 
         {
             write(1, "fork error", 9);
             exit(1);
         }
-
         if (pid == 0)
         {
 			setup_redirections(cmd);

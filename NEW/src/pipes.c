@@ -40,3 +40,36 @@ void create_pipes(int command_count, int *pipefds)
 		i++;
 	}
 }
+
+void wait_for_child(int command_count)
+{
+	int i;
+
+	i = -1;
+	while (++i < command_count)
+		wait(NULL); // store the value in an int
+}
+
+int setup_redirections(Command *cmd) 
+{
+    if (cmd->input_file) 
+	{
+        cmd->input_fd = open(cmd->input_file, O_RDONLY);
+        if (cmd->input_fd == -1) {
+            perror("open");
+            return -1;
+        }
+        dup2(cmd->input_fd, STDIN_FILENO);
+    }
+
+    if (cmd->output_file) 
+	{
+        cmd->output_fd = open(cmd->output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (cmd->output_fd == -1) {
+            perror("open");
+            return -1;
+        }
+        dup2(cmd->output_fd, STDOUT_FILENO);
+    }
+    return 0;
+}

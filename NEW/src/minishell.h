@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/12 10:13:42 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/12 13:30:03 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,5 +45,6 @@ void execute_commands(LinkedList *commands, int command_count);
 void create_pipes(int command_count, int *pipefds);
 void setup_pipes(int pipefds[], int current_command, int total_commands);
 void close_pipes(int command_count, int *pipefds);
-
+void wait_for_child(int command_count);
+int setup_redirections(Command *cmd);
 #endif

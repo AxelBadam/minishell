@@ -31,6 +31,8 @@ shell functionality
 		env with no options or arguments
 		cd with only a relative or absolute path, what other paths there is?
 		exit with no options
+		*********
+		only execute parent process if there are no pipes. if there are pipes just dont execute these, think thats what bash does
 	}
 
 1. Implement the main loop
