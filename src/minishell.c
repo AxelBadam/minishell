@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/12 13:39:33 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/15 17:29:38 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,15 +276,131 @@ void	expand(char **array, char **env)
 	}
 }
 
+int	count_operators(char **array)
+{
+	int	ctr[2];
+	int	operators;
+	int	start;
+
+	operators = 0;
+	start = 0;
+	ctr[0] = 0;
+	ctr[1] = -1;
+	while (array[ctr[0]])
+	{
+		while (array[ctr[0]][++ctr[1]])
+		{
+			if (array[ctr[0]][ctr[1]] == '"' || array[ctr[0]][ctr[1]] == '\'')
+			{
+				ctr[1]++;
+				iterate_quotes(array[ctr[0]], &ctr[1], array[ctr[0]][ctr[1] - 1], 0);
+			}
+			if (array[ctr[0]][ctr[1]] == '>' || array[ctr[0]][ctr[1]] == '<' || array[ctr[0]][ctr[1]] == '|')
+			{
+				start = ctr[1];
+				operators++;
+				while (array[ctr[0]][ctr[1]] && (array[ctr[0]][ctr[1]] == '>' || array[ctr[0]][ctr[1]] == '<' || array[ctr[0]][ctr[1]] == '|'))
+					ctr[1]++;
+				if (array[ctr[0]][ctr[1]])
+					operators++;
+				else if (!start && !array[ctr[0]][ctr[1]])
+					operators--;
+			}
+		}
+		ctr[1] = -1;
+		ctr[0]++;
+	}
+	printf("%i\n", operators);
+	return (operators);
+}
+
+void	fill_array_with_operators(char **new_array, char **old_array)
+{
+	int	ctr[2];
+	int	start;
+	int	index;
+
+	ctr[0] = 0;
+	ctr[1] = -1;
+	index = 0;
+	start = 0;
+	while (old_array[ctr[0]])
+	{
+		while (old_array[ctr[0]][++ctr[1]])
+		{
+			if (old_array[ctr[0]][ctr[1]] == '"' || old_array[ctr[0]][ctr[1]] == '\'')
+			{
+				ctr[1]++;
+				iterate_quotes(old_array[ctr[0]], &ctr[1], old_array[ctr[0]][ctr[1] - 1], 0);
+			}
+			if (old_array[ctr[0]][ctr[1]] == '<' || old_array[ctr[0]][ctr[1]] == '>' || old_array[ctr[0]][ctr[1]] == '|')
+			{
+				if (ctr[1])
+				{
+					new_array[index++] = ft_substr(old_array[ctr[0]], start, ctr[1] - start);
+					start = ctr[1];
+				}
+				while (old_array[ctr[0]][ctr[1]] && (old_array[ctr[0]][ctr[1]] == '<' || old_array[ctr[0]][ctr[1]] == '>' || old_array[ctr[0]][ctr[1]] == '|'))
+					ctr[1]++;
+				new_array[index++] = ft_substr(old_array[ctr[0]], start, ctr[1] - start);
+				start = ctr[1];
+				if (!old_array[ctr[0]][ctr[1] + 1])
+					break ;
+			}
+			if (!old_array[ctr[0]][ctr[1] + 1])
+				if (!new_array[index])
+					new_array[index++] = ft_substr(old_array[ctr[0]], start, ctr[1] + 1 - start);
+		}
+		start = 0;
+		ctr[1] = -1;
+		ctr[0]++;
+	}
+	printf("INDEX %i\n", index);
+	new_array[index] = 0;
+}
+
+char	**make_array_with_operators(char **array, int operators)
+{
+	int		ctr;
+	char	**new_array;
+
+	ctr = 0;
+	while (array[ctr])
+		ctr++;
+	printf("strings == %i\n", ctr + operators + 1);
+	new_array = (char **)malloc(sizeof(char *) * (ctr + operators + 1));
+	if (!new_array)
+		return (NULL);
+	fill_array_with_operators(new_array, array);
+	return (new_array);
+}
+
+char	**split_by_operator(char **array)
+{
+	int		operators;
+	char	**new_array;
+
+	operators = count_operators(array);
+	if (!operators)
+		return (array);
+	new_array = make_array_with_operators(array, operators);
+	return (new_array);
+}
+
 char	**split_command(char *line, char **env)
 {
 	char	**array;
+	char	**new_array;
 
 	array = make_array(line);
 	if (!array)
 		return (NULL);
 	fill_array(line, array);
 	expand(array, env);
+	new_array = split_by_operator(array);
+	while (*new_array)
+		printf("%s\n", *new_array++);
+	printf("\n\n\n");
 	return (array);
 }
 
