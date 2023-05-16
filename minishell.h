@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/12 13:22:42 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/16 17:02:22 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,26 @@
 # include <signal.h>
 # include "libft/libft.h"
 
-typedef struct s_resrc
-{
-	char	*line;
-	char	**s_line;
-	char	*buf;
-	char	*history;
-	char	**envp;
-}			t_resrc;
-
 typedef struct s_command
 {
-	char				*command;
-	char				*command_option;
-	char				*string;
-	int					output_fd;
-	struct s_command	*next;
-}						t_command;
+	char	*command;
+	char	*args;
+	int		output_fd;
+	int		input_fd;
+}	t_command;
 
-void	print_list(t_command **head);
+
+typedef struct s_list
+{
+	t_command		command;
+	struct s_list	*next;
+}	t_list;
+
+typedef struct s_resrc
+{
+	t_list	*list;
+	char	**array;
+	char	**envp;
+}	t_resrc;
+
 #endif

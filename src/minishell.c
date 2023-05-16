@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/15 17:29:38 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/16 17:03:05 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,8 @@ int	len_ctr(char *line)
 		{
 			ctr[0]++;
 			ctr[1]++;
-			if (line[ctr[0] - 1] == '"')
-				iterate_quotes(line, ctr, '"' , 1);
-			if (line[ctr[0] - 1] == '\'')
-				iterate_quotes(line, ctr, '\'', 1);
+			if (line[ctr[0] - 1] == '"' || line[ctr[0] - 1] == '\'')
+				iterate_quotes(line, ctr, line[ctr[0] - 1] , 1);
 			if (line[ctr[0]] == ' ' || !line[ctr[0]])
 				return (ctr[1]);
 		}
@@ -70,11 +68,8 @@ int	count_words(char *line)
 		while (line[ctr[0]] && line[ctr[0]] != ' ')
 		{
 			ctr[0]++;
-			if (line[ctr[0] - 1] == '"')
-				if (!iterate_quotes(line, ctr, '"' , 0))
-					return (0);
-			if (line[ctr[0] - 1] == '\'')
-				if (!iterate_quotes(line, ctr, '\'', 0))
+			if (line[ctr[0] - 1] == '"' || line[ctr[0] - 1] == '\'')
+				if (!iterate_quotes(line, ctr, line[ctr[0] - 1] , 0))
 					return (0);
 			if (line[ctr[0]] == ' ' || !line[ctr[0]])
 				ctr[1]++;
@@ -244,13 +239,11 @@ void	expand(char **array, char **env)
 
 	len = 0;
 	ctr[0] = 0;
-	ctr[1] = 0;
-	(void)env;
+	ctr[1] = -1;
 	while (array[ctr[0]])
 	{
-		while (array[ctr[0]][ctr[1]])
+		while (array[ctr[0]][++ctr[1]])
 		{
-			ctr[1]++;
 			if (array[ctr[0]][ctr[1] - 1] == '$')
 			{
 				len++;
@@ -268,10 +261,11 @@ void	expand(char **array, char **env)
 			if (!array[ctr[0]][ctr[1] - 2] && array[ctr[0]][ctr[1] - 1] == '~' && (array[ctr[0]][ctr[1]] == '/' || !array[ctr[0]][ctr[1]]))
 				add_expansion(array, array[ctr[0]], get_env("HOME", env), 1);
 			if (array[ctr[0]][ctr[1] - 1] == '\'')
-				iterate_quotes(array[ctr[0]], &ctr[1], '\'', 0);
+				if (ft_strchr(&array[ctr[0]][ctr[1]], '\''))
+					iterate_quotes(array[ctr[0]], &ctr[1], '\'', 0);
 			len = 0;
 		}
-		ctr[1] = 0;
+		ctr[1] = -1;
 		ctr[0]++;
 	}
 }
@@ -375,6 +369,19 @@ char	**make_array_with_operators(char **array, int operators)
 	return (new_array);
 }
 
+void	free_string_array(char **array)
+{
+	int	ctr;
+
+	ctr = 0;
+	if (array)
+	{
+		while (array[ctr])
+			free(array[ctr++]);
+		free(array);
+	}
+}
+
 char	**split_by_operator(char **array)
 {
 	int		operators;
@@ -384,77 +391,136 @@ char	**split_by_operator(char **array)
 	if (!operators)
 		return (array);
 	new_array = make_array_with_operators(array, operators);
+	free_string_array(array);
 	return (new_array);
+}
+
+int	str_len_without_quotes(char *str)
+{
+	int		ctr[2];
+	char	d;
+
+	ctr[0] = -1;
+	ctr[1] = 0;
+	while (str[++ctr[0]])
+	{
+		if (str[ctr[0]] == '\'' || str[ctr[0]] == '"')
+		{
+			ctr[1] -= 2;
+			d = str[ctr[0]++];
+			while (str[ctr[0]] && str[ctr[0]] != d)
+				ctr[0]++;
+			ctr[0]++;
+		}
+	}
+	return (ctr[0] - ctr[1]);
+}
+
+char	*make_new_str(char *old_str, int len)
+{
+	char	*new_str;
+	int		ctr[2];
+	char	d;
+
+	ctr[0] = 0;
+	ctr[1] = 0;
+	new_str = (char *)malloc(sizeof(char) * (len + 1));
+	if (!new_str)
+		return (NULL);
+	while (old_str[ctr[0]])
+	{
+		if (old_str[ctr[0]] == '"' || old_str[ctr[0]] == '\'')
+		{
+			d = old_str[ctr[0]++];
+			while (old_str[ctr[0]] && old_str[ctr[0]] != d)
+				new_str[ctr[1]++] = old_str[ctr[0]++];
+			ctr[0]++;
+		}
+		if (old_str[ctr[0]] && (old_str[ctr[0]] != '"' || old_str[ctr[0]] != '\''))
+			new_str[ctr[1]++] = old_str[ctr[0]++];
+	}
+	new_str[ctr[1]] = 0;
+	free(old_str);
+	return (new_str);
+}
+
+void	remove_quotes(char **array)
+{
+	int		ctr[2];
+	int		len;
+
+	ctr[0] = 0;
+	ctr[1] = 0;
+	len = 0;
+	while (array[ctr[0]])
+	{
+		len = str_len_without_quotes(array[ctr[0]]);
+		if (len == ft_strlen(array[ctr[0]]))
+			ctr[0]++;
+		else
+			array[ctr[0]++] = make_new_str(array[ctr[0]], len);
+	}
 }
 
 char	**split_command(char *line, char **env)
 {
 	char	**array;
-	char	**new_array;
 
 	array = make_array(line);
 	if (!array)
 		return (NULL);
 	fill_array(line, array);
 	expand(array, env);
-	new_array = split_by_operator(array);
-	while (*new_array)
-		printf("%s\n", *new_array++);
-	printf("\n\n\n");
+	array = split_by_operator(array);
+	remove_quotes(array);
 	return (array);
 }
 
-void	parse_command(char *line, char **env)
+void	parse_command(char *line, t_resrc *resource)
 {
-	char	**array;
-
-	array = split_command(line, env);
-	if (array)
+	resource->array = split_command(line, resource->envp);
+	if (resource->array)
 	{
-		while (*array)
-			printf("%s\n", *array++);
+		while (*resource->array)
+			printf("%s\n", *resource->array++);
 	}
 }
 
-void	minishell(t_resrc *resrc, char **env)
+void	minishell(t_resrc *resrc)
 {
-	//t_command *head;
+	char	*line;
 
-	//head = NULL;
-	resrc->line = readline("minishell: ");
-	while (resrc->line)
+	line = readline("minishell: ");
+	while (line)
 	{
-		add_history(resrc->line);
-		parse_command(resrc->line, env);
-		free(resrc->line);
-		resrc->line = readline("minishell: ");
+		add_history(line);
+		parse_command(line, resrc);
+		free(line);
+		line = readline("minishell: ");
 	}
 }
 
-void	*init_resources(void)
+void	*init_resources(char **envp)
 {
 	t_resrc	*resrc;
 
 	resrc = (t_resrc *)malloc(sizeof(t_resrc));
 	if (!resrc)
 		return NULL;
-	resrc->buf = NULL;
-	resrc->line = NULL;
-	resrc->s_line = NULL;
-	resrc->history = NULL;
+	resrc->envp = envp;
 	return (resrc);
 }
 
-t_command	*ft_lst_last(t_command *head)
+t_list	*ft_lst_last(t_list *head)
 {
 	while (head->next != NULL)
 		head = head->next;
 	return (head);
 }
 
-void	ft_lstadd_back(t_command **head, t_command *new)
+void	ft_lstadd_back(t_list **head, t_list *new)
 {
-	t_command	*tmp;
+	t_list	*tmp;
 
 	if (*head == NULL)
 		*head = new;
@@ -487,8 +553,7 @@ char	**create_env(char **env)
 			lvl = ft_atoi(&env[ctr[0]][ctr[1]]);
 			lvl++;
 		}*/
-		envp[ctr[0]] = ft_strdup(env[ctr[0]]);
-		ctr[0]++;
+		envp[ctr[0]++] = ft_strdup(env[ctr[0]]);
 	}
 	envp[ctr[0]] = 0;
 	return (envp);
@@ -502,9 +567,8 @@ int	main(int argc, char **argv, char **env)
 	(void)argv;
 	/*while (*env)
 		printf("%s\n", *env++);*/
-	create_env(env);
-	resrc = init_resources();
-	minishell(resrc, env);
+	resrc = init_resources(create_env(env));
+	minishell(resrc);
 	return (0);
 }
 
