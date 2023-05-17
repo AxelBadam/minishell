@@ -3,7 +3,6 @@ shell functionality
 	-display prompt
 	-working history
 	-searh and launch executable (based on PATH variable)
-	-interpret special characters (/ and ;)
 	-handle ' (prevent interpretting metacharacters)
 	{
 		echo 'What the *heck* is a $ doing here???'
@@ -16,16 +15,24 @@ shell functionality
 	}
 	-redirections
 	-pipes
+	{
+		pipes has to be setup before entering the execution, 
+
+		if no pipes function
+		do builtin
+		if there are pipes, fork. 
+		int pipe variable in the struct; 
+		output and input variable, which are used in pipes and redirections. 
+		
+	}
+
 	-$
 	-$? (exit status of the last foreground pipe)
 	-ctrl-C, ctrl-D, ctrl-\
 	-builtins
 	{
-		/w child
 		echo with option -n
 		pwd with no options
-		
-		/w parent
 		export with no options, modifies the enviroment of the process - if I want to modi the parent process' env? just copy the env from the child? 
 		unset with no options, also modifies the env. 
 		env with no options or arguments

@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/05 16:21:54 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/08 11:10:04 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/17 15:49:59 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,16 @@ typedef struct LinkedList {
     int size;
 } LinkedList;
 
+typedef struct s_global
+{
+	char **env;
+} t_global;
+
+
 typedef struct {
     char *name;
     LinkedList *args;
+	t_global env;
     char *input_file;
     char *output_file;
 	int input_fd;

@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/10 15:25:37 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/17 18:40:00 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,20 +56,28 @@ void handle_input(const char *input)
 	}
 	//linked_list_print(tokens);
 	LinkedList *commands = build_command_structure(tokens, command_types);
-	//print_commands(commands);
+	print_commands(commands);
 	command_count = linked_list_count(commands);
-	execute_commands(commands, command_count);
+	execute_commands_pipes(commands, command_count);
 	
 	// Iterate through the tokens and execute appropriate actions
     // based on the type of token (command, argument, I/O redirection, pipeline, etc.)
     linked_list_free(tokens);
 }
 
-int main() 
+int main(int ac, char **av, char **env) 
 {
+	(void)ac;
+	(void)av;
     char *input;
     char *prompt = "minishell> ";
-
+	t_global envi;
+	envi.env = create_env(env);
+	/*while (*envi.env)
+	{
+		printf("%s\n", *envi.env++);
+	}*/
+	
     while (1) 
 	{
         input = readline(prompt);

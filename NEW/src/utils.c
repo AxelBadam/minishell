@@ -6,9 +6,12 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 13:45:06 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/04 15:33:17 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/17 15:40:58 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "minishell.h"
+#include "linked_list.h"
 
 /*
 #include "minishell.h"
@@ -57,3 +60,39 @@ void	print_list(t_command **head)
 		tmp = tmp->next;
 	}
 }*/
+
+void error_handling(char *str)
+{
+	printf("%s", str);
+	exit (1);
+}
+
+char    **create_env(char **env)
+{
+    int        ctr[2];
+    char    **envp;
+    //int        lvl;
+
+    ctr[0] = 0;
+    ctr[1] = 0;
+    while (env[ctr[0]])
+        ctr[0]++;
+    envp = (char **)malloc(sizeof(char *) * (ctr[0] + 1));
+    if (!envp)
+        return (NULL);
+    ctr[0] = 0;
+    while (env[ctr[0]])
+    {
+        /*if (ft_strncmp("SHLVL", env[ctr[0]], 5) == 0)
+        {
+            while (env[ctr[0]][ctr[1]] != '=')
+                ctr[1]++;
+            ctr[1]++;
+            lvl = ft_atoi(&env[ctr[0]][ctr[1]]);
+            lvl++;
+        }*/
+        envp[ctr[0]++] = ft_strdup(env[ctr[0]]);
+    }
+    envp[ctr[0]] = 0;
+    return (envp);
+}

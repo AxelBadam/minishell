@@ -1,46 +1,27 @@
 #include "linked_list.h"
 #include "minishell.h"
 
-
-void close_pipes(int command_count, int *pipefds)
+/*
+void close_pipes(int *pipefds)
 {
-	int i;
-
-	i = -1;
-	while (++i < command_count * 2)
-		close(pipefds[i]);
+	close(pipefds[0]);
+	close(pipefds[1]);
 }
 
-void setup_pipes(int pipefds[], int current_command, int total_commands) 
+void setup_pipes(Command *cmd, int *pipefds) 
 {
-    if (current_command > 0) // check if first
-	{
-        dup2(pipefds[(current_command - 1) * 2], STDIN_FILENO);
-		close(pipefds[(current_command - 1) * 2]);
-	}
-    if (current_command < total_commands - 1) // check if not last
-	{
-		dup2(pipefds[current_command * 2 + 1], STDOUT_FILENO);
-		close(pipefds[current_command * 2 + 1]);
-	}
-}
 
-void create_pipes(int command_count, int *pipefds)
-{
-	int i;
-	
-	i = 0;
-	while (i < command_count - 1)
-	{
-		if (pipe(&pipefds[i * 2]) < 0)
-		{
-			write(1, "error pipe", 10);
-			return ;
-		}
-		i++;
-	}
-}
+	cmd->output_fd = pipefds[1];
+    dup2(cmd->output_fd, STDOUT_FILENO);
+	close(pipefds[1]);
+	close(cmd->output_fd);
 
+	cmd->input_fd = pipefds[0];
+	dup2(cmd->input_fd, STDIN_FILENO);
+	close(cmd->input_fd);
+	close(pipefds[0]);
+}
+*/
 void wait_for_child(int command_count)
 {
 	int i;
