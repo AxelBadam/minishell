@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/16 17:03:05 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/17 18:44:49 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -478,13 +478,87 @@ char	**split_command(char *line, char **env)
 
 void	parse_command(char *line, t_resrc *resource)
 {
+	int ctr = 0;
+	
 	resource->array = split_command(line, resource->envp);
 	if (resource->array)
 	{
-		while (*resource->array)
-			printf("%s\n", *resource->array++);
+		while (resource->array[ctr])
+			printf("%s\n", resource->array[ctr++]);
 	}
 }
+
+/*t_list	*create_node(char **array)
+{
+	t_list	*new_node;
+	int		ctr;
+
+	ctr = 0;
+	new_node = (t_list *)malloc(sizeof(t_list));
+	if (!new_node)
+		return (NULL);
+	new_node->command.command = array[ctr++];
+}
+
+int	open_file(char *redirect, char *filename)
+{
+	int	fd;
+
+	fd = 0;
+	if (filename)
+	{
+		if (ft_strncmp(redirect, ">", SIZE_MAX) == 0)
+			fd = open(filename, O_CREAT | O_WRONLY , 0644);
+		else if (ft_strncmp(redirect, ">>", SIZE_MAX) == 0)
+			fd = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
+	}
+	return (fd);
+}
+
+int	check_syntax(char *redirect, char d)
+{
+	if (d == '|')
+		if (redirect[1])
+			return (0);
+	if ((redirect[1] && redirect[1] != d) || redirect[2])
+		return (0);
+	return (1);
+}
+
+int	find_file_descriptor(char **array, int *ctr)
+{
+	int	output;
+	int	input;
+
+	while (array[ctr[0]])
+	{
+		if (array[ctr[0]][0] == '>' || array[ctr[0]][0] == '<' || array[ctr[0]][0] == '|')
+		{
+			if (!check_syntax(array[ctr[0]], array[ctr[0]][0]))
+				return ;
+			if (array[ctr[0]][0] == '|')
+				break ;
+			if (output)
+				close(output);
+			if (!output)
+				output = open_file(array[ctr[0]], array[ctr[0] + 1]);
+			ctr[0]++;
+		}
+		ctr[0]++;
+	}
+}
+
+void	make_list(t_resrc *resource)
+{
+	int		ctr[2];
+	char	**full_cmd;
+	int		output;
+	int		input;
+
+	ctr[0] = 0;
+	ctr[1] = 0;
+	output = 0;
+}*/
 
 void	minishell(t_resrc *resrc)
 {
@@ -495,6 +569,8 @@ void	minishell(t_resrc *resrc)
 	{
 		add_history(line);
 		parse_command(line, resrc);
+		//make_list(resrc);
+		free_string_array(resrc->array);
 		free(line);
 		line = readline("minishell: ");
 	}
@@ -565,8 +641,6 @@ int	main(int argc, char **argv, char **env)
 
 	(void)argc;
 	(void)argv;
-	/*while (*env)
-		printf("%s\n", *env++);*/
 	resrc = init_resources(create_env(env));
 	minishell(resrc);
 	return (0);
