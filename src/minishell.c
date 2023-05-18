@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/17 18:44:49 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/18 18:20:10 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@ void	iterate_env(char **env, char *d_string, int *ctr)
 		while (env[ctr[0]][ctr[1]] != '=')
 			ctr[1]++;
 		str = ft_substr(env[ctr[0]], 0, ctr[1]);
-		if (ft_strncmp(str, d_string, ctr[1]) == 0)
+		if (ft_strncmp(str, d_string, SIZE_MAX) == 0)
 		{
 			free(str);
 			break ;
@@ -338,7 +338,7 @@ void	fill_array_with_operators(char **new_array, char **old_array)
 					ctr[1]++;
 				new_array[index++] = ft_substr(old_array[ctr[0]], start, ctr[1] - start);
 				start = ctr[1];
-				if (!old_array[ctr[0]][ctr[1] + 1])
+				if (!old_array[ctr[0]][ctr[1]])
 					break ;
 			}
 			if (!old_array[ctr[0]][ctr[1] + 1])
@@ -472,45 +472,30 @@ char	**split_command(char *line, char **env)
 	fill_array(line, array);
 	expand(array, env);
 	array = split_by_operator(array);
-	remove_quotes(array);
+	//remove_quotes(array);
 	return (array);
 }
 
 void	parse_command(char *line, t_resrc *resource)
 {
-	int ctr = 0;
+	//int ctr = 0;
 	
 	resource->array = split_command(line, resource->envp);
-	if (resource->array)
+	/*if (resource->array)
 	{
 		while (resource->array[ctr])
 			printf("%s\n", resource->array[ctr++]);
-	}
+	}*/
 }
 
-/*t_list	*create_node(char **array)
+int	*open_file(char *redirect, char *filename, int *fd)
 {
-	t_list	*new_node;
-	int		ctr;
-
-	ctr = 0;
-	new_node = (t_list *)malloc(sizeof(t_list));
-	if (!new_node)
-		return (NULL);
-	new_node->command.command = array[ctr++];
-}
-
-int	open_file(char *redirect, char *filename)
-{
-	int	fd;
-
-	fd = 0;
 	if (filename)
 	{
 		if (ft_strncmp(redirect, ">", SIZE_MAX) == 0)
-			fd = open(filename, O_CREAT | O_WRONLY , 0644);
+			fd[0] = open(filename, O_CREAT | O_WRONLY , 0644);
 		else if (ft_strncmp(redirect, ">>", SIZE_MAX) == 0)
-			fd = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
+			fd[0] = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
 	}
 	return (fd);
 }
@@ -525,40 +510,120 @@ int	check_syntax(char *redirect, char d)
 	return (1);
 }
 
-int	find_file_descriptor(char **array, int *ctr)
+int	find_file_descriptor(char **array, int *fd)
 {
-	int	output;
-	int	input;
+	int	ctr[2];
+
+	ctr[0] = 0;
+	ctr[1] = 0;
 
 	while (array[ctr[0]])
 	{
 		if (array[ctr[0]][0] == '>' || array[ctr[0]][0] == '<' || array[ctr[0]][0] == '|')
 		{
 			if (!check_syntax(array[ctr[0]], array[ctr[0]][0]))
-				return ;
+				return (0);
 			if (array[ctr[0]][0] == '|')
 				break ;
-			if (output)
-				close(output);
-			if (!output)
-				output = open_file(array[ctr[0]], array[ctr[0] + 1]);
-			ctr[0]++;
+			if (fd[0])
+				close(fd[0]);
+			open_file(array[ctr[0]], array[ctr[0] + 1], fd);
+			if (array[ctr[0] + 1])
+				ctr[1] -= 2;
+			else
+				ctr[1]--;
 		}
 		ctr[0]++;
+		ctr[1]++;
+	}
+	printf("LEN == %i\n", ctr[1]);
+	return (ctr[1]);
+}
+
+t_list *create_node(char **full_cmd, int *fd)
+{
+	t_list	*new_node;
+
+	new_node = (t_list *)malloc(sizeof(t_list));
+	if (!new_node)
+		return (NULL);
+	new_node->command.full_path = NULL;
+	new_node->command.full_cmd = full_cmd;
+	new_node->command.output_fd = fd[0];
+	new_node->command.input_fd = fd[1];
+	new_node->next = NULL;
+	return (new_node);
+}
+
+void	create_list(t_resrc *resource, char **full_cmd, int *fd)
+{
+	ft_lstadd_back(&resource->list, create_node(full_cmd, fd));
+}
+
+void	make_list(t_resrc *resource, char **array)
+{
+	int		ctr[2];
+	int		len;
+	char	**full_cmd;
+	int		fd[2];
+
+	ctr[1] = 0;
+	ctr[0] = 0;
+	fd[0] = 0;
+	fd[1] = 0;
+	len = find_file_descriptor(array, fd);
+	full_cmd = (char **)malloc(sizeof(char *) * (len + 1));
+	if (!full_cmd)
+		return ;
+	while (array[ctr[1]] && array[ctr[1]][0] != '|')
+	{
+		if (ctr[0] < len)
+			full_cmd[ctr[0]++] = ft_strdup(array[ctr[1]++]);
+		while (resource->array[ctr[1]] && (resource->array[ctr[1]][0] == '>' || array[ctr[1]][0] == '<'))
+		{
+			if (array[ctr[1] + 1])
+				ctr[1] += 2;
+			else
+				ctr[1]++;
+		}
+	}
+	full_cmd[ctr[0]] = 0;
+	ctr[0] = 0;
+	while (full_cmd[ctr[0]])
+		printf("%s\n", full_cmd[ctr[0]++]);
+	create_list(resource, full_cmd, fd);
+	if (array[ctr[1]])
+		make_list(resource, &array[ctr[1] + 1]);
+}
+
+void	print_list(t_list **head)
+{
+	t_list *tmp = *head;
+	int ctr = 0;
+
+	while (tmp)
+	{
+		printf("FULL CMD = ");
+		while (tmp->command.full_cmd[ctr])
+			printf("%s ", tmp->command.full_cmd[ctr++]);
+		printf("\nOUTPUT_FD = %i\nINPUT_FD = %i\n", tmp->command.output_fd, tmp->command.input_fd);
+		tmp = tmp->next;
 	}
 }
 
-void	make_list(t_resrc *resource)
+void	free_all_nodes(t_list **head)
 {
-	int		ctr[2];
-	char	**full_cmd;
-	int		output;
-	int		input;
+	t_list	*tmp;
 
-	ctr[0] = 0;
-	ctr[1] = 0;
-	output = 0;
-}*/
+	tmp = *head;
+	while (*head)
+	{
+		*head = (*head)->next;
+		free(tmp);
+		tmp = *head;
+	}
+	free(*head);
+}
 
 void	minishell(t_resrc *resrc)
 {
@@ -569,8 +634,10 @@ void	minishell(t_resrc *resrc)
 	{
 		add_history(line);
 		parse_command(line, resrc);
-		//make_list(resrc);
+		make_list(resrc, resrc->array);
+		print_list(&resrc->list);
 		free_string_array(resrc->array);
+		free_all_nodes(&resrc->list);
 		free(line);
 		line = readline("minishell: ");
 	}
@@ -584,6 +651,7 @@ void	*init_resources(char **envp)
 	if (!resrc)
 		return NULL;
 	resrc->envp = envp;
+	resrc->list = NULL;
 	return (resrc);
 }
 

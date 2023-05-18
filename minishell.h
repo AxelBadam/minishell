@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/17 14:44:41 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/18 17:11:23 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 
 typedef struct s_command
 {
-	char	*command;
-	char	*args;
+	char	*full_path;
+	char	**full_cmd;
 	int		output_fd;
 	int		input_fd;
 }	t_command;
@@ -41,5 +41,9 @@ typedef struct s_resrc
 	char	**array;
 	char	**envp;
 }	t_resrc;
+
+void	ft_lstadd_back(t_list **head, t_list *new);
+t_list	*ft_lst_last(t_list *head);
+
 
 #endif
