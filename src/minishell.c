@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/18 18:20:10 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/19 16:37:03 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,8 +175,7 @@ char	*get_env(char *d_string, char **env)
 	{
 		while (env[ctr[0]][ctr[1]] != '=')
 			ctr[1]++;
-		ctr[1]++;
-		len = ft_strlen(&env[ctr[0]][ctr[1]]);
+		len = ft_strlen(&env[ctr[0]][++ctr[1]]);
 		str = (char *)malloc(sizeof(char) * (len + 1));
 		if (!str)
 			return (NULL);
@@ -210,7 +209,7 @@ void	add_expansion(char **array, char *dst, char *src, int rm_len)
 	{
 		if (!ctr[3])
 		{
-			if (dst[ctr[1]] == '$' || (dst[ctr[1]] == '~' && (array[ctr[0]][ctr[1] + 1] == '/' || !array[ctr[0]][ctr[1] + 1])))
+			if (dst[ctr[1]] == '$' || (!dst[ctr[1] - 1] && dst[ctr[1]] == '~' && (array[ctr[0]][ctr[1] + 1] == '/' || !array[ctr[0]][ctr[1] + 1])))
 			{
 				if (src)
 					while (src[ctr[3]])
@@ -258,7 +257,7 @@ void	expand(char **array, char **env)
 				if (ptr)
 					free(ptr);
 			}
-			if (!array[ctr[0]][ctr[1] - 2] && array[ctr[0]][ctr[1] - 1] == '~' && (array[ctr[0]][ctr[1]] == '/' || !array[ctr[0]][ctr[1]]))
+			if (!array[ctr[0]][ctr[1] -  1] && array[ctr[0]][ctr[1]] == '~' && (array[ctr[0]][ctr[1] + 1] == '/' || !array[ctr[0]][ctr[1] + 1]))
 				add_expansion(array, array[ctr[0]], get_env("HOME", env), 1);
 			if (array[ctr[0]][ctr[1] - 1] == '\'')
 				if (ft_strchr(&array[ctr[0]][ctr[1]], '\''))
@@ -579,7 +578,7 @@ void	make_list(t_resrc *resource, char **array)
 	{
 		if (ctr[0] < len)
 			full_cmd[ctr[0]++] = ft_strdup(array[ctr[1]++]);
-		while (resource->array[ctr[1]] && (resource->array[ctr[1]][0] == '>' || array[ctr[1]][0] == '<'))
+		while (array[ctr[1]] && (array[ctr[1]][0] == '>' || array[ctr[1]][0] == '<'))
 		{
 			if (array[ctr[1] + 1])
 				ctr[1] += 2;
@@ -608,6 +607,7 @@ void	print_list(t_list **head)
 			printf("%s ", tmp->command.full_cmd[ctr++]);
 		printf("\nOUTPUT_FD = %i\nINPUT_FD = %i\n", tmp->command.output_fd, tmp->command.input_fd);
 		tmp = tmp->next;
+		ctr = 0;
 	}
 }
 
@@ -667,7 +667,10 @@ void	ft_lstadd_back(t_list **head, t_list *new)
 	t_list	*tmp;
 
 	if (*head == NULL)
+	{
 		*head = new;
+		return ;
+	}
 	tmp = ft_lst_last(*head);
 	tmp->next = new;
 	new->next = NULL;
