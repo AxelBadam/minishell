@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/19 16:37:03 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/23 13:32:51 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -509,7 +509,7 @@ int	check_syntax(char *redirect, char d)
 	return (1);
 }
 
-int	find_file_descriptor(char **array, int *fd)
+int	get_file_descriptor(char **array, int *fd)
 {
 	int	ctr[2];
 
@@ -554,11 +554,6 @@ t_list *create_node(char **full_cmd, int *fd)
 	return (new_node);
 }
 
-void	create_list(t_resrc *resource, char **full_cmd, int *fd)
-{
-	ft_lstadd_back(&resource->list, create_node(full_cmd, fd));
-}
-
 void	make_list(t_resrc *resource, char **array)
 {
 	int		ctr[2];
@@ -570,7 +565,7 @@ void	make_list(t_resrc *resource, char **array)
 	ctr[0] = 0;
 	fd[0] = 0;
 	fd[1] = 0;
-	len = find_file_descriptor(array, fd);
+	len = get_file_descriptor(array, fd);
 	full_cmd = (char **)malloc(sizeof(char *) * (len + 1));
 	if (!full_cmd)
 		return ;
@@ -590,7 +585,8 @@ void	make_list(t_resrc *resource, char **array)
 	ctr[0] = 0;
 	while (full_cmd[ctr[0]])
 		printf("%s\n", full_cmd[ctr[0]++]);
-	create_list(resource, full_cmd, fd);
+	remove_quotes(full_cmd);
+	ft_lstadd_back(&resource->list, create_node(full_cmd, fd));
 	if (array[ctr[1]])
 		make_list(resource, &array[ctr[1] + 1]);
 }
