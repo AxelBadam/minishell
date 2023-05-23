@@ -18,6 +18,7 @@ LinkedList *linked_list_create() {
     LinkedList *list = malloc(sizeof(LinkedList));
     list->head = NULL;
     list->size = 0;
+	list->env = NULL;
     return list;
 }
 

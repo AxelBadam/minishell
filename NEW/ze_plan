@@ -34,6 +34,8 @@ shell functionality
 		echo with option -n
 		pwd with no options
 		export with no options, modifies the enviroment of the process - if I want to modi the parent process' env? just copy the env from the child? 
+		-no doubles, update existing VAR=, 
+		
 		unset with no options, also modifies the env. 
 		env with no options or arguments
 		cd with only a relative or absolute path, what other paths there is?

@@ -11,31 +11,92 @@ int execute_builtin_export(Command *cmd)
 	args = args->next;
 	str = args->value;
 	//printf("%s", str);
-	while(cmd->env.env[i])
+	while(cmd->env[i])
 		i++;
 	new_env = (char **)malloc(sizeof(char *) * (i + 2));
 	i = 0;
-	while (cmd->env.env[i])
+	while (cmd->env[i])
 	{
-		new_env[i] = ft_strdup(cmd->env.env[i]);
+		new_env[i] = ft_strdup(cmd->env[i]);
 		i++;
 	}
 	new_env[i++] = str;
 	new_env[i] = 0;
-	cmd->env.env = new_env;
-	write(1, "asd", 1);
-	while (*cmd->env.env)
-		printf("%s", *cmd->env.env++);
+	cmd->env = new_env;
+	//write(1, "asd", 1);
+	/*while (*cmd->env)
+		printf("%s\n", *cmd->env++);*/
 	free(new_env);
-	return 0;
+	return 1;
 }
 
-int execute_builtin_env(Command *cmd)
+int is_in_env(char *str, Command *cmd)
 {
-	//write(1, "asd", 1);
-	while (*cmd->env.env)
-		printf("%s", *cmd->env.env++);
-	return 0;
+	int len;
+	int count;
+	int i;
+	(void)cmd;
+	i = 0;
+	count = 1;
+	len = ft_strlen(str);
+	/*while (cmd->env[i])
+	{
+		if (ft_strncmp(cmd->env[i], str, SIZE_MAX) == 0)
+			count++;
+		i++;
+	}
+	printf("%d", count);*/
+	return (count);
+}
+
+int execute_builtin_unset(Command *cmd, char ***commands_env)
+{
+	char *str;
+	int i = 0;
+	int j = 0;
+	char **new_env;
+	int len;
+	//char *ret = NULL;
+
+	LinkedListNode *args = cmd->args->head;
+	args = args->next;
+	str = args->value;
+	//printf("%s", str);
+	len = ft_strlen(str);
+	cmd->env = *commands_env;
+
+	if (is_in_env(str, cmd))
+	{
+		while(cmd->env[i])
+			i++;
+	new_env = (char **)malloc(sizeof(char *) * (i + 2 - is_in_env(str, cmd)));
+	i = 0;
+	while (cmd->env[i])
+	{
+		if (ft_strnstr(cmd->env[i], str, len))
+			i++;
+		//ret = ft_strnstr(cmd->env[i], str, len);
+		//printf("%s", ret);
+
+		new_env[j] = ft_strdup(cmd->env[i++]);
+		//ft_printf("%s\n", new_env[j]);
+		j++;
+	}
+	new_env[j] = 0;
+	*commands_env = new_env;
+	}
+	printf("--------------------------\n");
+	/*while (*cmd->env)
+		printf("%s\n", *cmd->env++);*/
+	return 1;
+}
+
+int execute_builtin_env(Command *cmd, char ***commands_env)
+{	
+	cmd->env = *commands_env;
+	while (*cmd->env)
+		printf("%s\n", *cmd->env++);
+	return 1;
 }
 
 int execute_builtin_cd(Command *cmd) 
@@ -45,10 +106,9 @@ int execute_builtin_cd(Command *cmd)
 
     if (chdir(path) != 0) 
 	{
-        write(2, "cd, error", 8);
-        return (1);
+        error_handling("cd erore");
     }
-    return 0;
+    return 1;
 }
 
 int execute_builtin_echo(Command *cmd) 
@@ -80,7 +140,7 @@ int execute_builtin_echo(Command *cmd)
 int execute_builtin_exit()
 {
 	write(1, "exit\n", 5);
-	exit (0);
+	exit (1);
 } 
 
 int execute_builtin_pwd() 

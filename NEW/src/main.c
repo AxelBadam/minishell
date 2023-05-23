@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/17 18:40:00 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/19 10:24:34 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ CommandType identify_command_type(const char *token) {
     }
 }
 
-void handle_input(const char *input) 
+void handle_input(const char *input, char ***env_cpy) 
 {
     // Parse the input string into tokens (commands and arguments)
     LinkedList *tokens = parse_tokens(input, " \t\n");
@@ -57,11 +57,9 @@ void handle_input(const char *input)
 	//linked_list_print(tokens);
 	LinkedList *commands = build_command_structure(tokens, command_types);
 	print_commands(commands);
+	commands->env = *env_cpy;
 	command_count = linked_list_count(commands);
 	execute_commands_pipes(commands, command_count);
-	
-	// Iterate through the tokens and execute appropriate actions
-    // based on the type of token (command, argument, I/O redirection, pipeline, etc.)
     linked_list_free(tokens);
 }
 
@@ -71,12 +69,8 @@ int main(int ac, char **av, char **env)
 	(void)av;
     char *input;
     char *prompt = "minishell> ";
-	t_global envi;
-	envi.env = create_env(env);
-	/*while (*envi.env)
-	{
-		printf("%s\n", *envi.env++);
-	}*/
+	char **env_cpy;
+	env_cpy = create_env(env);
 	
     while (1) 
 	{
@@ -89,7 +83,7 @@ int main(int ac, char **av, char **env)
         if (input[0] != '\0') 
 		{
             add_history(input);
-            handle_input(input);
+            handle_input(input, &env_cpy);
         }
         free(input);
     }

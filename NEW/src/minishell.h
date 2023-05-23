@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/17 17:15:44 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/19 11:04:39 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,11 @@ typedef struct s_command
 }						t_command;
 */
 
-
+int execute_builtin_unset(Command *cmd, char ***commands_env);
 int execute_builtin_export(Command *cmd);
-int execute_builtin_env(Command *cmd);
 char    **create_env(char **env);
-void handle_input(const char *input);
+void handle_input(const char *input, char ***env_cpy);
+int execute_builtin_env(Command *cmd, char ***commands_env);
 CommandType identify_command_type(const char *token);
 void execute_commands_pipes(LinkedList *commands, int command_count);
 void error_handling(char *str);
