@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/23 13:32:51 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/23 16:24:33 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -487,14 +487,42 @@ void	parse_command(char *line, t_resrc *resource)
 	}*/
 }
 
+void	create_heredoc(int *fd, char *delimitor)
+{
+	char	*line;
+
+	line = readline("> ");
+	while (ft_strncmp(line, delimitor, SIZE_MAX) != 0)
+	{
+		ft_putendl_fd(line, fd[1]);
+		printf("%s", line);
+		free(line);
+		line = readline("> ");
+	}
+	close(fd[1]);
+	fd[1] = 1;
+	free(line);
+}
+
 int	*open_file(char *redirect, char *filename, int *fd)
 {
+	int	len;
+
+	len = str_len_without_quotes(filename);
+	if (len != ft_strlen(filename))
+		filename = make_new_str(filename, len);
 	if (filename)
 	{
 		if (ft_strncmp(redirect, ">", SIZE_MAX) == 0)
-			fd[0] = open(filename, O_CREAT | O_WRONLY , 0644);
+			fd[1] = open(filename, O_CREAT | O_WRONLY , 0644);
 		else if (ft_strncmp(redirect, ">>", SIZE_MAX) == 0)
-			fd[0] = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
+			fd[1] = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
+		else if	(ft_strncmp(redirect, "<<", SIZE_MAX) == 0)
+		{
+			pipe(fd);
+			create_heredoc(fd, filename);
+		}
+
 	}
 	return (fd);
 }
@@ -515,7 +543,6 @@ int	get_file_descriptor(char **array, int *fd)
 
 	ctr[0] = 0;
 	ctr[1] = 0;
-
 	while (array[ctr[0]])
 	{
 		if (array[ctr[0]][0] == '>' || array[ctr[0]][0] == '<' || array[ctr[0]][0] == '|')
@@ -524,8 +551,8 @@ int	get_file_descriptor(char **array, int *fd)
 				return (0);
 			if (array[ctr[0]][0] == '|')
 				break ;
-			if (fd[0])
-				close(fd[0]);
+			if (fd[1] != 1)
+				close(fd[1]);
 			open_file(array[ctr[0]], array[ctr[0] + 1], fd);
 			if (array[ctr[0] + 1])
 				ctr[1] -= 2;
@@ -548,8 +575,8 @@ t_list *create_node(char **full_cmd, int *fd)
 		return (NULL);
 	new_node->command.full_path = NULL;
 	new_node->command.full_cmd = full_cmd;
-	new_node->command.output_fd = fd[0];
-	new_node->command.input_fd = fd[1];
+	new_node->command.output_fd = fd[1];
+	new_node->command.input_fd = fd[0];
 	new_node->next = NULL;
 	return (new_node);
 }
@@ -564,7 +591,7 @@ void	make_list(t_resrc *resource, char **array)
 	ctr[1] = 0;
 	ctr[0] = 0;
 	fd[0] = 0;
-	fd[1] = 0;
+	fd[1] = 1;
 	len = get_file_descriptor(array, fd);
 	full_cmd = (char **)malloc(sizeof(char *) * (len + 1));
 	if (!full_cmd)
@@ -588,7 +615,7 @@ void	make_list(t_resrc *resource, char **array)
 	remove_quotes(full_cmd);
 	ft_lstadd_back(&resource->list, create_node(full_cmd, fd));
 	if (array[ctr[1]])
-		make_list(resource, &array[ctr[1] + 1]);
+		make_list(resource, &array[ctr[1]]);
 }
 
 void	print_list(t_list **head)
@@ -625,7 +652,7 @@ void	minishell(t_resrc *resrc)
 {
 	char	*line;
 
-	line = readline("minishell: ");
+	line = readline("minishell-1.0$ ");
 	while (line)
 	{
 		add_history(line);
@@ -635,7 +662,7 @@ void	minishell(t_resrc *resrc)
 		free_string_array(resrc->array);
 		free_all_nodes(&resrc->list);
 		free(line);
-		line = readline("minishell: ");
+		line = readline("minishell-1.0$ ");
 	}
 }
 
@@ -676,7 +703,7 @@ char	**create_env(char **env)
 {
 	int		ctr[2];
 	char	**envp;
-	//int		lvl;
+	int		lvl;
 
 	ctr[0] = 0;
 	ctr[1] = 0;
@@ -688,15 +715,21 @@ char	**create_env(char **env)
 	ctr[0] = 0;
 	while (env[ctr[0]])
 	{
-		/*if (ft_strncmp("SHLVL", env[ctr[0]], 5) == 0)
+		if (ft_strncmp("SHLVL", env[ctr[0]], 5) == 0)
 		{
 			while (env[ctr[0]][ctr[1]] != '=')
 				ctr[1]++;
 			ctr[1]++;
 			lvl = ft_atoi(&env[ctr[0]][ctr[1]]);
 			lvl++;
-		}*/
-		envp[ctr[0]++] = ft_strdup(env[ctr[0]]);
+			envp[ctr[0]] = (char *)malloc(sizeof(char) * 8);
+			if (!envp[ctr[0]])
+				return (NULL);
+			ft_strlcpy(envp[ctr[0]], env[ctr[0]], 7);
+			envp[ctr[0]++] = ft_strjoin(envp[ctr[0]], ft_itoa(lvl));
+		}
+		else
+			envp[ctr[0]++] = ft_strdup(env[ctr[0]]);
 	}
 	envp[ctr[0]] = 0;
 	return (envp);
