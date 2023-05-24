@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/23 16:24:33 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/24 15:00:26 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,14 +269,31 @@ void	expand(char **array, char **env)
 	}
 }
 
-int	count_operators(char **array)
+int	count(char **array, int *ctr, int strings)
 {
-	int	ctr[2];
-	int	operators;
 	int	start;
 
-	operators = 0;
 	start = 0;
+	if (array[ctr[0]][ctr[1]] == '>' || array[ctr[0]][ctr[1]] == '<' || array[ctr[0]][ctr[1]] == '|')
+	{
+		start = ctr[1];
+		strings++;
+		while (array[ctr[0]][ctr[1]] && (array[ctr[0]][ctr[1]] == '>' || array[ctr[0]][ctr[1]] == '<' || array[ctr[0]][ctr[1]] == '|'))
+			ctr[1]++;
+		if (array[ctr[0]][ctr[1]])
+			strings++;
+		else if (!start && !array[ctr[0]][ctr[1]])
+			strings--;
+	}
+	return (strings);
+}
+
+int	count_strings(char **array)
+{
+	int	ctr[2];
+	int	strings;
+
+	strings = 0;
 	ctr[0] = 0;
 	ctr[1] = -1;
 	while (array[ctr[0]])
@@ -288,71 +305,67 @@ int	count_operators(char **array)
 				ctr[1]++;
 				iterate_quotes(array[ctr[0]], &ctr[1], array[ctr[0]][ctr[1] - 1], 0);
 			}
-			if (array[ctr[0]][ctr[1]] == '>' || array[ctr[0]][ctr[1]] == '<' || array[ctr[0]][ctr[1]] == '|')
-			{
-				start = ctr[1];
-				operators++;
-				while (array[ctr[0]][ctr[1]] && (array[ctr[0]][ctr[1]] == '>' || array[ctr[0]][ctr[1]] == '<' || array[ctr[0]][ctr[1]] == '|'))
-					ctr[1]++;
-				if (array[ctr[0]][ctr[1]])
-					operators++;
-				else if (!start && !array[ctr[0]][ctr[1]])
-					operators--;
-			}
+			strings = count(array, ctr, strings);
 		}
 		ctr[1] = -1;
 		ctr[0]++;
 	}
-	printf("%i\n", operators);
-	return (operators);
+	printf("strings == %i\n", strings);
+	return (strings);
+}
+
+int	fill(char **new_array, char **old_array, int *ctr, int *index)
+{
+	if (old_array[ctr[0]][ctr[1]] == '"' || old_array[ctr[0]][ctr[1]] == '\'')
+	{
+		ctr[1]++;
+		iterate_quotes(old_array[ctr[0]], &ctr[1], old_array[ctr[0]][ctr[1] - 1], 0);
+	}
+	if (old_array[ctr[0]][ctr[1]] == '<' || old_array[ctr[0]][ctr[1]] == '>' || old_array[ctr[0]][ctr[1]] == '|')
+	{
+		if (ctr[1])
+		{
+			new_array[index[0]++] = ft_substr(old_array[ctr[0]], index[1], ctr[1] - index[1]);
+			index[1] = ctr[1];
+		}
+		while (old_array[ctr[0]][ctr[1]] && (old_array[ctr[0]][ctr[1]] == '<' || old_array[ctr[0]][ctr[1]] == '>' || old_array[ctr[0]][ctr[1]] == '|'))
+			ctr[1]++;
+		new_array[index[0]++] = ft_substr(old_array[ctr[0]], index[1], ctr[1] - index[1]);
+		index[1] = ctr[1];
+		if (!old_array[ctr[0]][ctr[1]])
+			return (1);
+	}
+	if (!old_array[ctr[0]][ctr[1] + 1])
+		if (!new_array[index[0]])
+			new_array[index[0]++] = ft_substr(old_array[ctr[0]], index[1], ctr[1] + 1 - index[1]);
+	return (0);
 }
 
 void	fill_array_with_operators(char **new_array, char **old_array)
 {
 	int	ctr[2];
-	int	start;
-	int	index;
+	int	index[2];
 
 	ctr[0] = 0;
 	ctr[1] = -1;
-	index = 0;
-	start = 0;
+	index[0] = 0;
+	index[1] = 0;
 	while (old_array[ctr[0]])
 	{
 		while (old_array[ctr[0]][++ctr[1]])
 		{
-			if (old_array[ctr[0]][ctr[1]] == '"' || old_array[ctr[0]][ctr[1]] == '\'')
-			{
-				ctr[1]++;
-				iterate_quotes(old_array[ctr[0]], &ctr[1], old_array[ctr[0]][ctr[1] - 1], 0);
-			}
-			if (old_array[ctr[0]][ctr[1]] == '<' || old_array[ctr[0]][ctr[1]] == '>' || old_array[ctr[0]][ctr[1]] == '|')
-			{
-				if (ctr[1])
-				{
-					new_array[index++] = ft_substr(old_array[ctr[0]], start, ctr[1] - start);
-					start = ctr[1];
-				}
-				while (old_array[ctr[0]][ctr[1]] && (old_array[ctr[0]][ctr[1]] == '<' || old_array[ctr[0]][ctr[1]] == '>' || old_array[ctr[0]][ctr[1]] == '|'))
-					ctr[1]++;
-				new_array[index++] = ft_substr(old_array[ctr[0]], start, ctr[1] - start);
-				start = ctr[1];
-				if (!old_array[ctr[0]][ctr[1]])
-					break ;
-			}
-			if (!old_array[ctr[0]][ctr[1] + 1])
-				if (!new_array[index])
-					new_array[index++] = ft_substr(old_array[ctr[0]], start, ctr[1] + 1 - start);
+			if (fill(new_array, old_array, ctr, index))
+				break ;
 		}
-		start = 0;
+		index[1] = 0;
 		ctr[1] = -1;
 		ctr[0]++;
 	}
-	printf("INDEX %i\n", index);
-	new_array[index] = 0;
+	printf("INDEX %i\n", index[0]);
+	new_array[index[0]] = 0;
 }
 
-char	**make_array_with_operators(char **array, int operators)
+char	**make_array_with_operators(char **array, int strings)
 {
 	int		ctr;
 	char	**new_array;
@@ -360,8 +373,8 @@ char	**make_array_with_operators(char **array, int operators)
 	ctr = 0;
 	while (array[ctr])
 		ctr++;
-	printf("strings == %i\n", ctr + operators + 1);
-	new_array = (char **)malloc(sizeof(char *) * (ctr + operators + 1));
+	printf("strings == %i\n", ctr + strings + 1);
+	new_array = (char **)malloc(sizeof(char *) * (ctr + strings + 1));
 	if (!new_array)
 		return (NULL);
 	fill_array_with_operators(new_array, array);
@@ -383,13 +396,13 @@ void	free_string_array(char **array)
 
 char	**split_by_operator(char **array)
 {
-	int		operators;
+	int		strings;
 	char	**new_array;
 
-	operators = count_operators(array);
-	if (!operators)
+	strings = count_strings(array);
+	if (!strings)
 		return (array);
-	new_array = make_array_with_operators(array, operators);
+	new_array = make_array_with_operators(array, strings);
 	free_string_array(array);
 	return (new_array);
 }
@@ -471,20 +484,7 @@ char	**split_command(char *line, char **env)
 	fill_array(line, array);
 	expand(array, env);
 	array = split_by_operator(array);
-	//remove_quotes(array);
 	return (array);
-}
-
-void	parse_command(char *line, t_resrc *resource)
-{
-	//int ctr = 0;
-	
-	resource->array = split_command(line, resource->envp);
-	/*if (resource->array)
-	{
-		while (resource->array[ctr])
-			printf("%s\n", resource->array[ctr++]);
-	}*/
 }
 
 void	create_heredoc(int *fd, char *delimitor)
@@ -522,17 +522,64 @@ int	*open_file(char *redirect, char *filename, int *fd)
 			pipe(fd);
 			create_heredoc(fd, filename);
 		}
-
+		else if	(ft_strncmp(redirect, "<", SIZE_MAX) == 0)
+			fd[0] = open(filename, O_RDONLY);
 	}
 	return (fd);
 }
 
-int	check_syntax(char *redirect, char d)
+int	get_array_size(char **array)
+{
+	int	ctr;
+
+	ctr = 0;
+	if (!array)
+		return (0);
+	while (array[ctr])
+		ctr++;
+	return (ctr);
+}
+
+void	add_array_to_array(t_resrc *resource, char **array, char **pipe_command)
+{
+	char	**new_array;
+	int		ctr[2];
+
+	ctr[0] = 0;
+	ctr[1] = 0;
+	new_array = (char **)malloc(sizeof(char *) * (get_array_size(array) + get_array_size(pipe_command) + 1));
+	while (array[ctr[0]])
+		new_array[ctr[0]++] = ft_strdup(array[ctr[0]]);
+	while (pipe_command[ctr[1]])
+		new_array[ctr[0]++] = ft_strdup(array[ctr[1]++]);
+	new_array[ctr[0]] = 0;
+	free_string_array(array);
+	free_string_array(pipe_command);
+	resource->array = new_array;
+}
+
+void	get_new_command(t_resrc *resource, char **array)
+{
+	char	*line;
+	char	**pipe_command;
+
+	line = readline("> ");
+	pipe_command = split_command(line, resource->envp);
+	add_array_to_array(resource, array, pipe_command);
+	free(line);
+}
+
+int	check_syntax(char **array, int *ctr, char d)
 {
 	if (d == '|')
-		if (redirect[1])
+	{
+		if (array[ctr[0]][1])
 			return (0);
-	if ((redirect[1] && redirect[1] != d) || redirect[2])
+		return (1);
+	}
+	if ((array[ctr[0]][1] && array[ctr[0]][1] != d) || array[ctr[0]][2])
+		return (0);
+	if (!array[ctr[0] + 1]|| (array[ctr[0] + 1] && (array[ctr[0] + 1][0] == '>' ||  array[ctr[0] + 1][0] == '<' ||  array[ctr[0] + 1][0] == '|')))
 		return (0);
 	return (1);
 }
@@ -547,8 +594,8 @@ int	get_file_descriptor(char **array, int *fd)
 	{
 		if (array[ctr[0]][0] == '>' || array[ctr[0]][0] == '<' || array[ctr[0]][0] == '|')
 		{
-			if (!check_syntax(array[ctr[0]], array[ctr[0]][0]))
-				return (0);
+			if (!check_syntax(array, ctr, array[ctr[0]][0]))
+				return (-1);
 			if (array[ctr[0]][0] == '|')
 				break ;
 			if (fd[1] != 1)
@@ -581,41 +628,47 @@ t_list *create_node(char **full_cmd, int *fd)
 	return (new_node);
 }
 
+void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len)
+{
+	if (ctr[0] < len)
+			full_cmd[ctr[0]++] = ft_strdup(array[ctr[1]++]);
+	while (array[ctr[1]] && (array[ctr[1]][0] == '>' || array[ctr[1]][0] == '<'))
+	{
+		if (array[ctr[1] + 1])
+			ctr[1] += 2;
+		else
+			ctr[1]++;
+	}
+}
+
 void	make_list(t_resrc *resource, char **array)
 {
-	int		ctr[2];
-	int		len;
-	char	**full_cmd;
-	int		fd[2];
+	t_variables variable;
 
-	ctr[1] = 0;
-	ctr[0] = 0;
-	fd[0] = 0;
-	fd[1] = 1;
-	len = get_file_descriptor(array, fd);
-	full_cmd = (char **)malloc(sizeof(char *) * (len + 1));
-	if (!full_cmd)
+	variable.ctr[1] = 0;
+	variable.ctr[0] = 0;
+	variable.fd[0] = 0;
+	variable.fd[1] = 1;
+	variable.len = get_file_descriptor(array, variable.fd);
+	if (!variable.len)
 		return ;
-	while (array[ctr[1]] && array[ctr[1]][0] != '|')
+	variable.full_cmd = (char **)malloc(sizeof(char *) * (variable.len + 1));
+	if (!variable.full_cmd)
+		return ;
+	while (array[variable.ctr[1]] && array[variable.ctr[1]][0] != '|')
+		create_full_cmd(variable.full_cmd, array, variable.ctr, variable.len);
+	variable.full_cmd[variable.ctr[0]] = 0;
+	variable.ctr[0] = 0;
+	while (variable.full_cmd[variable.ctr[0]])
+		printf("%s\n", variable.full_cmd[variable.ctr[0]++]);
+	remove_quotes(variable.full_cmd);
+	ft_lstadd_back(&resource->list, create_node(variable.full_cmd, variable.fd));
+	if (array[variable.ctr[1]])
 	{
-		if (ctr[0] < len)
-			full_cmd[ctr[0]++] = ft_strdup(array[ctr[1]++]);
-		while (array[ctr[1]] && (array[ctr[1]][0] == '>' || array[ctr[1]][0] == '<'))
-		{
-			if (array[ctr[1] + 1])
-				ctr[1] += 2;
-			else
-				ctr[1]++;
-		}
+		if (!array[variable.ctr[1] + 1])
+			get_new_command(resource, array);
+		make_list(resource, &resource->array[variable.ctr[1] + 1]);
 	}
-	full_cmd[ctr[0]] = 0;
-	ctr[0] = 0;
-	while (full_cmd[ctr[0]])
-		printf("%s\n", full_cmd[ctr[0]++]);
-	remove_quotes(full_cmd);
-	ft_lstadd_back(&resource->list, create_node(full_cmd, fd));
-	if (array[ctr[1]])
-		make_list(resource, &array[ctr[1]]);
 }
 
 void	print_list(t_list **head)
@@ -641,6 +694,8 @@ void	free_all_nodes(t_list **head)
 	tmp = *head;
 	while (*head)
 	{
+		if ((*head)->command.full_cmd)
+			free_string_array((*head)->command.full_cmd);
 		*head = (*head)->next;
 		free(tmp);
 		tmp = *head;
@@ -655,12 +710,15 @@ void	minishell(t_resrc *resrc)
 	line = readline("minishell-1.0$ ");
 	while (line)
 	{
-		add_history(line);
-		parse_command(line, resrc);
-		make_list(resrc, resrc->array);
-		print_list(&resrc->list);
-		free_string_array(resrc->array);
-		free_all_nodes(&resrc->list);
+		if (*line)
+		{
+			resrc->array = split_command(line, resrc->envp);
+			add_history(line);
+			make_list(resrc, resrc->array);
+			print_list(&resrc->list);
+			free_string_array(resrc->array);
+			free_all_nodes(&resrc->list);
+		}
 		free(line);
 		line = readline("minishell-1.0$ ");
 	}
@@ -699,35 +757,38 @@ void	ft_lstadd_back(t_list **head, t_list *new)
 	new->next = NULL;
 }
 
+char	*shlvl(char *sys_shlvl)
+{
+	char	shlvl[7];
+	int		lvl;
+	char	*level;
+	char	*program_shlvl;
+	
+	lvl = ft_atoi(&sys_shlvl[6]);
+	lvl++;
+	ft_strlcpy(shlvl, sys_shlvl, 7);
+	level = ft_itoa(lvl);
+	program_shlvl = ft_strjoin(shlvl, level);
+	free(level);
+	if (!program_shlvl)
+		return (NULL);
+	return (program_shlvl);
+}
+
 char	**create_env(char **env)
 {
 	int		ctr[2];
 	char	**envp;
-	int		lvl;
 
 	ctr[0] = 0;
 	ctr[1] = 0;
-	while (env[ctr[0]])
-		ctr[0]++;
-	envp = (char **)malloc(sizeof(char *) * (ctr[0] + 1));
+	envp = (char **)malloc(sizeof(char *) * (get_array_size(env) + 1));
 	if (!envp)
 		return (NULL);
-	ctr[0] = 0;
 	while (env[ctr[0]])
 	{
 		if (ft_strncmp("SHLVL", env[ctr[0]], 5) == 0)
-		{
-			while (env[ctr[0]][ctr[1]] != '=')
-				ctr[1]++;
-			ctr[1]++;
-			lvl = ft_atoi(&env[ctr[0]][ctr[1]]);
-			lvl++;
-			envp[ctr[0]] = (char *)malloc(sizeof(char) * 8);
-			if (!envp[ctr[0]])
-				return (NULL);
-			ft_strlcpy(envp[ctr[0]], env[ctr[0]], 7);
-			envp[ctr[0]++] = ft_strjoin(envp[ctr[0]], ft_itoa(lvl));
-		}
+			envp[ctr[0]++] = shlvl(env[ctr[0]]);
 		else
 			envp[ctr[0]++] = ft_strdup(env[ctr[0]]);
 	}
@@ -743,6 +804,8 @@ int	main(int argc, char **argv, char **env)
 	(void)argv;
 	resrc = init_resources(create_env(env));
 	minishell(resrc);
+	free_string_array(resrc->envp);
+	free(resrc);
 	return (0);
 }
 
