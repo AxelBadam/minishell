@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/24 15:00:26 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/25 17:10:35 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,6 +239,7 @@ void	expand(char **array, char **env)
 	len = 0;
 	ctr[0] = 0;
 	ctr[1] = -1;
+	ptr = NULL;
 	while (array[ctr[0]])
 	{
 		while (array[ctr[0]][++ctr[1]])
@@ -246,18 +247,23 @@ void	expand(char **array, char **env)
 			if (array[ctr[0]][ctr[1] - 1] == '$')
 			{
 				len++;
-				while (ft_isalpha(array[ctr[0]][ctr[1]]) || array[ctr[0]][ctr[1]] == '_')
+				if (array[ctr[0]][ctr[1]] == '?')
+					add_expansion(array, array[ctr[0]], ft_itoa(g_exit_status), len + 1);
+				else
 				{
-					ctr[1]++;
-					len++;
+					while (ft_isalpha(array[ctr[0]][ctr[1]]) || array[ctr[0]][ctr[1]] == '_')
+					{
+						ctr[1]++;
+						len++;
+					}
+					ptr = ft_substr(array[ctr[0]], ctr[1] - len, len);
+					add_expansion(array, array[ctr[0]], get_env(ptr + 1, env), len);
 				}
-				ptr = ft_substr(array[ctr[0]], ctr[1] - len, len);
-				add_expansion(array, array[ctr[0]], get_env(ptr + 1, env), len);
 				ctr[1] = 0;
 				if (ptr)
 					free(ptr);
 			}
-			if (!array[ctr[0]][ctr[1] -  1] && array[ctr[0]][ctr[1]] == '~' && (array[ctr[0]][ctr[1] + 1] == '/' || !array[ctr[0]][ctr[1] + 1]))
+			if (ctr[1] == 0 && array[ctr[0]][ctr[1]] == '~' && (array[ctr[0]][ctr[1] + 1] == '/' || !array[ctr[0]][ctr[1] + 1]))
 				add_expansion(array, array[ctr[0]], get_env("HOME", env), 1);
 			if (array[ctr[0]][ctr[1] - 1] == '\'')
 				if (ft_strchr(&array[ctr[0]][ctr[1]], '\''))
@@ -491,41 +497,78 @@ void	create_heredoc(int *fd, char *delimitor)
 {
 	char	*line;
 
-	line = readline("> ");
-	while (ft_strncmp(line, delimitor, SIZE_MAX) != 0)
+	g_exit_status = 0;
+	while (g_exit_status != 1)
 	{
-		ft_putendl_fd(line, fd[1]);
-		printf("%s", line);
-		free(line);
 		line = readline("> ");
+		if (!line || ft_strncmp(line, delimitor, SIZE_MAX) != 0)
+			break ;
+		ft_putendl_fd(line, fd[1]);
+		free(line);
 	}
 	close(fd[1]);
+	if (g_exit_status == 1)
+		close(fd[0]);
 	fd[1] = 1;
-	free(line);
+	if (line)
+		free(line);
 }
 
-int	*open_file(char *redirect, char *filename, int *fd)
+/*void	file_error(char *filename, int error)
+{
+	return ;
+}*/
+
+int print_error(char *str, int exit_status, char *filename)
+{
+	ft_putstr_fd("minishell: ", 2);
+	if (filename)
+		ft_putstr_fd(filename, 2);
+	ft_putstr_fd(str, 2);
+	g_exit_status = exit_status;
+	return (0);
+}
+
+int	open_file(char *redirect, char *filename, int *fd)
 {
 	int	len;
 
+	if (!filename)
+	{
+		print_error("syntax error near unexpected token `newline'\n", 69, filename);
+		return (-1);
+	}
 	len = str_len_without_quotes(filename);
 	if (len != ft_strlen(filename))
 		filename = make_new_str(filename, len);
-	if (filename)
+	if (access(filename, F_OK) == 0 && access(filename, W_OK != 0 ) &&
+		(ft_strncmp(redirect, ">", SIZE_MAX) == 0 || ft_strncmp(redirect, ">>", SIZE_MAX) == 0))
+		if (!print_error(": Permission denied\n", 69, filename))
+			return (-1);
+	if (ft_strncmp(redirect, ">", SIZE_MAX) == 0)
+		fd[1] = open(filename, O_CREAT | O_WRONLY , 0644);
+	else if (ft_strncmp(redirect, ">>", SIZE_MAX) == 0)
+		fd[1] = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
+	if (ft_strncmp(redirect, "<<", SIZE_MAX) == 0)
 	{
-		if (ft_strncmp(redirect, ">", SIZE_MAX) == 0)
-			fd[1] = open(filename, O_CREAT | O_WRONLY , 0644);
-		else if (ft_strncmp(redirect, ">>", SIZE_MAX) == 0)
-			fd[1] = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
-		else if	(ft_strncmp(redirect, "<<", SIZE_MAX) == 0)
-		{
-			pipe(fd);
-			create_heredoc(fd, filename);
-		}
-		else if	(ft_strncmp(redirect, "<", SIZE_MAX) == 0)
-			fd[0] = open(filename, O_RDONLY);
+		pipe(fd);
+		create_heredoc(fd, filename);
 	}
-	return (fd);
+	else if	(ft_strncmp(redirect, "<", SIZE_MAX) == 0)
+	{
+		if (access(filename, F_OK) != 0 || (access(filename, F_OK) == 0 && access(filename, R_OK) != 0))
+		{
+			if (access(filename, F_OK) != 0)
+			{
+				if (!print_error(": No such file or directory\n", 69, filename))
+					return (-1);
+			}
+			else if (!print_error(": Permission denied\n", 69, filename))
+				return (-1);
+		}
+		fd[0] = open(filename, O_RDONLY);
+	}
+	return (0);
 }
 
 int	get_array_size(char **array)
@@ -551,22 +594,33 @@ void	add_array_to_array(t_resrc *resource, char **array, char **pipe_command)
 	while (array[ctr[0]])
 		new_array[ctr[0]++] = ft_strdup(array[ctr[0]]);
 	while (pipe_command[ctr[1]])
-		new_array[ctr[0]++] = ft_strdup(array[ctr[1]++]);
+		new_array[ctr[0]++] = ft_strdup(pipe_command[ctr[1]++]);
 	new_array[ctr[0]] = 0;
 	free_string_array(array);
 	free_string_array(pipe_command);
 	resource->array = new_array;
 }
 
-void	get_new_command(t_resrc *resource, char **array)
+int	get_new_command(t_resrc *resource, char **array)
 {
 	char	*line;
 	char	**pipe_command;
 
+	g_exit_status = 0;
 	line = readline("> ");
-	pipe_command = split_command(line, resource->envp);
-	add_array_to_array(resource, array, pipe_command);
-	free(line);
+	if (!line)
+		print_error("syntax error: unexpected end of file\n", 258, NULL);
+	if (line && g_exit_status != 1)
+	{
+		while (!*line)
+			line = readline("> ");
+		pipe_command = split_command(line, resource->envp);
+		add_array_to_array(resource, array, pipe_command);
+		free(line);
+		return (1);
+	}
+	free_all_nodes(&resource->list);
+	return (0);
 }
 
 int	check_syntax(char **array, int *ctr, char d)
@@ -578,8 +632,6 @@ int	check_syntax(char **array, int *ctr, char d)
 		return (1);
 	}
 	if ((array[ctr[0]][1] && array[ctr[0]][1] != d) || array[ctr[0]][2])
-		return (0);
-	if (!array[ctr[0] + 1]|| (array[ctr[0] + 1] && (array[ctr[0] + 1][0] == '>' ||  array[ctr[0] + 1][0] == '<' ||  array[ctr[0] + 1][0] == '|')))
 		return (0);
 	return (1);
 }
@@ -595,12 +647,13 @@ int	get_file_descriptor(char **array, int *fd)
 		if (array[ctr[0]][0] == '>' || array[ctr[0]][0] == '<' || array[ctr[0]][0] == '|')
 		{
 			if (!check_syntax(array, ctr, array[ctr[0]][0]))
-				return (-1);
+				return (0);
 			if (array[ctr[0]][0] == '|')
 				break ;
 			if (fd[1] != 1)
 				close(fd[1]);
-			open_file(array[ctr[0]], array[ctr[0] + 1], fd);
+			if (open_file(array[ctr[0]], array[ctr[0] + 1], fd) == -1)
+				return (0);
 			if (array[ctr[0] + 1])
 				ctr[1] -= 2;
 			else
@@ -665,8 +718,8 @@ void	make_list(t_resrc *resource, char **array)
 	ft_lstadd_back(&resource->list, create_node(variable.full_cmd, variable.fd));
 	if (array[variable.ctr[1]])
 	{
-		if (!array[variable.ctr[1] + 1])
-			get_new_command(resource, array);
+		if (!get_new_command(resource, array))
+			return ;
 		make_list(resource, &resource->array[variable.ctr[1] + 1]);
 	}
 }
@@ -796,12 +849,25 @@ char	**create_env(char **env)
 	return (envp);
 }
 
+void	signal_handler(int signal)
+{
+	if (signal == SIGINT)
+	{
+		g_exit_status = 1;
+		ioctl(STDIN_FILENO, TIOCSTI, "\n");
+		rl_replace_line("", 0);
+		rl_on_new_line();
+	}
+}
+
 int	main(int argc, char **argv, char **env)
 {
 	t_resrc	*resrc;
 
 	(void)argc;
 	(void)argv;
+	g_exit_status = 0;
+	signal(SIGINT, signal_handler);
 	resrc = init_resources(create_env(env));
 	minishell(resrc);
 	free_string_array(resrc->envp);

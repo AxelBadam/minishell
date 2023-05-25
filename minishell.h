@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/24 13:07:40 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/25 13:55:24 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <unistd.h>
 # include <signal.h>
 # include "libft/libft.h"
+# include <sys/ioctl.h>
 
 int	g_exit_status;
 
@@ -57,4 +58,5 @@ typedef struct s_resrc
 void	ft_lstadd_back(t_list **head, t_list *new);
 t_list	*ft_lst_last(t_list *head);
 int		get_array_size(char **array);
+void	free_all_nodes(t_list **head);
 #endif
