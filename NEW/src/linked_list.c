@@ -10,7 +10,6 @@ int linked_list_count(LinkedList *list) {
         count++;
         current_node = current_node->next;
     }
-
     return count;
 }
 

@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/04 13:36:42 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/25 15:53:54 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,50 @@
 # include <signal.h>
 # include "libft/libft.h"
 
-typedef struct s_resrc
-{
-	char	*line;
-	char	**s_line;
-	char	*buf;
-	char	*history;
-}			t_resrc;
-
 typedef struct s_command
 {
-	char				*command;
-	char				*command_argument;
-	char				*redirection;
-	char				*filename;
-	struct s_command	*next;
-}						t_command;
+	char	*full_path;
+	char	**full_cmd;
+	int		output_fd;
+	int		input_fd;
+}	t_command;
+
+
+typedef struct s_list
+{
+	t_command		command;
+	struct s_list	*next;
+}	t_list;
+
+typedef struct s_resrc
+{
+	t_list	*list;
+	char	**array;
+	char	**envp;
+}	t_resrc;
+
+void	ft_lstadd_back(t_list **head, t_list *new);
+t_list	*ft_lst_last(t_list *head);
+/*
+** EXEC
+*/
+void execution(t_resrc *resrc, t_list *list);
+/*
+** BUILTINS
+*/
+void execute_builtin_pwd();
+int execute_builtin_exit();
+int execute_builtin_cd(t_list *list);
+int execute_builtin_echo(t_command cmd);
+void execute_builtin_env(char **envp);
+/*
+** ERRORRR
+*/
+void error_handling(char *str);
+/*
+** UTILS
+*/
+int linked_list_count(t_list **lst);
+void wait_for_child(int command_count);
+
+#endif

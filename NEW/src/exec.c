@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/05 15:36:40 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/19 11:14:02 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/24 14:13:12 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,12 @@ int is_builtin(Command *cmd)
    	  	return (1);
    	else if (ft_strncmp(cmd->name, "echo", 4) == 0)
         return (1);
-	/*else if (ft_strncmp(cmd->name, "env", 3) == 0)
+	else if (ft_strncmp(cmd->name, "env", 3) == 0)
         return (1);
 	else if (ft_strncmp(cmd->name, "export", 6) == 0)
         return (1);
 	else if (ft_strncmp(cmd->name, "unset", 5) == 0)
         return (1);
-		*/
     return 0;
 }
 
