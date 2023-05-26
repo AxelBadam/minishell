@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/25 17:10:35 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/26 18:15:46 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,13 @@ int	len_ctr(char *line)
 			ctr[0]++;
 			ctr[1]++;
 			if (line[ctr[0] - 1] == '"' || line[ctr[0] - 1] == '\'')
-				iterate_quotes(line, ctr, line[ctr[0] - 1] , 1);
+				iterate_quotes(line, ctr, line[ctr[0] - 1], 1);
 			if (line[ctr[0]] == ' ' || !line[ctr[0]])
 				return (ctr[1]);
 		}
 	}
 	return (ctr[1]);
 }
-
 
 int	count_words(char *line)
 {
@@ -69,7 +68,7 @@ int	count_words(char *line)
 		{
 			ctr[0]++;
 			if (line[ctr[0] - 1] == '"' || line[ctr[0] - 1] == '\'')
-				if (!iterate_quotes(line, ctr, line[ctr[0] - 1] , 0))
+				if (!iterate_quotes(line, ctr, line[ctr[0] - 1], 0))
 					return (0);
 			if (line[ctr[0]] == ' ' || !line[ctr[0]])
 				ctr[1]++;
@@ -80,33 +79,37 @@ int	count_words(char *line)
 
 char	**make_array(char *line)
 {
-	int		words;
-	int		tmp[2];
+	int		tmp[3];
 	int		ctr;
 	char	**array;
 
 	ctr = 0;
 	tmp[0] = 0;
 	tmp[1] = 0;
-	words = count_words(line);
-	if (!words)
+	tmp[2] = count_words(line);
+	if (!tmp[2])
 		return (NULL);
-	array = (char **)malloc(sizeof(char *) * (words + 1));
+	array = (char **)malloc(sizeof(char *) * (tmp[2] + 1));
 	if (!array)
 		return (NULL);
-	while (words > 0)
+	while (tmp[2] > 0)
 	{
 		tmp[1] = len_ctr(&line[tmp[0]]);
 		tmp[0] += tmp[1];
 		array[ctr] = (char *)malloc(sizeof(char) * (tmp[1] + 1));
-		if (!array[ctr])
+		if (!array[ctr++])
 			return (NULL);
 		while (line[tmp[0]] == ' ')
 			tmp[0]++;
-		ctr++;
-		words--;
+		tmp[2]--;
 	}
 	return (array);
+}
+
+void	iterate_over_spaces(char *line, int *tmp)
+{
+	while (line[tmp[0]] == ' ')
+		tmp[0]++;
 }
 
 void	fill_array(char *line, char **array)
@@ -124,6 +127,7 @@ void	fill_array(char *line, char **array)
 	words = count_words(line);
 	while (words > index[0])
 	{
+		iterate_over_spaces(line, tmp);
 		len = len_ctr(&line[tmp[0]]);
 		tmp[1] = tmp[0];
 		tmp[0] += len;
@@ -131,9 +135,8 @@ void	fill_array(char *line, char **array)
 			array[index[0]][index[1]++] = line[tmp[1]++];
 		array[index[0]][index[1]] = 0;
 		index[1] = 0;
-		while (line[tmp[0]] == ' ')
-			tmp[0]++;
 		index[0]++;
+		iterate_over_spaces(line, tmp);
 	}
 	array[index[0]] = 0;
 }
@@ -186,57 +189,98 @@ char	*get_env(char *d_string, char **env)
 	return (str);
 }
 
-void	add_expansion(char **array, char *dst, char *src, int rm_len)
+char	*create_expanded_string(char *dst, char *src, int rm_len)
 {
-	int		ctr[4];
-	int		s_len;
-	char	*new_str;
 	int		src_len;
+	char	*new_str;
+	int		s_len;
 
-	ctr[0] = 0;
-	ctr[1] = 0;
-	ctr[2] = 0;
-	ctr[3] = 0;
 	if (!src)
 		src_len = 0;
 	else
 		src_len = ft_strlen(src);
 	s_len = (ft_strlen(dst) - rm_len + src_len);
-	while (array[ctr[0]] && array[ctr[0]] != dst)
-		ctr[0]++;
 	new_str = (char *)malloc(sizeof(char) * (s_len + 1));
-	while (dst[ctr[1]])
+	if (!new_str)
+		return (NULL);
+	return (new_str);
+}
+
+void	expand_string(char *src, char *new_str, int *ctr, int rm_len)
+{
+	if (src)
+		while (src[ctr[3]])
+			new_str[ctr[2]++] = src[ctr[3]++];
+	while (rm_len > 0)
 	{
-		if (!ctr[3])
-		{
-			if (dst[ctr[1]] == '$' || (!dst[ctr[1] - 1] && dst[ctr[1]] == '~' && (array[ctr[0]][ctr[1] + 1] == '/' || !array[ctr[0]][ctr[1] + 1])))
-			{
-				if (src)
-					while (src[ctr[3]])
-						new_str[ctr[2]++] = src[ctr[3]++];
-				while (rm_len > 0)
-				{
-					ctr[1]++;
-					rm_len--;
-				}
-			}
-		}
-		if (dst[ctr[1]])
-			new_str[ctr[2]++] = dst[ctr[1]++];
+		ctr[1]++;
+		rm_len--;
 	}
-	new_str[ctr[2]] = 0;
-	free(array[ctr[0]]);
+}
+
+void	add_expansion(char **ar, char *dst, char *src, int rm_len)
+{
+	int		c[4];
+	char	*new_str;
+
+	c[0] = 0;
+	c[1] = 0;
+	c[2] = 0;
+	c[3] = 0;
+	while (ar[c[0]] && ar[c[0]] != dst)
+		c[0]++;
+	new_str = create_expanded_string(dst, src, rm_len);
+	if (!new_str)
+		return ;
+	while (dst[c[1]])
+	{
+		if (!c[3])
+			if (dst[c[1]] == '$' || (!dst[c[1] - 1] && dst[c[1]] == '~'
+					&& (ar[c[0]][c[1] + 1] == '/' || !ar[c[0]][c[1] + 1])))
+				expand_string(src, new_str, c, rm_len);
+		if (dst[c[1]])
+			new_str[c[2]++] = dst[c[1]++];
+	}
+	new_str[c[2]] = 0;
+	free(ar[c[0]]);
 	free(src);
-	array[ctr[0]] = new_str;
+	ar[c[0]] = new_str;
+}
+
+void	expand_dollar_sign(char **ar, int *ctr, char **env)
+{
+	char	*ptr;
+	int		len;
+
+	len = 0;
+	ptr = NULL;
+	if (ar[ctr[0]][ctr[1] - 1] == '$')
+	{
+		len++;
+		if (ar[ctr[0]][ctr[1]] == '?')
+			add_expansion(ar, ar[ctr[0]], ft_itoa(g_exit_status), len + 1);
+		else
+		{
+			while (ft_isalpha(ar[ctr[0]][ctr[1]])
+				|| ar[ctr[0]][ctr[1]] == '_')
+			{
+				ctr[1]++;
+				len++;
+			}
+			ptr = ft_substr(ar[ctr[0]], ctr[1] - len, len);
+			add_expansion(ar, ar[ctr[0]], get_env(ptr + 1, env), len);
+		}
+		ctr[1] = 0;
+		if (ptr)
+			free(ptr);
+	}
 }
 
 void	expand(char **array, char **env)
 {
 	int		ctr[2];
-	int		len;
 	char	*ptr;
 
-	len = 0;
 	ctr[0] = 0;
 	ctr[1] = -1;
 	ptr = NULL;
@@ -244,31 +288,14 @@ void	expand(char **array, char **env)
 	{
 		while (array[ctr[0]][++ctr[1]])
 		{
-			if (array[ctr[0]][ctr[1] - 1] == '$')
-			{
-				len++;
-				if (array[ctr[0]][ctr[1]] == '?')
-					add_expansion(array, array[ctr[0]], ft_itoa(g_exit_status), len + 1);
-				else
-				{
-					while (ft_isalpha(array[ctr[0]][ctr[1]]) || array[ctr[0]][ctr[1]] == '_')
-					{
-						ctr[1]++;
-						len++;
-					}
-					ptr = ft_substr(array[ctr[0]], ctr[1] - len, len);
-					add_expansion(array, array[ctr[0]], get_env(ptr + 1, env), len);
-				}
-				ctr[1] = 0;
-				if (ptr)
-					free(ptr);
-			}
-			if (ctr[1] == 0 && array[ctr[0]][ctr[1]] == '~' && (array[ctr[0]][ctr[1] + 1] == '/' || !array[ctr[0]][ctr[1] + 1]))
+			expand_dollar_sign(array, ctr, env);
+			if (ctr[1] == 0 && array[ctr[0]][ctr[1]] == '~'
+				&& (array[ctr[0]][ctr[1] + 1] == '/'
+					|| !array[ctr[0]][ctr[1] + 1]))
 				add_expansion(array, array[ctr[0]], get_env("HOME", env), 1);
 			if (array[ctr[0]][ctr[1] - 1] == '\'')
 				if (ft_strchr(&array[ctr[0]][ctr[1]], '\''))
 					iterate_quotes(array[ctr[0]], &ctr[1], '\'', 0);
-			len = 0;
 		}
 		ctr[1] = -1;
 		ctr[0]++;
@@ -280,11 +307,13 @@ int	count(char **array, int *ctr, int strings)
 	int	start;
 
 	start = 0;
-	if (array[ctr[0]][ctr[1]] == '>' || array[ctr[0]][ctr[1]] == '<' || array[ctr[0]][ctr[1]] == '|')
+	if (array[ctr[0]][ctr[1]] == '>' || array[ctr[0]][ctr[1]] == '<'
+		|| array[ctr[0]][ctr[1]] == '|')
 	{
 		start = ctr[1];
 		strings++;
-		while (array[ctr[0]][ctr[1]] && (array[ctr[0]][ctr[1]] == '>' || array[ctr[0]][ctr[1]] == '<' || array[ctr[0]][ctr[1]] == '|'))
+		while (array[ctr[0]][ctr[1]] && (array[ctr[0]][ctr[1]] == '>'
+			|| array[ctr[0]][ctr[1]] == '<' || array[ctr[0]][ctr[1]] == '|'))
 			ctr[1]++;
 		if (array[ctr[0]][ctr[1]])
 			strings++;
@@ -309,7 +338,8 @@ int	count_strings(char **array)
 			if (array[ctr[0]][ctr[1]] == '"' || array[ctr[0]][ctr[1]] == '\'')
 			{
 				ctr[1]++;
-				iterate_quotes(array[ctr[0]], &ctr[1], array[ctr[0]][ctr[1] - 1], 0);
+				iterate_quotes(array[ctr[0]],
+					&ctr[1], array[ctr[0]][ctr[1] - 1], 0);
 			}
 			strings = count(array, ctr, strings);
 		}
@@ -320,34 +350,36 @@ int	count_strings(char **array)
 	return (strings);
 }
 
-int	fill(char **new_array, char **old_array, int *ctr, int *index)
+int	fill(char **n_arr, char **o_arr, int *c, int *i)
 {
-	if (old_array[ctr[0]][ctr[1]] == '"' || old_array[ctr[0]][ctr[1]] == '\'')
+	if (o_arr[c[0]][c[1]] == '"' || o_arr[c[0]][c[1]] == '\'')
 	{
-		ctr[1]++;
-		iterate_quotes(old_array[ctr[0]], &ctr[1], old_array[ctr[0]][ctr[1] - 1], 0);
+		c[1]++;
+		iterate_quotes(o_arr[c[0]], &c[1], o_arr[c[0]][c[1] - 1], 0);
 	}
-	if (old_array[ctr[0]][ctr[1]] == '<' || old_array[ctr[0]][ctr[1]] == '>' || old_array[ctr[0]][ctr[1]] == '|')
+	if (o_arr[c[0]][c[1]] == '<' || o_arr[c[0]][c[1]] == '>'
+		|| o_arr[c[0]][c[1]] == '|')
 	{
-		if (ctr[1])
+		if (c[1])
 		{
-			new_array[index[0]++] = ft_substr(old_array[ctr[0]], index[1], ctr[1] - index[1]);
-			index[1] = ctr[1];
+			n_arr[i[0]++] = ft_substr(o_arr[c[0]], i[1], c[1] - i[1]);
+			i[1] = c[1];
 		}
-		while (old_array[ctr[0]][ctr[1]] && (old_array[ctr[0]][ctr[1]] == '<' || old_array[ctr[0]][ctr[1]] == '>' || old_array[ctr[0]][ctr[1]] == '|'))
-			ctr[1]++;
-		new_array[index[0]++] = ft_substr(old_array[ctr[0]], index[1], ctr[1] - index[1]);
-		index[1] = ctr[1];
-		if (!old_array[ctr[0]][ctr[1]])
+		while (o_arr[c[0]][c[1]] && (o_arr[c[0]][c[1]] == '<'
+			|| o_arr[c[0]][c[1]] == '>' || o_arr[c[0]][c[1]] == '|'))
+			c[1]++;
+		n_arr[i[0]++] = ft_substr(o_arr[c[0]], i[1], c[1] - i[1]);
+		i[1] = c[1];
+		if (!o_arr[c[0]][c[1]])
 			return (1);
 	}
-	if (!old_array[ctr[0]][ctr[1] + 1])
-		if (!new_array[index[0]])
-			new_array[index[0]++] = ft_substr(old_array[ctr[0]], index[1], ctr[1] + 1 - index[1]);
+	if (!o_arr[c[0]][c[1] + 1])
+		if (!n_arr[i[0]])
+			n_arr[i[0]++] = ft_substr(o_arr[c[0]], i[1], c[1] + 1 - i[1]);
 	return (0);
 }
 
-void	fill_array_with_operators(char **new_array, char **old_array)
+void	fill_array_with_operators(char **n_arr, char **o_arr)
 {
 	int	ctr[2];
 	int	index[2];
@@ -356,11 +388,11 @@ void	fill_array_with_operators(char **new_array, char **old_array)
 	ctr[1] = -1;
 	index[0] = 0;
 	index[1] = 0;
-	while (old_array[ctr[0]])
+	while (o_arr[ctr[0]])
 	{
-		while (old_array[ctr[0]][++ctr[1]])
+		while (o_arr[ctr[0]][++ctr[1]])
 		{
-			if (fill(new_array, old_array, ctr, index))
+			if (fill(n_arr, o_arr, ctr, index))
 				break ;
 		}
 		index[1] = 0;
@@ -368,23 +400,23 @@ void	fill_array_with_operators(char **new_array, char **old_array)
 		ctr[0]++;
 	}
 	printf("INDEX %i\n", index[0]);
-	new_array[index[0]] = 0;
+	n_arr[index[0]] = 0;
 }
 
 char	**make_array_with_operators(char **array, int strings)
 {
 	int		ctr;
-	char	**new_array;
+	char	**n_arr;
 
 	ctr = 0;
 	while (array[ctr])
 		ctr++;
 	printf("strings == %i\n", ctr + strings + 1);
-	new_array = (char **)malloc(sizeof(char *) * (ctr + strings + 1));
-	if (!new_array)
+	n_arr = (char **)malloc(sizeof(char *) * (ctr + strings + 1));
+	if (!n_arr)
 		return (NULL);
-	fill_array_with_operators(new_array, array);
-	return (new_array);
+	fill_array_with_operators(n_arr, array);
+	return (n_arr);
 }
 
 void	free_string_array(char **array)
@@ -403,14 +435,14 @@ void	free_string_array(char **array)
 char	**split_by_operator(char **array)
 {
 	int		strings;
-	char	**new_array;
+	char	**n_arr;
 
 	strings = count_strings(array);
 	if (!strings)
 		return (array);
-	new_array = make_array_with_operators(array, strings);
+	n_arr = make_array_with_operators(array, strings);
 	free_string_array(array);
-	return (new_array);
+	return (n_arr);
 }
 
 int	str_len_without_quotes(char *str)
@@ -454,7 +486,8 @@ char	*make_new_str(char *old_str, int len)
 				new_str[ctr[1]++] = old_str[ctr[0]++];
 			ctr[0]++;
 		}
-		if (old_str[ctr[0]] && (old_str[ctr[0]] != '"' || old_str[ctr[0]] != '\''))
+		if (old_str[ctr[0]] && (old_str[ctr[0]] != '"'
+				|| old_str[ctr[0]] != '\''))
 			new_str[ctr[1]++] = old_str[ctr[0]++];
 	}
 	new_str[ctr[1]] = 0;
@@ -514,12 +547,7 @@ void	create_heredoc(int *fd, char *delimitor)
 		free(line);
 }
 
-/*void	file_error(char *filename, int error)
-{
-	return ;
-}*/
-
-int print_error(char *str, int exit_status, char *filename)
+int	print_error(char *str, int exit_status, char *filename)
 {
 	ft_putstr_fd("minishell: ", 2);
 	if (filename)
@@ -529,34 +557,31 @@ int print_error(char *str, int exit_status, char *filename)
 	return (0);
 }
 
-int	open_file(char *redirect, char *filename, int *fd)
+int	open_output_redirect(char *redirect, char *filename, int *fd)
 {
-	int	len;
-
-	if (!filename)
-	{
-		print_error("syntax error near unexpected token `newline'\n", 69, filename);
-		return (-1);
-	}
-	len = str_len_without_quotes(filename);
-	if (len != ft_strlen(filename))
-		filename = make_new_str(filename, len);
-	if (access(filename, F_OK) == 0 && access(filename, W_OK != 0 ) &&
-		(ft_strncmp(redirect, ">", SIZE_MAX) == 0 || ft_strncmp(redirect, ">>", SIZE_MAX) == 0))
+	if (access(filename, F_OK) == 0 && access(filename, W_OK != 0)
+		&& (ft_strncmp(redirect, ">", SIZE_MAX) == 0
+			|| ft_strncmp(redirect, ">>", SIZE_MAX) == 0))
 		if (!print_error(": Permission denied\n", 69, filename))
 			return (-1);
 	if (ft_strncmp(redirect, ">", SIZE_MAX) == 0)
-		fd[1] = open(filename, O_CREAT | O_WRONLY , 0644);
+		fd[1] = open(filename, O_CREAT | O_WRONLY, 0644);
 	else if (ft_strncmp(redirect, ">>", SIZE_MAX) == 0)
 		fd[1] = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
+	return (0);
+}
+
+int	open_input_redirect(char *redirect, char *filename, int *fd)
+{
 	if (ft_strncmp(redirect, "<<", SIZE_MAX) == 0)
 	{
 		pipe(fd);
 		create_heredoc(fd, filename);
 	}
-	else if	(ft_strncmp(redirect, "<", SIZE_MAX) == 0)
+	else if (ft_strncmp(redirect, "<", SIZE_MAX) == 0)
 	{
-		if (access(filename, F_OK) != 0 || (access(filename, F_OK) == 0 && access(filename, R_OK) != 0))
+		if (access(filename, F_OK) != 0
+			|| (access(filename, F_OK) == 0 && access(filename, R_OK) != 0))
 		{
 			if (access(filename, F_OK) != 0)
 			{
@@ -568,6 +593,41 @@ int	open_file(char *redirect, char *filename, int *fd)
 		}
 		fd[0] = open(filename, O_RDONLY);
 	}
+	return (0);
+}
+
+int	is_a_directory(char *filename)
+{
+	struct stat	statbuf;
+	int			dir;
+
+	if (stat(filename, &statbuf) != 0)
+		return (0);
+	dir = S_ISDIR(statbuf.st_mode);
+	if (dir)
+		print_error(": Is a directory\n", 258, filename);
+	return (dir);
+}
+
+int	open_file(char *redirect, char *filename, int *fd)
+{
+	int	len;
+
+	if (!filename)
+	{
+		print_error("syntax error near unexpected token `newline'\n",
+			69, filename);
+		return (-1);
+	}
+	len = str_len_without_quotes(filename);
+	if (len != ft_strlen(filename))
+		filename = make_new_str(filename, len);
+	if (is_a_directory(filename))
+		return (-1);
+	if (open_output_redirect(redirect, filename, fd) == -1)
+		return (-1);
+	if (open_input_redirect(redirect, filename, fd) == -1)
+		return (-1);
 	return (0);
 }
 
@@ -585,20 +645,21 @@ int	get_array_size(char **array)
 
 void	add_array_to_array(t_resrc *resource, char **array, char **pipe_command)
 {
-	char	**new_array;
+	char	**n_arr;
 	int		ctr[2];
 
 	ctr[0] = 0;
 	ctr[1] = 0;
-	new_array = (char **)malloc(sizeof(char *) * (get_array_size(array) + get_array_size(pipe_command) + 1));
+	n_arr = (char **)malloc(sizeof(char *)
+			* (get_array_size(array) + get_array_size(pipe_command) + 1));
 	while (array[ctr[0]])
-		new_array[ctr[0]++] = ft_strdup(array[ctr[0]]);
+		n_arr[ctr[0]++] = ft_strdup(array[ctr[0]]);
 	while (pipe_command[ctr[1]])
-		new_array[ctr[0]++] = ft_strdup(pipe_command[ctr[1]++]);
-	new_array[ctr[0]] = 0;
+		n_arr[ctr[0]++] = ft_strdup(pipe_command[ctr[1]++]);
+	n_arr[ctr[0]] = 0;
 	free_string_array(array);
 	free_string_array(pipe_command);
-	resource->array = new_array;
+	resource->array = n_arr;
 }
 
 int	get_new_command(t_resrc *resource, char **array)
@@ -623,57 +684,126 @@ int	get_new_command(t_resrc *resource, char **array)
 	return (0);
 }
 
-int	check_syntax(char **array, int *ctr, char d)
+int	check_pipe_syntax(char **array, int *ctr)
 {
-	if (d == '|')
+	int	error;
+
+	error = 0;
+	if (array[ctr[0]][1])
+		error = 258;
+	if (array[ctr[0] + 1])
+		if (array[ctr[0] + 1][0] == '>' || array[ctr[0] + 1][0] == '<'
+			|| array[ctr[0] + 1][0] == '|')
+			error = 258;
+	if (error)
 	{
-		if (array[ctr[0]][1])
-			return (0);
-		return (1);
-	}
-	if ((array[ctr[0]][1] && array[ctr[0]][1] != d) || array[ctr[0]][2])
+		print_error("syntax error near unexpected token `|'\n", 258, NULL);
 		return (0);
+	}
 	return (1);
 }
 
-int	get_file_descriptor(char **array, int *fd)
+int	check_syntax(char **array, int *ctr, char d)
 {
-	int	ctr[2];
+	int	error;
 
-	ctr[0] = 0;
-	ctr[1] = 0;
-	while (array[ctr[0]])
+	error = 0;
+	if (d == '|')
+		if (!check_pipe_syntax(array, ctr))
+			return (0);
+	if ((array[ctr[0]][1] && array[ctr[0]][1] != d) || array[ctr[0]][2])
+		return (0);
+	if (array[ctr[0] + 1])
 	{
-		if (array[ctr[0]][0] == '>' || array[ctr[0]][0] == '<' || array[ctr[0]][0] == '|')
+		if (array[ctr[0] + 1][0] == '>' || array[ctr[0] + 1][0] == '<'
+			|| array[ctr[0] + 1][0] == '|')
 		{
-			if (!check_syntax(array, ctr, array[ctr[0]][0]))
+			print_error("syntax error near unexpected token `>'\n", 258, NULL);
+			return (0);
+		}
+	}
+	return (1);
+}
+
+int	get_len_without_redirects(char **ar, int *fd)
+{
+	int	c[2];
+
+	c[0] = 0;
+	c[1] = 0;
+	while (ar[c[0]])
+	{
+		if (ar[c[0]][0] == '>' || ar[c[0]][0] == '<' || ar[c[0]][0] == '|')
+		{
+			if (!check_syntax(ar, c, ar[c[0]][0]))
 				return (0);
-			if (array[ctr[0]][0] == '|')
+			if (ar[c[0]][0] == '|')
 				break ;
 			if (fd[1] != 1)
 				close(fd[1]);
-			if (open_file(array[ctr[0]], array[ctr[0] + 1], fd) == -1)
+			if (open_file(ar[c[0]], ar[c[0] + 1], fd) == -1)
 				return (0);
-			if (array[ctr[0] + 1])
-				ctr[1] -= 2;
+			if (ar[c[0] + 1])
+				c[1] -= 2;
 			else
-				ctr[1]--;
+				c[1]--;
 		}
-		ctr[0]++;
-		ctr[1]++;
+		c[0]++;
+		c[1]++;
 	}
-	printf("LEN == %i\n", ctr[1]);
-	return (ctr[1]);
+	return (c[1]);
 }
 
-t_list *create_node(char **full_cmd, int *fd)
+char	*create_full_path(char *cmd, char *path, int start, int len)
+{
+	char	*full_path;
+
+	full_path = (char *)malloc(sizeof(char) * (len));
+	if (!full_path)
+		return (NULL);
+	full_path = ft_substr(path, start, len - 1);
+	full_path = ft_strjoin(full_path, "/");
+	full_path = ft_strjoin(full_path, cmd);
+	return (full_path);
+}
+
+char	*get_full_path(char *cmd, char *path)
+{
+	char	*full_path;
+	int		ctr[2];
+	int		len;
+
+	ctr[0] = 0;
+	ctr[1] = 0;
+	len = 0;
+	while (path[ctr[0]])
+	{
+		if (path[ctr[0]] == ':')
+		{
+			full_path = create_full_path(cmd, path, ctr[1], len);
+			if (access(full_path, F_OK) == 0)
+				break ;
+			free(full_path);
+			full_path = NULL;
+			ctr[1] = ctr[0] + 1;
+			len = 0;
+		}
+		len++;
+		ctr[0]++;
+	}
+	free(path);
+	return (full_path);
+}
+
+t_list	*create_node(char **full_cmd, int *fd, char **env)
 {
 	t_list	*new_node;
 
 	new_node = (t_list *)malloc(sizeof(t_list));
 	if (!new_node)
 		return (NULL);
-	new_node->command.full_path = NULL;
+	new_node->command.full_path = get_full_path(*full_cmd,
+			get_env("PATH", env));
 	new_node->command.full_cmd = full_cmd;
 	new_node->command.output_fd = fd[1];
 	new_node->command.input_fd = fd[0];
@@ -684,8 +814,9 @@ t_list *create_node(char **full_cmd, int *fd)
 void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len)
 {
 	if (ctr[0] < len)
-			full_cmd[ctr[0]++] = ft_strdup(array[ctr[1]++]);
-	while (array[ctr[1]] && (array[ctr[1]][0] == '>' || array[ctr[1]][0] == '<'))
+		full_cmd[ctr[0]++] = ft_strdup(array[ctr[1]++]);
+	while (array[ctr[1]]
+		&& (array[ctr[1]][0] == '>' || array[ctr[1]][0] == '<'))
 	{
 		if (array[ctr[1] + 1])
 			ctr[1] += 2;
@@ -696,13 +827,13 @@ void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len)
 
 void	make_list(t_resrc *resource, char **array)
 {
-	t_variables variable;
+	t_variables	variable;
 
 	variable.ctr[1] = 0;
 	variable.ctr[0] = 0;
 	variable.fd[0] = 0;
 	variable.fd[1] = 1;
-	variable.len = get_file_descriptor(array, variable.fd);
+	variable.len = get_len_without_redirects(array, variable.fd);
 	if (!variable.len)
 		return ;
 	variable.full_cmd = (char **)malloc(sizeof(char *) * (variable.len + 1));
@@ -712,10 +843,9 @@ void	make_list(t_resrc *resource, char **array)
 		create_full_cmd(variable.full_cmd, array, variable.ctr, variable.len);
 	variable.full_cmd[variable.ctr[0]] = 0;
 	variable.ctr[0] = 0;
-	while (variable.full_cmd[variable.ctr[0]])
-		printf("%s\n", variable.full_cmd[variable.ctr[0]++]);
 	remove_quotes(variable.full_cmd);
-	ft_lstadd_back(&resource->list, create_node(variable.full_cmd, variable.fd));
+	ft_lstadd_back(&resource->list,
+		create_node(variable.full_cmd, variable.fd, resource->envp));
 	if (array[variable.ctr[1]])
 	{
 		if (!get_new_command(resource, array))
@@ -726,15 +856,19 @@ void	make_list(t_resrc *resource, char **array)
 
 void	print_list(t_list **head)
 {
-	t_list *tmp = *head;
-	int ctr = 0;
+	t_list	*tmp;
+	int		ctr;
 
+	ctr = 0;
+	tmp = *head;
 	while (tmp)
 	{
 		printf("FULL CMD = ");
 		while (tmp->command.full_cmd[ctr])
 			printf("%s ", tmp->command.full_cmd[ctr++]);
-		printf("\nOUTPUT_FD = %i\nINPUT_FD = %i\n", tmp->command.output_fd, tmp->command.input_fd);
+		printf("\nFULL PATH = %s\n", tmp->command.full_path);
+		printf("OUTPUT_FD = %i\nINPUT_FD = %i\n",
+			tmp->command.output_fd, tmp->command.input_fd);
 		tmp = tmp->next;
 		ctr = 0;
 	}
@@ -783,7 +917,7 @@ void	*init_resources(char **envp)
 
 	resrc = (t_resrc *)malloc(sizeof(t_resrc));
 	if (!resrc)
-		return NULL;
+		return (NULL);
 	resrc->envp = envp;
 	resrc->list = NULL;
 	return (resrc);
@@ -816,7 +950,7 @@ char	*shlvl(char *sys_shlvl)
 	int		lvl;
 	char	*level;
 	char	*program_shlvl;
-	
+
 	lvl = ft_atoi(&sys_shlvl[6]);
 	lvl++;
 	ft_strlcpy(shlvl, sys_shlvl, 7);
@@ -874,5 +1008,3 @@ int	main(int argc, char **argv, char **env)
 	free(resrc);
 	return (0);
 }
-
-//hello man

@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/25 13:55:24 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/26 18:15:34 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <signal.h>
 # include "libft/libft.h"
 # include <sys/ioctl.h>
+# include <sys/stat.h>
 
 int	g_exit_status;
 
@@ -31,7 +32,6 @@ typedef struct s_variables
 	int		fd[2];
 }	t_variables;
 
-
 typedef struct s_command
 {
 	char	*full_path;
@@ -39,7 +39,6 @@ typedef struct s_command
 	int		input_fd;
 	int		output_fd;
 }	t_command;
-
 
 typedef struct s_list
 {
