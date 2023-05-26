@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:04:53 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/25 15:14:53 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/26 17:15:54 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,4 +33,17 @@ void wait_for_child(int command_count)
 {
 	while (command_count-- > 0)
 		wait(&g_exit_status);
+}
+
+void    free_string_array(char **array)
+{
+    int    ctr;
+
+    ctr = 0;
+    if (array)
+    {
+        while (array[ctr])
+            free(array[ctr++]);
+        free(array);
+    }
 }

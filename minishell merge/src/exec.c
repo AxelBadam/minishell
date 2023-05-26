@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/25 15:55:59 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/26 17:06:58 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,10 @@ int check_for_parent_builtin(t_resrc *resrc, char **cmd_arr, int len)
 {	
 	if (!ft_strncmp(*cmd_arr, "cd", len))
  	   	return (execute_builtin_cd(resrc->list));
-	/*else if (!ft_strncmp(*cmd_arr, "unset", len))
-        return (execute_builtin_unset(resrc->list, resrc->envp));
+	else if (!ft_strncmp(*cmd_arr, "unset", len))
+        return (execute_builtin_unset(resrc->list, resrc));
 	else if (!ft_strncmp(*cmd_arr, "export", 6))
-        return (execute_builtin_export(resrc->list, resrc->envp));*/
+        return (execute_builtin_export(resrc->list, resrc));
 	return (0);
 }
 
@@ -58,7 +58,6 @@ void execute_builtin(t_resrc *resrc, t_list *list)
     	execute_builtin_echo(list->command);
 	else if (ft_strncmp(cmd, "env", len) == 0)
     	execute_builtin_env(resrc->envp);
-	exit(g_exit_status);
 }
 
 int is_builtin(t_command command)
@@ -95,6 +94,7 @@ void execute_child(t_resrc *resrc, t_list *list)
 		execve(list->command.full_path, list->command.full_cmd, resrc->envp);
 	else if (is_builtin(list->command))
 		execute_builtin(resrc, list);
+	exit(g_exit_status);
 }
 
 int setup_redir(t_list *list)

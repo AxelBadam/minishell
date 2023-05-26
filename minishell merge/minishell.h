@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/25 15:53:54 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/26 17:16:20 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ typedef struct s_command
 	int		output_fd;
 	int		input_fd;
 }	t_command;
-
 
 typedef struct s_list
 {
@@ -56,6 +55,8 @@ int execute_builtin_exit();
 int execute_builtin_cd(t_list *list);
 int execute_builtin_echo(t_command cmd);
 void execute_builtin_env(char **envp);
+int execute_builtin_unset(t_list *list, t_resrc *resrc);
+int execute_builtin_export(t_list *list, t_resrc *resrc);
 /*
 ** ERRORRR
 */
@@ -63,7 +64,9 @@ void error_handling(char *str);
 /*
 ** UTILS
 */
+void    free_string_array(char **array);
 int linked_list_count(t_list **lst);
 void wait_for_child(int command_count);
+int is_in_env(char *str, char **envp);
 
 #endif

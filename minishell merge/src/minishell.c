@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/25 15:06:42 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/26 17:17:21 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -370,19 +370,6 @@ char	**make_array_with_operators(char **array, int operators)
 	return (new_array);
 }
 
-void	free_string_array(char **array)
-{
-	int	ctr;
-
-	ctr = 0;
-	if (array)
-	{
-		while (array[ctr])
-			free(array[ctr++]);
-		free(array);
-	}
-}
-
 char	**split_by_operator(char **array)
 {
 	int		operators;
@@ -708,7 +695,7 @@ char	**create_env(char **env)
 int	main(int argc, char **argv, char **env)
 {
 	t_resrc	*resrc;
-
+	
 	(void)argc;
 	(void)argv;
 	resrc = init_resources(create_env(env));
