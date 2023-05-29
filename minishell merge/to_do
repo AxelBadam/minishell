@@ -1,0 +1,11 @@
+- cd not working 
+- has to do with (path)
+- exit statuses
+- error_handling
+- malloc protection
+- setting env at startup?
+- env last command
+- signals
+- put cmds in lower case in parsing
+- clearing and freeing lst after child has executed
+- access checks for for files and directory check

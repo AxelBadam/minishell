@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/26 18:08:55 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/29 17:13:49 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,21 +24,22 @@ int execute_builtin_cd(t_list *list)
         error_handling("cd erore");
     }
     g_exit_status = 1337;
-	return (1);
+	return (g_exit_status);
 }
 
-void execute_builtin_pwd()
+int execute_builtin_pwd()
 {
     char cwd[4096];
 
     if (getcwd(cwd, sizeof(cwd)) != NULL) 
     {
-        write(STDOUT_FILENO, cwd, ft_strlen(cwd)); // using STDOUT_FILENO
-        write(STDOUT_FILENO, "\n", 1); // using STDOUT_FILENO
+        write(STDOUT_FILENO, cwd, ft_strlen(cwd));
+        write(STDOUT_FILENO, "\n", 1);
     } 
     else 
 		error_handling("pwd error");
-	g_exit_status = 1338;
+	g_exit_status = 1338; //?
+	return (g_exit_status);
 }
 
 int execute_builtin_exit()
@@ -47,7 +48,7 @@ int execute_builtin_exit()
 	exit (0);
 }
 
-void execute_builtin_env(char **envp)
+int execute_builtin_env(char **envp)
 {
 	char **tmp;
 
@@ -57,6 +58,7 @@ void execute_builtin_env(char **envp)
 		ft_putstr_fd(*tmp++, 1);
 		ft_putstr_fd("\n", 1);
 	}
+	return (0);
 }
 
 int is_in_env(char *str, char **envp)
@@ -67,7 +69,9 @@ int is_in_env(char *str, char **envp)
 
 	i = 0;
 	count = 0;
-	len = ft_strlen(str);
+	len = 0;
+	while (str[len] != '=')
+		len++;
 	while (envp[i] && str[0] != 0)
 	{
 		if (ft_strncmp(envp[i], str, len) == 0 && envp[i][len] == '=')
@@ -75,6 +79,29 @@ int is_in_env(char *str, char **envp)
 		i++;
 	}
 	return (count);
+}
+
+char **replace_str(char *str, char **envp)
+{
+	int len;
+	int count;
+	int i;
+
+	len = 0;
+	i = 0;
+	count = 0;
+	while (str[len] != '=')
+		len++;
+	while (envp[i] && str[0] != 0)
+	{
+		if (ft_strncmp(envp[i], str, len) == 0 && envp[i][len] == '=')
+		{
+			free(envp[i]);
+			envp[i] = ft_strdup(str);
+		}
+		i++;
+	}
+	return (envp);
 }
 
 char **append_twod(char **twod, char *str_to_add)
@@ -104,39 +131,52 @@ int execute_builtin_export(t_list *list, t_resrc *resrc)
 	while (list->command.full_cmd[j])
 	{
 		str = list->command.full_cmd[j];
-		if (ft_strchr(str, '=') != NULL)
+		if (is_in_env(str, resrc->envp))
+			resrc->envp = replace_str(str, resrc->envp);
+		else if (ft_strchr(str, '=') != NULL)
 			resrc->envp = append_twod(resrc->envp, str);
 		j++;
 	}
 	return (1);
 }
 
+char **rmv_str_twod(char **env, char *to_rmv)
+{
+	char **new;
+	int i;
+	int len;
+	int j;
+
+	i = 0;
+	j = 0;
+	len = ft_strlen(to_rmv);
+	while(env[i])
+		i++;
+	new = (char **)malloc(sizeof(char *) * \
+	(i + 1 - is_in_env(to_rmv, env)));
+	i = 0;
+	while (env[i])
+	{			
+		if (ft_strnstr(env[i], to_rmv, len))
+			i++;
+	new[j++] = ft_strdup(env[i]);
+	free(env[i]);
+	i++;
+	}
+	new[j] = 0;	
+	free(env);
+	return(new);
+}
+
 int execute_builtin_unset(t_list *list, t_resrc *resrc)
 {
-	int i = 0;
-	int j = 0;
-	char **new_env;
-	int len;
-	
-	len = ft_strlen(list->command.full_cmd[1]);
-	if (is_in_env(list->command.full_cmd[1], resrc->envp))
+	int ac;
+
+	ac = 1;
+	while (list->command.full_cmd[ac] && is_in_env(list->command.full_cmd[ac], resrc->envp))
 	{
-		while(resrc->envp[i])
-			i++;
-		new_env = (char **)malloc(sizeof(char *) * \
-		(i + 1 - is_in_env(list->command.full_cmd[1], resrc->envp)));
-		i = 0;
-		while (resrc->envp[i])
-		{
-			if (ft_strnstr(resrc->envp[i], list->command.full_cmd[1], len))
-				i++;
-		new_env[j++] = ft_strdup(resrc->envp[i]);
-		free(resrc->envp[i]);
-		i++;
-		}
-	new_env[j] = 0;
-	free(resrc->envp);
-	resrc->envp = new_env;
+		resrc->envp = rmv_str_twod(resrc->envp, list->command.full_cmd[ac]);
+		ac++;
 	}
 	return (1);
 }
@@ -148,20 +188,19 @@ int execute_builtin_echo(t_command cmd)
 
 	newline = 1;
 	i = 1;
-    if (*cmd.full_cmd != 0 && cmd.full_cmd[i] != 0 && ft_strncmp(cmd.full_cmd[i], "-n", 2) == 0)
+    if (*cmd.full_cmd != 0 && cmd.full_cmd[i] != 0 \
+	&& ft_strncmp(cmd.full_cmd[i], "-n", 2) == 0)
     {
 		newline = 0;
 		i++;
 	}
     while (cmd.full_cmd[i] != 0)
     {
-    	ft_putstr_fd(cmd.full_cmd[i], STDOUT_FILENO); // using STDOUT_FILENO
+    	ft_putstr_fd(cmd.full_cmd[i], STDOUT_FILENO);
         if (cmd.full_cmd[++i] != 0)
-            write(1, " ", 1); // using STDOUT_FILENO
+            write(1, " ", 1);
     }
     if (newline)
-    {
-        ft_putstr_fd("\n", 1); // using STDOUT_FILENO
-    }
-    return 0;
+        ft_putstr_fd("\n", 1);
+    return (0);
 }
