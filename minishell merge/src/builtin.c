@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/29 17:13:49 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/30 11:30:51 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,11 @@ int is_in_env(char *str, char **envp)
 	i = 0;
 	count = 0;
 	len = 0;
-	while (str[len] != '=')
+	while (str[len] && str[len] != '=')
 		len++;
 	while (envp[i] && str[0] != 0)
 	{
-		if (ft_strncmp(envp[i], str, len) == 0 && envp[i][len] == '=')
+		if (!ft_strncmp(envp[i], str, len) && envp[i][len] == '=')
 			count++;
 		i++;
 	}
@@ -94,7 +94,7 @@ char **replace_str(char *str, char **envp)
 		len++;
 	while (envp[i] && str[0] != 0)
 	{
-		if (ft_strncmp(envp[i], str, len) == 0 && envp[i][len] == '=')
+		if (!ft_strncmp(envp[i], str, len) && envp[i][len] == '=')
 		{
 			free(envp[i]);
 			envp[i] = ft_strdup(str);
@@ -104,7 +104,7 @@ char **replace_str(char *str, char **envp)
 	return (envp);
 }
 
-char **append_twod(char **twod, char *str_to_add)
+char **append_2d(char **twod, char *str_to_add)
 {
 	char **new;
 	int i;
@@ -134,13 +134,13 @@ int execute_builtin_export(t_list *list, t_resrc *resrc)
 		if (is_in_env(str, resrc->envp))
 			resrc->envp = replace_str(str, resrc->envp);
 		else if (ft_strchr(str, '=') != NULL)
-			resrc->envp = append_twod(resrc->envp, str);
+			resrc->envp = append_2d(resrc->envp, str);
 		j++;
 	}
 	return (1);
 }
 
-char **rmv_str_twod(char **env, char *to_rmv)
+char **rmv_str_2d(char **env, char *to_rmv)
 {
 	char **new;
 	int i;
@@ -159,9 +159,8 @@ char **rmv_str_twod(char **env, char *to_rmv)
 	{			
 		if (ft_strnstr(env[i], to_rmv, len))
 			i++;
-	new[j++] = ft_strdup(env[i]);
-	free(env[i]);
-	i++;
+		new[j++] = ft_strdup(env[i]);
+		free(env[i++]);
 	}
 	new[j] = 0;	
 	free(env);
@@ -175,7 +174,7 @@ int execute_builtin_unset(t_list *list, t_resrc *resrc)
 	ac = 1;
 	while (list->command.full_cmd[ac] && is_in_env(list->command.full_cmd[ac], resrc->envp))
 	{
-		resrc->envp = rmv_str_twod(resrc->envp, list->command.full_cmd[ac]);
+		resrc->envp = rmv_str_2d(resrc->envp, list->command.full_cmd[ac]);
 		ac++;
 	}
 	return (1);

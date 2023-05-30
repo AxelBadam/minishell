@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/29 17:10:35 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/30 13:09:06 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,16 @@
 # include <unistd.h>
 # include <signal.h>
 # include "libft/libft.h"
+# include <sys/ioctl.h>
+# include <sys/stat.h>
+
+typedef struct s_variables
+{
+	int		ctr[2];
+	int		len;
+	char	**full_cmd;
+	int		fd[2];
+}	t_variables;
 
 typedef struct s_command
 {
@@ -68,5 +78,10 @@ void    free_string_array(char **array);
 int linked_list_count(t_list **lst);
 void wait_for_child(int command_count);
 int is_in_env(char *str, char **envp);
+int	get_2d_array_size(char **array);
+char **append_2d(char **twod, char *str_to_add);
+char **replace_str(char *str, char **envp);
+void	free_all_nodes(t_list **head);
+int    is_builtin(char *str);
 
 #endif

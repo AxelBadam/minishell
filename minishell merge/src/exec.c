@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/29 17:14:24 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/30 13:08:57 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,51 +66,23 @@ void execute_builtin(t_resrc *resrc, t_list *list)
 	int len;
 	
 	len = 0;
-	(void)resrc; // remove later, add g_status
 	cmd = *list->command.full_cmd;
 	if (*list->command.full_cmd)
 		len = ft_strlen(cmd);
-    if (!ft_strncmp(cmd, "pwd", len) || !ft_strncmp(cmd, "PWD", len))
+    if (!ft_strncmp(cmd, "pwd", len))
     	g_exit_status = execute_builtin_pwd();
- 	else if (!ft_strncmp(cmd, "echo", len) || !ft_strncmp(cmd, "ECHO", len))
+ 	else if (!ft_strncmp(cmd, "echo", len))
     	g_exit_status = execute_builtin_echo(list->command);
-	else if (!ft_strncmp(cmd, "env", len) || !ft_strncmp(cmd, "ENV", len))
+	else if (!ft_strncmp(cmd, "env", len))
     	g_exit_status = execute_builtin_env(resrc->envp);
-}
-
-int is_builtin(t_command command)
-{
-	int		len;
-	
-	len = ft_strlen(*command.full_cmd);
-	if (!*command.full_cmd)
-		return (0);
-	/*if ((*command.full_cmd && ft_strchr(*command.full_cmd, '/')) || \ 
-		(command.full_path && ft_strchr(command.full_path, '/')))
-		return (0);*/
-	if (!ft_strncmp(*command.full_cmd, "pwd", len))
-		return (1);
-	if (!ft_strncmp(*command.full_cmd, "env", len))
-		return (1);
-	if (!ft_strncmp(*command.full_cmd, "cd", len))
-		return (1);
-	if (!ft_strncmp(*command.full_cmd, "export", len))
-		return (1);
-	if (!ft_strncmp(*command.full_cmd, "unset", len))
-		return (1);
-	if (!ft_strncmp(*command.full_cmd, "echo", len))
-		return (1);
-	if (!ft_strncmp(*command.full_cmd, "exit", len))
-		return (1);
-	return (0);
 }
 
 void execute_child(t_resrc *resrc, t_list *list)
 {
 	// signals 
-	if (!is_builtin(list->command) && list->command.full_cmd)
+	if (!is_builtin(*list->command.full_cmd) && list->command.full_cmd)
 		execve(list->command.full_path, list->command.full_cmd, resrc->envp);
-	else if (is_builtin(list->command))
+	else if (is_builtin(*list->command.full_cmd))
 		execute_builtin(resrc, list);
 	exit(g_exit_status); // return to parent
 }
