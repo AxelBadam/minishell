@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/30 13:07:23 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/30 13:40:11 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -536,7 +536,7 @@ void	create_heredoc(int *fd, char *delimitor)
 	while (g_exit_status != 1)
 	{
 		line = readline("> ");
-		if (!line || ft_strncmp(line, delimitor, SIZE_MAX) != 0)
+		if (!line || ft_strncmp(line, delimitor, SIZE_MAX) == 0)
 			break ;
 		ft_putendl_fd(line, fd[1]);
 		free(line);
