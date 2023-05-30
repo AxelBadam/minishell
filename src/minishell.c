@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/30 13:11:50 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/30 13:22:29 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -534,7 +534,7 @@ void	create_heredoc(int *fd, char *delimitor)
 	while (g_exit_status != 1)
 	{
 		line = readline("> ");
-		if (!line || ft_strncmp(line, delimitor, SIZE_MAX) != 0)
+		if (!line || ft_strncmp(line, delimitor, SIZE_MAX) == 0)
 			break ;
 		ft_putendl_fd(line, fd[1]);
 		free(line);
