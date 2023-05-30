@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/26 18:15:46 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/30 12:59:42 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -795,6 +795,35 @@ char	*get_full_path(char *cmd, char *path)
 	return (full_path);
 }
 
+int	is_builtin(char *str)
+{
+	char	*tmp;
+	int		ctr;
+	int		re;
+
+	tmp = ft_strdup(str);
+	ctr = -1;
+	re = 0;
+	while (tmp[++ctr])
+		tmp[ctr] = ft_tolower(tmp[ctr]);
+	if (!ft_strncmp(tmp, "pwd", ctr))
+		re = 1;
+	else if (!ft_strncmp(tmp, "env", ctr))
+		re = 1;
+	else if (!ft_strncmp(tmp, "cd", ctr))
+		re = 1;
+	else if (!ft_strncmp(tmp, "export", ctr))
+		re = 1;
+	else if (!ft_strncmp(tmp, "unset", ctr))
+		re = 1;
+	else if (!ft_strncmp(tmp, "echo", ctr))
+		re = 1;
+	else if (!ft_strncmp(tmp, "exit", ctr))
+		re = 1;
+	free(tmp);
+    return (re);
+}
+
 t_list	*create_node(char **full_cmd, int *fd, char **env)
 {
 	t_list	*new_node;
@@ -802,8 +831,10 @@ t_list	*create_node(char **full_cmd, int *fd, char **env)
 	new_node = (t_list *)malloc(sizeof(t_list));
 	if (!new_node)
 		return (NULL);
-	new_node->command.full_path = get_full_path(*full_cmd,
-			get_env("PATH", env));
+	new_node->command.full_path = NULL;
+	if (!is_builtin(*full_cmd))
+		new_node->command.full_path = get_full_path(*full_cmd,
+				get_env("PATH", env));
 	new_node->command.full_cmd = full_cmd;
 	new_node->command.output_fd = fd[1];
 	new_node->command.input_fd = fd[0];
@@ -825,32 +856,32 @@ void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len)
 	}
 }
 
-void	make_list(t_resrc *resource, char **array)
+void	make_list(t_resrc *rs, char **array)
 {
-	t_variables	variable;
+	t_variables	v;
 
-	variable.ctr[1] = 0;
-	variable.ctr[0] = 0;
-	variable.fd[0] = 0;
-	variable.fd[1] = 1;
-	variable.len = get_len_without_redirects(array, variable.fd);
-	if (!variable.len)
+	v.ctr[1] = 0;
+	v.ctr[0] = 0;
+	v.fd[0] = 0;
+	v.fd[1] = 1;
+	v.len = get_len_without_redirects(array, v.fd);
+	if (!v.len)
 		return ;
-	variable.full_cmd = (char **)malloc(sizeof(char *) * (variable.len + 1));
-	if (!variable.full_cmd)
+	v.full_cmd = (char **)malloc(sizeof(char *) * (v.len + 1));
+	if (!v.full_cmd)
 		return ;
-	while (array[variable.ctr[1]] && array[variable.ctr[1]][0] != '|')
-		create_full_cmd(variable.full_cmd, array, variable.ctr, variable.len);
-	variable.full_cmd[variable.ctr[0]] = 0;
-	variable.ctr[0] = 0;
-	remove_quotes(variable.full_cmd);
-	ft_lstadd_back(&resource->list,
-		create_node(variable.full_cmd, variable.fd, resource->envp));
-	if (array[variable.ctr[1]])
+	while (array[v.ctr[1]] && array[v.ctr[1]][0] != '|')
+		create_full_cmd(v.full_cmd, array, v.ctr, v.len);
+	v.full_cmd[v.ctr[0]] = 0;
+	v.ctr[0] = 0;
+	remove_quotes(v.full_cmd);
+	ft_lstadd_back(&rs->list, create_node(v.full_cmd, v.fd, rs->envp));
+	if (array[v.ctr[1]])
 	{
-		if (!get_new_command(resource, array))
-			return ;
-		make_list(resource, &resource->array[variable.ctr[1] + 1]);
+		if (!array[v.ctr[1] + 1])
+			if (!get_new_command(rs, array))
+				return ;
+		make_list(rs, &rs->array[v.ctr[1] + 1]);
 	}
 }
 
