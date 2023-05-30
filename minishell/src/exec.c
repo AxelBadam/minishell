@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/30 13:08:57 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/30 14:58:56 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,8 +132,8 @@ void exec_cmd(t_resrc *resrc, t_list *list)
 		error_handling("pipe error"); // close pipes too
 	do_fork(resrc, list, fd);
 	close(fd[1]);
-	if (list->next && list->command.input_fd == 0)
-		(list->command.input_fd = fd[0]);
+	if (list->next && list->next->command.input_fd == 0)
+		list->next->command.input_fd = fd[0];
 	else
 		close_pipes(list, fd);
 }

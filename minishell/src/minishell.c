@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/30 14:50:20 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/05/30 16:47:28 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -561,7 +561,7 @@ int	print_error(char *str, int exit_status, char *filename)
 
 int	open_output_redirect(char *redirect, char *filename, int *fd)
 {
-	if (access(filename, F_OK) == 0 && access(filename, W_OK != 0)
+	if (access(filename, F_OK) == 0 && access(filename, W_OK == -1)
 		&& (ft_strncmp(redirect, ">", SIZE_MAX) == 0
 			|| ft_strncmp(redirect, ">>", SIZE_MAX) == 0))
 		if (!print_error(": Permission denied\n", 69, filename))
@@ -570,6 +570,9 @@ int	open_output_redirect(char *redirect, char *filename, int *fd)
 		fd[1] = open(filename, O_CREAT | O_WRONLY, 0644);
 	else if (ft_strncmp(redirect, ">>", SIZE_MAX) == 0)
 		fd[1] = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
+	if (fd[1] == -1 || fd[0] == -1)
+		if (!print_error("FATAL: Open fail\n", 69, NULL))
+			return (-1);
 	return (0);
 }
 
@@ -577,7 +580,9 @@ int	open_input_redirect(char *redirect, char *filename, int *fd)
 {
 	if (ft_strncmp(redirect, "<<", SIZE_MAX) == 0)
 	{
-		pipe(fd);
+		if (pipe(fd) == -1)
+			if (!print_error("FATAL: Pipe fail\n", 69, NULL))
+				return (-1);
 		create_heredoc(fd, filename);
 	}
 	else if (ft_strncmp(redirect, "<", SIZE_MAX) == 0)
@@ -626,9 +631,9 @@ int	open_file(char *redirect, char *filename, int *fd)
 		filename = make_new_str(filename, len);
 	if (is_a_directory(filename))
 		return (-1);
-	if (open_output_redirect(redirect, filename, fd) == -1)
-		return (-1);
 	if (open_input_redirect(redirect, filename, fd) == -1)
+		return (-1);
+	if (open_output_redirect(redirect, filename, fd) == -1)
 		return (-1);
 	return (0);
 }
@@ -953,8 +958,11 @@ void	minishell(t_resrc *resrc)
 			add_history(line);
 			make_list(resrc, resrc->array);
 			print_list(&resrc->list);
-			execution(resrc, resrc->list);
-			set_env(resrc);
+			if (resrc->list)
+			{
+				execution(resrc, resrc->list);
+				set_env(resrc);
+			}
 			free_string_array(resrc->array);
 			free_all_nodes(&resrc->list);
 		}
