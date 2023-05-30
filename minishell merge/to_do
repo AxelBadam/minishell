@@ -10,6 +10,14 @@
 
 -----------------
 exit_status
+126 = is not executable
 127 = command not found
 2 = incorrect usage; invalid options or missing arguments
+
+
 status > 0 = error during expansion or redirection
+
+
+
+
+redirection errors eetu

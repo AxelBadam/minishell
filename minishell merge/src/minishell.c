@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/30 13:07:23 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/30 15:43:35 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -953,8 +953,11 @@ void	minishell(t_resrc *resrc)
 			add_history(line);
 			make_list(resrc, resrc->array);
 			print_list(&resrc->list);
-			execution(resrc, resrc->list);
-			set_env(resrc);
+			if (resrc->list)
+			{
+				execution(resrc, resrc->list);
+				set_env(resrc);
+			}
 			free_string_array(resrc->array);
 			free_all_nodes(&resrc->list);
 		}

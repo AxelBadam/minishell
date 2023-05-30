@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/30 13:08:57 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/30 16:53:24 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,12 @@ int check_input(char **cmd_arr)
 
 int check_for_parent_builtin(t_resrc *resrc, char **cmd_arr, int len)
 {	
-	if (!ft_strncmp(*cmd_arr, "cd", len) || !ft_strncmp(*cmd_arr, "CD", len))
+	if (!ft_strncmp(*cmd_arr, "cd", len))
  	   	return (execute_builtin_cd(resrc->list));
 	else if ((!ft_strncmp(*cmd_arr, "unset", len) \
 	|| !ft_strncmp(*cmd_arr, "UNSET", len)) && check_input(cmd_arr))
         return (execute_builtin_unset(resrc->list, resrc));
-	else if (!ft_strncmp(*cmd_arr, "export", 6) || !ft_strncmp(*cmd_arr, "EXPORT", 6))
+	else if (!ft_strncmp(*cmd_arr, "export", 6))
         return (execute_builtin_export(resrc->list, resrc));
 	return (0);
 }
@@ -84,12 +84,11 @@ void execute_child(t_resrc *resrc, t_list *list)
 		execve(list->command.full_path, list->command.full_cmd, resrc->envp);
 	else if (is_builtin(*list->command.full_cmd))
 		execute_builtin(resrc, list);
-	exit(g_exit_status); // return to parent
+	exit(g_exit_status);
 }
 
 int setup_redir(t_list *list)
 {
-
 	//printf("%d", list->command.input_fd);
 	//printf("\n%d\n", list->command.output_fd);
     if (list->command.input_fd != STDIN_FILENO) 
@@ -124,16 +123,37 @@ void do_fork(t_resrc *resrc, t_list *list, int *fd)
 		child_process(resrc, list, fd);
 }
 
+int fork_check(t_resrc *resrc, t_list *list)
+{
+	DIR *dir;
+	
+	dir = NULL;
+
+	if (*list->command.full_cmd)
+		dir = opendir(*list->command.full_cmd)
+	if (dir)
+		g_exit_status = 126;
+	if ((!access(list->command.full_path, X_OK)) \
+	|| is_builtin(*list->command.full_cmd))
+	
+	
+	
+}
+
 void exec_cmd(t_resrc *resrc, t_list *list)
 {
 	int fd[2];
 
 	if (pipe(fd) < 0)
-		error_handling("pipe error"); // close pipes too
-	do_fork(resrc, list, fd);
+	{
+		close_pipes(list, fd);
+		error_handling("pipe error");
+	}
+	if (fork_check(resrc, list))
+		do_fork(resrc, list, fd);
 	close(fd[1]);
-	if (list->next && list->command.input_fd == 0)
-		(list->command.input_fd = fd[0]);
+	if (list->next && list->next->command.input_fd == 0)
+		list->next->command.input_fd = fd[0];
 	else
 		close_pipes(list, fd);
 }

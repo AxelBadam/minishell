@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/30 13:09:06 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/30 16:50:46 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include "libft/libft.h"
 # include <sys/ioctl.h>
 # include <sys/stat.h>
+# include <dirent.h>
 
 typedef struct s_variables
 {
