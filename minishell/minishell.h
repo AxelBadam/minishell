@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/30 13:09:06 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/05/31 13:35:45 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,5 +83,6 @@ char **append_2d(char **twod, char *str_to_add);
 char **replace_str(char *str, char **envp);
 void	free_all_nodes(t_list **head);
 int    is_builtin(char *str);
+int	print_error(char *str, int exit_status, char *filename);
 
 #endif
