@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/01 16:01:55 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/01 17:35:55 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -793,11 +793,13 @@ int	get_len_without_redirects(t_resrc *rs, char **ar, int *fd)
 char	*create_full_path(char *cmd, char *path, int start, int len)
 {
 	char	*full_path;
+	char	*tmp[2];
 
-	full_path = (char *)malloc(sizeof(char) * (len));
-	full_path = ft_substr(path, start, len - 1);
-	full_path = ft_strjoin(full_path, "/");
-	full_path = ft_strjoin(full_path, cmd);
+	tmp[0] = ft_substr(path, start, len - 1);
+	tmp[1] = ft_strjoin(tmp[0], "/");
+	full_path = ft_strjoin(tmp[1], cmd);
+	free(tmp[0]);
+	free(tmp[1]);
 	if (!full_path)
 		return (NULL);
 	return (full_path);
@@ -975,6 +977,7 @@ void set_env(t_resrc *resrc)
 		resrc->envp = replace_str(str, resrc->envp);
 	else if (ft_strchr(str, '=') != NULL)
 		resrc->envp = append_2d(resrc->envp, str);
+	free(str);
 }
 
 void	minishell(t_resrc *resrc)
