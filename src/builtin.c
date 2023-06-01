@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
+<<<<<<< HEAD:src/builtin.c
 /*   Updated: 2023/06/01 13:06:14 by atuliara         ###   ########.fr       */
+=======
+/*   Updated: 2023/06/01 15:47:18 by ekoljone         ###   ########.fr       */
+>>>>>>> origin/main:src/builtin.c
 /*                                                                            */
 /* ************************************************************************** */
 

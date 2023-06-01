@@ -2,45 +2,14 @@
 - has to do with (path)
 
 - clearing and freeing lst after child has executed
-
+- access checks for for files and directory check
 - malloc protection
+- exit statuses
 - error_handling
 - signals
 
 -----------------
-- access checks for for files and directory check
 exit_status
-126 = is not executable
 127 = command not found
 2 = incorrect usage; invalid options or missing arguments
-
 status > 0 = error during expansion or redirection
-
-
-cmd check:
--if binary not found 
-	print: "command not found"
-
---------------------------------------
--if not builtin and is dir,
-	"is a directory"
--if not builtin and no access F_OK, 
-	"no such file or directory"
--if not builtin and no perm, 
-	"permission denied"
-
-
-fork check:
--if output or input fd == -1, 
-	get out
--if access(X_OK) == 0, || is_builtin,
-	do fork
--else if not a builtin and file exists || is dir
-	g_status= 126
--else if not a builtin
-	status = command not found (127)
-
-
-if not builtin nor binary, its a program in the current dir (check access):
-
--fix basic either in fork check or cm check

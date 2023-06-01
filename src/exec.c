@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
+<<<<<<< HEAD:src/exec.c
 /*   Updated: 2023/06/01 15:34:18 by atuliara         ###   ########.fr       */
+=======
+/*   Updated: 2023/06/01 15:48:39 by ekoljone         ###   ########.fr       */
+>>>>>>> origin/main:src/exec.c
 /*                                                                            */
 /* ************************************************************************** */
 
