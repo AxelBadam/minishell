@@ -3,14 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-<<<<<<< HEAD:src/builtin.c
-/*   Updated: 2023/06/01 13:06:14 by atuliara         ###   ########.fr       */
-=======
-/*   Updated: 2023/06/01 15:47:18 by ekoljone         ###   ########.fr       */
->>>>>>> origin/main:src/builtin.c
+/*   Updated: 2023/06/01 17:22:17 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +19,12 @@ int execute_builtin_cd(t_list *list)
 	char *path;
 	
 	path = list->command.full_cmd[1];
-    if (chdir(path) != 0)
+	if (is_a_directory(path) && access(path, R_OK | X_OK) == 0) 
 	{
-        error_handling("cd erore");
-    }
-    g_exit_status = 1337;
+		g_exit_status = chdir(path);
+	}
+	if (g_exit_status != 0)
+		print_error("cd error", g_exit_status, path);
 	return (g_exit_status);
 }
 

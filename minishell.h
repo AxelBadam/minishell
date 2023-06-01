@@ -3,14 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-<<<<<<< HEAD:minishell.h
-/*   Updated: 2023/06/01 15:19:00 by atuliara         ###   ########.fr       */
-=======
-/*   Updated: 2023/06/01 16:00:30 by ekoljone         ###   ########.fr       */
->>>>>>> origin/main:minishell.h
+/*   Updated: 2023/06/01 16:22:38 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,12 +86,7 @@ char **append_2d(char **twod, char *str_to_add);
 char **replace_str(char *str, char **envp);
 void	free_all_nodes(t_list **head);
 int    is_builtin(char *str);
-<<<<<<< HEAD:minishell.h
-int	is_a_directory(char *filename);
-
-=======
 int	print_error(char *str, int exit_status, char *filename);
 int	is_a_directory(char *filename);
->>>>>>> origin/main:minishell.h
 
 #endif

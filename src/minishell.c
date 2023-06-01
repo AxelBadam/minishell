@@ -3,14 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-<<<<<<< HEAD:src/minishell.c
-/*   Updated: 2023/06/01 15:17:59 by atuliara         ###   ########.fr       */
-=======
-/*   Updated: 2023/06/01 16:01:55 by ekoljone         ###   ########.fr       */
->>>>>>> origin/main:src/minishell.c
+/*   Updated: 2023/06/01 17:23:16 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -793,18 +789,19 @@ int	get_len_without_redirects(t_resrc *rs, char **ar, int *fd)
 	}
 	return (c[1]);
 }
-
-char	*create_full_path(char *cmd, char *path, int start, int len)
+char    *create_full_path(char *cmd, char *path, int start, int len)
 {
-	char	*full_path;
+    char    *full_path;
+    char    *tmp[2];
 
-	full_path = (char *)malloc(sizeof(char) * (len));
-	full_path = ft_substr(path, start, len - 1);
-	full_path = ft_strjoin(full_path, "/");
-	full_path = ft_strjoin(full_path, cmd);
-	if (!full_path)
-		return (NULL);
-	return (full_path);
+    tmp[0] = ft_substr(path, start, len - 1);
+    tmp[1] = ft_strjoin(tmp[0], "/");
+    full_path = ft_strjoin(tmp[1], cmd);
+    free(tmp[0]);
+    free(tmp[1]);
+    if (!full_path)
+        return (NULL);
+    return (full_path);
 }
 
 char	*get_full_path(t_resrc *rs, char *cmd, char *path)
@@ -993,17 +990,6 @@ void	minishell(t_resrc *resrc)
 		{
 			resrc->array = split_command(resrc, line);
 			add_history(line);
-<<<<<<< HEAD:src/minishell.c
-			make_list(resrc, resrc->array);
-			print_list(&resrc->list);
-			if (resrc->list)
-			{
-				execution(resrc, resrc->list);
-				set_env(resrc);
-			}
-			free_string_array(resrc->array);
-			free_all_nodes(&resrc->list);
-=======
 			if (resrc->array)
 			{
 				make_list(resrc, resrc->array);
@@ -1016,7 +1002,6 @@ void	minishell(t_resrc *resrc)
 				free_string_array(resrc->array);
 				free_all_nodes(&resrc->list);
 			}
->>>>>>> origin/main:src/minishell.c
 		}
 		free(line);
 		line = readline("minishell-1.0$ ");
