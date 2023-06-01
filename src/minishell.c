@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/01 15:33:48 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/01 16:01:55 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -637,8 +637,6 @@ int	is_a_directory(char *filename)
 	if (stat(filename, &statbuf) != 0)
 		return (0);
 	dir = S_ISDIR(statbuf.st_mode);
-	if (dir)
-		print_error(": is a directory\n", 258, filename);
 	return (dir);
 }
 
@@ -658,7 +656,8 @@ int	open_file(t_resrc *rs, char *redirect, char *filename, int *fd)
 	if (!filename)
 		error_exit("minishell: fatal malloc error\n", rs);
 	if (is_a_directory(filename))
-		return (-1);
+		if (!print_error(": is a directory\n", 258, filename))
+			return (-1);
 	if (open_input_redirect(redirect, filename, fd) == -1)
 		return (-1);
 	if (open_output_redirect(redirect, filename, fd) == -1)

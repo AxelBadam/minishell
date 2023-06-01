@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/01 13:28:23 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/01 15:47:18 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ char **append_2d(char **twod, char *str_to_add)
 	i = -1;
 	while (twod[++i])
 		new[i] = ft_strdup(twod[i]);
-	new[i] = str_to_add;
+	new[i] = ft_strdup(str_to_add);
 	new[++i] = 0;
 	free_string_array(twod);
 	return (new);
@@ -124,23 +124,21 @@ char **append_2d(char **twod, char *str_to_add)
 
 int execute_builtin_export(t_list *list, t_resrc *resrc)
 {
-	char *str;
 	int j;
 
 	j = 1;
 	while (list->command.full_cmd[j])
 	{
-		str = ft_strdup(list->command.full_cmd[j]);
-		if (is_in_env(str, resrc->envp))
-			resrc->envp = replace_str(str, resrc->envp);
-		else if (ft_strchr(str, '=') != NULL)
-			resrc->envp = append_2d(resrc->envp, str);
+		if (is_in_env(list->command.full_cmd[j], resrc->envp))
+			resrc->envp = replace_str(list->command.full_cmd[j], resrc->envp);
+		else if (ft_strchr(list->command.full_cmd[j], '=') != NULL)
+			resrc->envp = append_2d(resrc->envp, list->command.full_cmd[j]);
 		j++;
 	}
 	return (1);
 }
 
-char **rmv_str_2d(char **env, char *to_rmv)
+char **rmv_str_twod(char **env, char *to_rmv)
 {
 	char **new;
 	int i;
@@ -159,8 +157,7 @@ char **rmv_str_2d(char **env, char *to_rmv)
 	{			
 		if (ft_strnstr(env[i], to_rmv, len))
 			i++;
-		new[j++] = ft_strdup(env[i]);
-		i++;
+		new[j++] = ft_strdup(env[i++]);
 	}
 	new[j] = 0;
 	free_string_array(env);
@@ -174,7 +171,7 @@ int execute_builtin_unset(t_list *list, t_resrc *resrc)
 	ac = 1;
 	while (list->command.full_cmd[ac] && is_in_env(list->command.full_cmd[ac], resrc->envp))
 	{
-		resrc->envp = rmv_str_2d(resrc->envp, list->command.full_cmd[ac]);
+		resrc->envp = rmv_str_twod(resrc->envp, list->command.full_cmd[ac]);
 		ac++;
 	}
 	return (1);
