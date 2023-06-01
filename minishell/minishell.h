@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/31 13:35:45 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/01 15:33:46 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ int execute_builtin_export(t_list *list, t_resrc *resrc);
 /*
 ** ERRORRR
 */
+int	print_error(char *str, int exit_status, char *filename);
 void error_handling(char *str);
 /*
 ** UTILS

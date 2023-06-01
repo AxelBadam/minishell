@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/30 11:30:51 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/01 13:28:23 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ int execute_builtin_export(t_list *list, t_resrc *resrc)
 	j = 1;
 	while (list->command.full_cmd[j])
 	{
-		str = list->command.full_cmd[j];
+		str = ft_strdup(list->command.full_cmd[j]);
 		if (is_in_env(str, resrc->envp))
 			resrc->envp = replace_str(str, resrc->envp);
 		else if (ft_strchr(str, '=') != NULL)
@@ -160,10 +160,10 @@ char **rmv_str_2d(char **env, char *to_rmv)
 		if (ft_strnstr(env[i], to_rmv, len))
 			i++;
 		new[j++] = ft_strdup(env[i]);
-		free(env[i++]);
+		i++;
 	}
-	new[j] = 0;	
-	free(env);
+	new[j] = 0;
+	free_string_array(env);
 	return(new);
 }
 

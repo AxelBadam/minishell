@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/05/31 17:15:57 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/01 15:33:48 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -539,7 +539,7 @@ void	remove_quotes(t_resrc *rs, char **array)
 	}
 }
 
-char	**split_command(t_resrc *rs, char *line, char **env)
+char	**split_command(t_resrc *rs, char *line)
 {
 	char	**array;
 
@@ -547,7 +547,7 @@ char	**split_command(t_resrc *rs, char *line, char **env)
 	if (!array)
 		return (NULL);
 	fill_array(line, array);
-	expand(array, env);
+	expand(array, rs->envp);
 	array = split_by_operator(array);
 	if (!array)
 		error_exit("minishell: fatal malloc error\n", rs);
@@ -587,10 +587,10 @@ int	print_error(char *str, int exit_status, char *filename)
 
 int	open_output_redirect(char *redirect, char *filename, int *fd)
 {
-	if (access(filename, F_OK) == 0 && access(filename, W_OK == -1)
+	if (access(filename, F_OK) == 0 && access(filename, W_OK) == -1
 		&& (ft_strncmp(redirect, ">", SIZE_MAX) == 0
 			|| ft_strncmp(redirect, ">>", SIZE_MAX) == 0))
-		if (!print_error(": Permission denied\n", 69, filename))
+		if (!print_error(": permission denied\n", 69, filename))
 			return (-1);
 	if (ft_strncmp(redirect, ">", SIZE_MAX) == 0)
 		fd[1] = open(filename, O_CREAT | O_WRONLY, 0644);
@@ -607,21 +607,21 @@ int	open_input_redirect(char *redirect, char *filename, int *fd)
 	if (ft_strncmp(redirect, "<<", SIZE_MAX) == 0)
 	{
 		if (pipe(fd) == -1)
-			if (!print_error("FATAL: Pipe fail\n", 69, NULL))
+			if (!print_error("fatal: pipe fail\n", 69, NULL))
 				return (-1);
 		create_heredoc(fd, filename);
 	}
 	else if (ft_strncmp(redirect, "<", SIZE_MAX) == 0)
 	{
 		if (access(filename, F_OK) != 0
-			|| (access(filename, F_OK) == 0 && access(filename, R_OK) != 0))
+			|| (access(filename, F_OK) == 0 && access(filename, R_OK) == -1))
 		{
-			if (access(filename, F_OK) != 0)
+			if (access(filename, F_OK) == -1)
 			{
-				if (!print_error(": No such file or directory\n", 69, filename))
+				if (!print_error(": no such file or directory\n", 69, filename))
 					return (-1);
 			}
-			else if (!print_error(": Permission denied\n", 69, filename))
+			else if (!print_error(": permission denied\n", 69, filename))
 				return (-1);
 		}
 		fd[0] = open(filename, O_RDONLY);
@@ -638,7 +638,7 @@ int	is_a_directory(char *filename)
 		return (0);
 	dir = S_ISDIR(statbuf.st_mode);
 	if (dir)
-		print_error(": Is a directory\n", 258, filename);
+		print_error(": is a directory\n", 258, filename);
 	return (dir);
 }
 
@@ -712,7 +712,7 @@ int	get_new_command(t_resrc *resource, char **array)
 	{
 		while (!*line)
 			line = readline("> ");
-		pipe_command = split_command(resource, line, resource->envp);
+		pipe_command = split_command(resource, line);
 		add_array_to_array(resource, array, pipe_command);
 		free(line);
 		return (1);
@@ -810,10 +810,10 @@ char	*get_full_path(t_resrc *rs, char *cmd, char *path)
 	int		ctr[2];
 	int		len;
 
-	ctr[0] = 0;
+	ctr[0] = -1;
 	ctr[1] = 0;
 	len = 0;
-	while (path[ctr[0]])
+	while (path[++ctr[0]])
 	{
 		if (path[ctr[0]] == ':')
 		{
@@ -828,7 +828,6 @@ char	*get_full_path(t_resrc *rs, char *cmd, char *path)
 			len = 0;
 		}
 		len++;
-		ctr[0]++;
 	}
 	free(path);
 	return (full_path);
@@ -988,7 +987,7 @@ void	minishell(t_resrc *resrc)
 	{
 		if (*line)
 		{
-			resrc->array = split_command(resrc, line, resrc->envp);
+			resrc->array = split_command(resrc, line);
 			add_history(line);
 			if (resrc->array)
 			{
