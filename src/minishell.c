@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/01 17:35:55 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/02 17:26:02 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -557,13 +557,18 @@ char	**split_command(t_resrc *rs, char *line)
 void	create_heredoc(int *fd, char *delimitor)
 {
 	char	*line;
+	int		len;
 
 	g_exit_status = 0;
+	len = ft_strlen(delimitor);
 	while (g_exit_status != 1)
 	{
 		line = readline("> ");
-		if (!line || ft_strncmp(line, delimitor, SIZE_MAX) == 0)
+		if (!line || ft_strncmp(line, delimitor, len) == 0)
+		{
+			write(1, "\033[1A\033[2C", 9);
 			break ;
+		}
 		ft_putendl_fd(line, fd[1]);
 		free(line);
 	}
@@ -642,27 +647,30 @@ int	is_a_directory(char *filename)
 
 int	open_file(t_resrc *rs, char *redirect, char *filename, int *fd)
 {
-	int	len;
+	int		tmp;
+	char	*f_name;
 
 	if (!filename)
-	{
-		print_error("syntax error near unexpected token `newline'\n",
-			69, filename);
+		if(!print_error("syntax error near unexpected token `newline'\n",
+			69, filename))
 		return (-1);
-	}
-	len = str_len_without_quotes(filename);
-	if (len != ft_strlen(filename))
-		filename = make_new_str(filename, len);
-	if (!filename)
+	f_name = ft_strdup(filename);
+	tmp = str_len_without_quotes(f_name);
+	if (tmp != ft_strlen(f_name))
+		f_name = make_new_str(f_name, tmp);
+	if (!f_name)
 		error_exit("minishell: fatal malloc error\n", rs);
-	if (is_a_directory(filename))
-		if (!print_error(": is a directory\n", 258, filename))
-			return (-1);
-	if (open_input_redirect(redirect, filename, fd) == -1)
-		return (-1);
-	if (open_output_redirect(redirect, filename, fd) == -1)
-		return (-1);
-	return (0);
+	if (is_a_directory(f_name))
+	{
+		if (!print_error(": is a directory\n", 258, f_name))
+			tmp = -1;
+	}
+	else if (open_input_redirect(redirect, f_name, fd) == -1)
+		tmp = -1;
+	else if (open_output_redirect(redirect, f_name, fd) == -1)
+		tmp = -1;
+	free(f_name);
+	return (tmp);
 }
 
 int	get_array_size(char **array)
@@ -706,7 +714,10 @@ int	get_new_command(t_resrc *resource, char **array)
 	g_exit_status = 0;
 	line = readline("> ");
 	if (!line)
+	{
+		write(1, "\033[1A\033[2C", 9);
 		print_error("syntax error: unexpected end of file\n", 258, NULL);
+	}
 	if (line && g_exit_status != 1)
 	{
 		while (!*line)
@@ -954,10 +965,12 @@ void	free_all_nodes(t_list **head)
 		if ((*head)->command.full_cmd)
 			free_string_array((*head)->command.full_cmd);
 		*head = (*head)->next;
-		free(tmp);
+		if (tmp)
+			free(tmp);
 		tmp = *head;
 	}
-	free(*head);
+	if (*head)
+		free(*head);
 }
 
 void set_env(t_resrc *resrc)
@@ -994,7 +1007,7 @@ void	minishell(t_resrc *resrc)
 			if (resrc->array)
 			{
 				make_list(resrc, resrc->array);
-				print_list(&resrc->list);
+				//print_list(&resrc->list);
 				if (resrc->list)
 				{
 					execution(resrc, resrc->list);
