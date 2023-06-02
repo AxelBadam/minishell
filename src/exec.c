@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/01 16:22:46 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/02 16:13:28 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,9 @@ int check_input(char **cmd_arr)
 
 int check_for_parent_builtin(t_resrc *resrc, char **cmd_arr, int len)
 {	
+	// make tmp to check big letters
 	if (!ft_strncmp(*cmd_arr, "cd", len))
- 	   	return (execute_builtin_cd(resrc->list));
+ 	   	return (execute_builtin_cd(resrc));
 	else if (!ft_strncmp(*cmd_arr, "unset", len) && check_input(cmd_arr))
         return (execute_builtin_unset(resrc->list, resrc));
 	else if (!ft_strncmp(*cmd_arr, "export", 6))
@@ -179,7 +180,7 @@ void execution(t_resrc *resrc, t_list *list)
 		if (!ft_strncmp(*cmd_arr, "exit", len))
       	 	execute_builtin_exit();
 		if (!list->next)
-			g_exit_status = check_for_parent_builtin(resrc, cmd_arr, len);
+			check_for_parent_builtin(resrc, cmd_arr, len);
 		//signals
 		if (cmd_check(list))
 			exec_cmd(resrc, list);

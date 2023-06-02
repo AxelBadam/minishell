@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/01 17:22:17 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/02 17:21:06 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,56 @@
 
 extern int g_exit_status;
 
-int execute_builtin_cd(t_list *list)
+int update_env(char *var, char *val, t_resrc *resrc)
+{
+	char *env_var;
+
+	env_var = ft_strjoin(var, val);
+	if (is_in_env(env_var, resrc->envp))
+		resrc->envp = replace_str(env_var, resrc->envp);
+	else if (ft_strchr(env_var, '=') != NULL)
+		resrc->envp = append_2d(resrc->envp, env_var);
+	free(env_var);
+	return (1);
+}
+	
+void cd_error(char *path)
+{
+	if (!is_a_directory(path) && access(path, F_OK) == 0)
+		print_error(": not a directory\n", -1, path);
+	if (access(path, F_OK) == -1)
+		print_error(": no such file or directory\n", -1, path);
+	else if (access(path, X_OK) == -1)
+		print_error(": permission denied\n", -1, path);
+}
+
+int execute_builtin_cd(t_resrc *resrc)
 {
 	char *path;
+	char pwd[4096];
 	
-	path = list->command.full_cmd[1];
-	if (is_a_directory(path) && access(path, R_OK | X_OK) == 0) 
+	if (!resrc->list->command.full_cmd[1])
+		path = get_env("HOME", resrc->envp);
+	else
+		path = resrc->list->command.full_cmd[1];
+	if (path == NULL)
 	{
-		g_exit_status = chdir(path);
+		print_error(": HOME not set", 1, "cd");
+		return (1);
 	}
-	if (g_exit_status != 0)
-		print_error("cd error", g_exit_status, path);
-	return (g_exit_status);
+	if (is_a_directory(path) && access(path, X_OK) == 0)
+	{
+		getcwd(pwd, sizeof(pwd));
+		update_env("OLDPWD=", pwd, resrc);
+		chdir(path);
+		getcwd(pwd, sizeof(pwd));
+		update_env("PWD=", pwd, resrc);
+	}
+	else
+		cd_error(path);
+	if (!resrc->list->command.full_cmd[1])
+		free(path);
+	return (0);
 }
 
 int execute_builtin_pwd()
