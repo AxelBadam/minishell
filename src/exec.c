@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/02 16:13:28 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/05 13:40:01 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,27 +33,21 @@ int check_input(char **cmd_arr)
 
 int check_for_parent_builtin(t_resrc *resrc, char **cmd_arr, int len)
 {	
-	// make tmp to check big letters
-	if (!ft_strncmp(*cmd_arr, "cd", len))
+	// is necessary to make tmp?
+
+	if (!ft_strncmp(str_to_lower(*cmd_arr), "cd", len))
  	   	return (execute_builtin_cd(resrc));
-	else if (!ft_strncmp(*cmd_arr, "unset", len) && check_input(cmd_arr))
+	else if (!ft_strncmp(str_to_lower(*cmd_arr), "unset", len) && check_input(cmd_arr))
         return (execute_builtin_unset(resrc->list, resrc));
-	else if (!ft_strncmp(*cmd_arr, "export", 6))
+	else if (!ft_strncmp(str_to_lower(*cmd_arr), "export", 6))
         return (execute_builtin_export(resrc->list, resrc));
 	return (0);
 }
 
-void setup_pipe(int *fd)
-{
-	if (dup2(fd[1], STDOUT_FILENO) < 0)
-		error_handling("pipe error");
-	close(fd[1]);
-	close(fd[0]);
-}
-
 void close_pipes(t_list *list, int *fd)
 {
-	close(fd[0]);
+	if (fd[0])
+		close(fd[0]);
 	if (list->command.input_fd > 2)
 		close(list->command.input_fd);
 	if (list->command.output_fd > 2)
@@ -66,15 +60,15 @@ void execute_builtin(t_resrc *resrc, t_list *list)
 	int len;
 	
 	len = 0;
-	cmd = *list->command.full_cmd;
+	cmd = str_to_lower(*list->command.full_cmd);
 	if (*list->command.full_cmd)
 		len = ft_strlen(cmd);
     if (!ft_strncmp(cmd, "pwd", len))
-    	g_exit_status = execute_builtin_pwd();
+    	execute_builtin_pwd();
  	else if (!ft_strncmp(cmd, "echo", len))
-    	g_exit_status = execute_builtin_echo(list->command);
+    	execute_builtin_echo(list->command);
 	else if (!ft_strncmp(cmd, "env", len))
-    	g_exit_status = execute_builtin_env(resrc->envp);
+    	execute_builtin_env(resrc->envp);
 }
 
 void execute_child(t_resrc *resrc, t_list *list)
@@ -104,6 +98,17 @@ int setup_redir(t_list *list)
     return 0;
 }
 
+void setup_pipe(int *fd)
+{
+	if (dup2(fd[1], STDOUT_FILENO) < 0)
+	{
+		print_error(": dup2 error", 1, "dup2");
+		exit(g_exit_status);
+	}
+	close(fd[1]);
+	close(fd[0]);
+}
+
 void child_process(t_resrc *resrc, t_list *list, int *fd)
 {
 	setup_redir(list);
@@ -118,7 +123,7 @@ void do_fork(t_resrc *resrc, t_list *list, int *fd)
 	
 	pid = fork();
 	if (pid < 0)
-		error_handling("fork error");
+		print_error(": fork error", 1, "fork");
 	if (!pid)
 		child_process(resrc, list, fd);
 }
@@ -130,7 +135,8 @@ void exec_cmd(t_resrc *resrc, t_list *list)
 	if (pipe(fd) < 0)
 	{
 		close_pipes(list, fd);
-		error_handling("pipe error");
+		print_error(": error creating pipe", -1, "pipe");
+		exit(g_exit_status); // exit gracefully?
 	}
 	do_fork(resrc, list, fd);
 	close(fd[1]);
@@ -143,25 +149,18 @@ void exec_cmd(t_resrc *resrc, t_list *list)
 int cmd_check(t_list *list)
 {
 	if (is_a_directory(*list->command.full_cmd))
-	{
-		print_error(": is a directory\n", 126, *list->command.full_cmd);
-		return (0);
-	}
+		return(print_error(": is a directory\n", 126, *list->command.full_cmd));
 	if (!is_builtin(*list->command.full_cmd) && !list->command.full_path &&\
 	access(*list->command.full_cmd, F_OK) == -1)
 	{
 		if (ft_strchr(*list->command.full_cmd, '/'))
-			print_error(": no such file or directory\n", 127, *list->command.full_cmd);
+			return(print_error(": no such file or directory\n", 127, *list->command.full_cmd));
 		else
-			print_error(": command not found\n", 127, *list->command.full_cmd);
-		return (0);
+			return(print_error(": command not found\n", 127, *list->command.full_cmd));
 	}
 	else if (!is_builtin(*list->command.full_cmd) && !list->command.full_path &&\
 	access(*list->command.full_cmd, X_OK) == -1)
-	{
-		print_error(": permission denied\n", 127, *list->command.full_cmd);
-		return (0);
-	}
+		return(print_error(": permission denied\n", 127, *list->command.full_cmd));
 	return (1);
 }
 
@@ -177,7 +176,7 @@ void execution(t_resrc *resrc, t_list *list)
 		cmd_arr = list->command.full_cmd;
 		if (cmd_arr)
 			len = ft_strlen(*cmd_arr);
-		if (!ft_strncmp(*cmd_arr, "exit", len))
+		if (!ft_strncmp(str_to_lower(*cmd_arr), "exit", len))
       	 	execute_builtin_exit();
 		if (!list->next)
 			check_for_parent_builtin(resrc, cmd_arr, len);

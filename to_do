@@ -2,16 +2,16 @@
 - error_handling
 - signals
 -----------------
+
+
 - exit_status
 127 = command not found
 2 = incorrect usage; invalid options or missing arguments
 status > 0 = error during expansion or redirection
 
-- cd errors and env modification in cd
-{
-	-home not set
-	-not a dir
-	-no such file or dir
-	-no perm
-}
-check with others later if they used access or opendir
+
+
+random checks
+-is the command within 4096 bytes? 
+-what if I mix parent builtin and child, wierd pipes ect. 
+-running commands  with full path (without dots)

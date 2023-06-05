@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/02 17:21:06 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/05 13:42:49 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int execute_builtin_cd(t_resrc *resrc)
 	return (0);
 }
 
-int execute_builtin_pwd()
+void execute_builtin_pwd()
 {
     char cwd[4096];
 
@@ -74,11 +74,10 @@ int execute_builtin_pwd()
     {
         write(STDOUT_FILENO, cwd, ft_strlen(cwd));
         write(STDOUT_FILENO, "\n", 1);
+		g_exit_status = 0;
     } 
     else 
-		error_handling("pwd error");
-	g_exit_status = 1338; //?
-	return (g_exit_status);
+		print_error(": getcwd failed", 1, "pwd");
 }
 
 int execute_builtin_exit()
@@ -87,7 +86,7 @@ int execute_builtin_exit()
 	exit (0);
 }
 
-int execute_builtin_env(char **envp)
+void execute_builtin_env(char **envp)
 {
 	char **tmp;
 
@@ -96,8 +95,9 @@ int execute_builtin_env(char **envp)
 	{
 		ft_putstr_fd(*tmp++, 1);
 		ft_putstr_fd("\n", 1);
+		g_exit_status = 0;
 	}
-	return (0);
+
 }
 
 int is_in_env(char *str, char **envp)
@@ -216,7 +216,7 @@ int execute_builtin_unset(t_list *list, t_resrc *resrc)
 	return (1);
 }
 
-int execute_builtin_echo(t_command cmd)
+void execute_builtin_echo(t_command cmd)
 {
     int newline;
 	int i;
@@ -237,5 +237,5 @@ int execute_builtin_echo(t_command cmd)
     }
     if (newline)
         ft_putstr_fd("\n", 1);
-    return (0);
+    g_exit_status = 0;
 }

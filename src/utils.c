@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:04:53 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/30 16:34:07 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/05 13:05:54 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,3 +46,14 @@ int	get_2d_array_size(char **array)
     	ctr++;
 	return (ctr);
 }
+
+char *str_to_lower(char *tmp)
+{
+	int ctr;
+
+	ctr = -1;
+	while (tmp[++ctr])
+		tmp[ctr] = ft_tolower(tmp[ctr]);
+	return (tmp);
+}
+

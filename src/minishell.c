@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/02 15:46:00 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/05 13:16:21 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -836,30 +836,27 @@ char	*get_full_path(t_resrc *rs, char *cmd, char *path)
 int	is_builtin(char *str)
 {
 	char	*tmp;
-	int		ctr;
-	int		re;
+	int 	len;
 
+	len = ft_strlen(str);
 	tmp = ft_strdup(str);
-	ctr = -1;
-	re = 0;
-	while (tmp[++ctr])
-		tmp[ctr] = ft_tolower(tmp[ctr]);
-	if (!ft_strncmp(tmp, "pwd", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "env", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "cd", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "export", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "unset", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "echo", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "exit", ctr))
-		re = 1;
+	tmp = str_to_lower(tmp);
+	if (!ft_strncmp(tmp, "pwd", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "env", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "cd", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "export", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "unset", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "echo", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "exit", len))
+		return (1);
 	free(tmp);
-    return (re);
+    return (0);
 }
 
 t_list	*create_node(char **full_cmd, int *fd, t_resrc *rs)
