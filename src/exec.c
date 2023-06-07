@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/05 13:40:01 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/07 17:45:06 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,19 +31,6 @@ int check_input(char **cmd_arr)
 	return (1);
 }
 
-int check_for_parent_builtin(t_resrc *resrc, char **cmd_arr, int len)
-{	
-	// is necessary to make tmp?
-
-	if (!ft_strncmp(str_to_lower(*cmd_arr), "cd", len))
- 	   	return (execute_builtin_cd(resrc));
-	else if (!ft_strncmp(str_to_lower(*cmd_arr), "unset", len) && check_input(cmd_arr))
-        return (execute_builtin_unset(resrc->list, resrc));
-	else if (!ft_strncmp(str_to_lower(*cmd_arr), "export", 6))
-        return (execute_builtin_export(resrc->list, resrc));
-	return (0);
-}
-
 void close_pipes(t_list *list, int *fd)
 {
 	if (fd[0])
@@ -60,7 +47,10 @@ void execute_builtin(t_resrc *resrc, t_list *list)
 	int len;
 	
 	len = 0;
-	cmd = str_to_lower(*list->command.full_cmd);
+	cmd = ft_strdup(*list->command.full_cmd);
+	if (!cmd)
+		return ; // g_states
+	cmd = str_to_lower(cmd);
 	if (*list->command.full_cmd)
 		len = ft_strlen(cmd);
     if (!ft_strncmp(cmd, "pwd", len))
@@ -69,6 +59,9 @@ void execute_builtin(t_resrc *resrc, t_list *list)
     	execute_builtin_echo(list->command);
 	else if (!ft_strncmp(cmd, "env", len))
     	execute_builtin_env(resrc->envp);
+	else if (!ft_strncmp(cmd, "export", 6))
+        execute_builtin_export(resrc->list, resrc);
+	free(cmd);
 }
 
 void execute_child(t_resrc *resrc, t_list *list)
@@ -79,7 +72,7 @@ void execute_child(t_resrc *resrc, t_list *list)
 	else if (is_builtin(*list->command.full_cmd))
 		execute_builtin(resrc, list);
 	else
-		execve(*list->command.full_cmd, NULL, resrc->envp);
+		execve(*list->command.full_cmd, list->command.full_cmd, resrc->envp);
 	exit(g_exit_status);
 }
 
@@ -164,11 +157,29 @@ int cmd_check(t_list *list)
 	return (1);
 }
 
+
+void check_for_parent_builtin(t_resrc *resrc, t_list *list, char **cmd_arr, int len)
+{	
+	char	*tmp;
+
+	tmp = ft_strdup(*cmd_arr);
+	tmp = str_to_lower(tmp);
+	if (!ft_strncmp(str_to_lower(tmp), "exit", len))
+      	execute_builtin_exit();
+	if (!ft_strncmp(str_to_lower(tmp), "cd", len))
+ 	   	execute_builtin_cd(resrc, list->command);
+	else if (!ft_strncmp(str_to_lower(tmp), "unset", len) && check_input(cmd_arr))
+        execute_builtin_unset(list, resrc);
+	else if (!ft_strncmp(str_to_lower(tmp), "export", 6))
+        execute_builtin_export(list, resrc);
+	free(tmp);
+}
+
 void execution(t_resrc *resrc, t_list *list)
 {	
 	char **cmd_arr;
 	int len;
-	int lst_size; 
+	int lst_size;
 
 	lst_size = linked_list_count(&list);
 	while (list)
@@ -176,14 +187,11 @@ void execution(t_resrc *resrc, t_list *list)
 		cmd_arr = list->command.full_cmd;
 		if (cmd_arr)
 			len = ft_strlen(*cmd_arr);
-		if (!ft_strncmp(str_to_lower(*cmd_arr), "exit", len))
-      	 	execute_builtin_exit();
 		if (!list->next)
-			check_for_parent_builtin(resrc, cmd_arr, len);
-		//signals
+			check_for_parent_builtin(resrc, list, cmd_arr, len);
 		if (cmd_check(list))
 			exec_cmd(resrc, list);
 		list = list->next;
 		wait_for_child(lst_size);
 	}
-}	
+}	 

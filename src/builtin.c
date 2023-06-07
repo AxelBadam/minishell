@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/05 13:42:49 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/07 17:47:30 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,15 +37,15 @@ void cd_error(char *path)
 		print_error(": permission denied\n", -1, path);
 }
 
-int execute_builtin_cd(t_resrc *resrc)
+int execute_builtin_cd(t_resrc *resrc, t_command command)
 {
 	char *path;
 	char pwd[4096];
 	
-	if (!resrc->list->command.full_cmd[1])
+	if (!command.full_cmd[1])
 		path = get_env("HOME", resrc->envp);
 	else
-		path = resrc->list->command.full_cmd[1];
+		path = command.full_cmd[1];
 	if (path == NULL)
 	{
 		print_error(": HOME not set", 1, "cd");
@@ -61,7 +61,7 @@ int execute_builtin_cd(t_resrc *resrc)
 	}
 	else
 		cd_error(path);
-	if (!resrc->list->command.full_cmd[1])
+	if (!command.full_cmd[1])
 		free(path);
 	return (0);
 }
@@ -83,7 +83,7 @@ void execute_builtin_pwd()
 int execute_builtin_exit()
 {
 	write(1, "exit\n", 5);
-	exit (0);
+	exit (g_exit_status);
 }
 
 void execute_builtin_env(char **envp)
@@ -164,6 +164,7 @@ char **append_2d(char **twod, char *str_to_add)
 int execute_builtin_export(t_list *list, t_resrc *resrc)
 {
 	int j;
+	int i;
 
 	j = 1;
 	while (list->command.full_cmd[j])
@@ -173,6 +174,12 @@ int execute_builtin_export(t_list *list, t_resrc *resrc)
 		else if (ft_strchr(list->command.full_cmd[j], '=') != NULL)
 			resrc->envp = append_2d(resrc->envp, list->command.full_cmd[j]);
 		j++;
+	}
+	i = 0;
+	if (!list->command.full_cmd[j])
+	{
+		while (resrc->envp[i])
+			printf("declare -x %s\n", resrc->envp[i++]);
 	}
 	return (1);
 }
@@ -203,7 +210,7 @@ char **rmv_str_twod(char **env, char *to_rmv)
 	return(new);
 }
 
-int execute_builtin_unset(t_list *list, t_resrc *resrc)
+void execute_builtin_unset(t_list *list, t_resrc *resrc)
 {
 	int ac;
 
@@ -213,7 +220,6 @@ int execute_builtin_unset(t_list *list, t_resrc *resrc)
 		resrc->envp = rmv_str_twod(resrc->envp, list->command.full_cmd[ac]);
 		ac++;
 	}
-	return (1);
 }
 
 void execute_builtin_echo(t_command cmd)
