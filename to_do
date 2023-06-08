@@ -12,9 +12,6 @@ status > 0 = error during expansion or redirection
 
 
 random checks
--is the command within 4096 bytes? 
--what if I mix parent builtin and child, wierd pipes ect. 
--running commands  with full path (without dots)
+-is the command within 4096 bytes?
 -if the  "parent builtin" cmd is part of the pipe line, does it get executed? "for example cd doesnt work in bash
-
-- echo asd | grep asd | export not workk
+echo asd | grep asd | export

@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/07 17:45:06 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/08 17:32:11 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,14 +66,15 @@ void execute_builtin(t_resrc *resrc, t_list *list)
 
 void execute_child(t_resrc *resrc, t_list *list)
 {
-	// signals
 	if (list->command.full_path)
-		execve(list->command.full_path, list->command.full_cmd, resrc->envp);
+	{
+		if (execve(list->command.full_path, list->command.full_cmd, resrc->envp) == -1)
+			exit(EXIT_FAILURE);
+	}
 	else if (is_builtin(*list->command.full_cmd))
 		execute_builtin(resrc, list);
 	else
 		execve(*list->command.full_cmd, list->command.full_cmd, resrc->envp);
-	exit(g_exit_status);
 }
 
 int setup_redir(t_list *list)
@@ -108,6 +109,8 @@ void child_process(t_resrc *resrc, t_list *list, int *fd)
 	if (list->next)
 		setup_pipe(fd);
 	execute_child(resrc, list);
+	exit(g_exit_status);
+
 }
 
 void do_fork(t_resrc *resrc, t_list *list, int *fd)
@@ -119,6 +122,21 @@ void do_fork(t_resrc *resrc, t_list *list, int *fd)
 		print_error(": fork error", 1, "fork");
 	if (!pid)
 		child_process(resrc, list, fd);
+	signal(SIGINT, SIG_IGN);
+    signal(SIGTERM, SIG_IGN);
+	waitpid(-1, &g_exit_status, 0);
+	printf("%d", g_exit_status);
+	if (WIFEXITED(g_exit_status))
+		g_exit_status = WEXITSTATUS(g_exit_status);
+	else if (WIFSIGNALED(g_exit_status))
+		g_exit_status = WTERMSIG(g_exit_status);
+	else if (WIFSTOPPED(g_exit_status))
+		g_exit_status = WSTOPSIG(g_exit_status);
+	else if (WTERMSIG(g_exit_status))
+		g_exit_status = _WSTATUS(g_exit_status);
+
+	signal(SIGINT, signal_handler);
+    signal(SIGTERM, SIG_DFL);
 }
 
 void exec_cmd(t_resrc *resrc, t_list *list)
@@ -158,21 +176,32 @@ int cmd_check(t_list *list)
 }
 
 
-void check_for_parent_builtin(t_resrc *resrc, t_list *list, char **cmd_arr, int len)
+int check_for_parent_builtin(t_resrc *resrc, t_list *list, char **cmd_arr, int len)
 {	
 	char	*tmp;
+	int		ret;
 
+	ret = 0;
 	tmp = ft_strdup(*cmd_arr);
 	tmp = str_to_lower(tmp);
-	if (!ft_strncmp(str_to_lower(tmp), "exit", len))
+	if (!ft_strncmp(tmp, "exit", len))
       	execute_builtin_exit();
-	if (!ft_strncmp(str_to_lower(tmp), "cd", len))
+	if (!ft_strncmp(tmp, "cd", len))
+	{
  	   	execute_builtin_cd(resrc, list->command);
-	else if (!ft_strncmp(str_to_lower(tmp), "unset", len) && check_input(cmd_arr))
+		ret = 1;
+	}
+	else if (!ft_strncmp(tmp, "unset", len) && check_input(cmd_arr))
+	{
         execute_builtin_unset(list, resrc);
-	else if (!ft_strncmp(str_to_lower(tmp), "export", 6))
-        execute_builtin_export(list, resrc);
-	free(tmp);
+		ret = 1;
+	}
+	else if (!ft_strncmp(tmp, "export", 6))
+    {    
+		execute_builtin_export(list, resrc);
+		ret = 1;
+	}
+	return (free(tmp), ret);
 }
 
 void execution(t_resrc *resrc, t_list *list)
@@ -188,10 +217,8 @@ void execution(t_resrc *resrc, t_list *list)
 		if (cmd_arr)
 			len = ft_strlen(*cmd_arr);
 		if (!list->next)
-			check_for_parent_builtin(resrc, list, cmd_arr, len);
-		if (cmd_check(list))
-			exec_cmd(resrc, list);
+			if (!check_for_parent_builtin(resrc, list, cmd_arr, len) && cmd_check(list))
+					exec_cmd(resrc, list);
 		list = list->next;
-		wait_for_child(lst_size);
 	}
 }	 

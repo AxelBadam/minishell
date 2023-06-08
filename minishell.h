@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/07 17:42:12 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/08 17:14:56 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <sys/ioctl.h>
 # include <sys/stat.h>
 # include <dirent.h>
+# include <sys/wait.h>
 
 typedef struct s_variables
 {
@@ -62,12 +63,12 @@ void execution(t_resrc *resrc, t_list *list);
 ** BUILTINS
 */
 void execute_builtin_pwd();
-int execute_builtin_exit();
-int execute_builtin_cd(t_resrc *resrc, t_command command);
+void execute_builtin_exit();
+void execute_builtin_cd(t_resrc *resrc, t_command command);
 void execute_builtin_echo(t_command cmd);
 void execute_builtin_env(char **envp);
 void execute_builtin_unset(t_list *list, t_resrc *resrc);
-int execute_builtin_export(t_list *list, t_resrc *resrc);
+void execute_builtin_export(t_list *list, t_resrc *resrc);
 /*
 ** ERRORRR
 */
@@ -90,5 +91,6 @@ int	print_error(char *str, int exit_status, char *filename);
 int	is_a_directory(char *filename);
 char	*get_env(char *d_string, char **env);
 char *str_to_lower(char *tmp);
+void	signal_handler(int signal);
 
 #endif

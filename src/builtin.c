@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/07 17:47:30 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/08 15:51:06 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,14 @@ int update_env(char *var, char *val, t_resrc *resrc)
 void cd_error(char *path)
 {
 	if (!is_a_directory(path) && access(path, F_OK) == 0)
-		print_error(": not a directory\n", -1, path);
+		print_error(": not a directory\n", 1, path);
 	if (access(path, F_OK) == -1)
-		print_error(": no such file or directory\n", -1, path);
+		print_error(": no such file or directory\n", 2, path);
 	else if (access(path, X_OK) == -1)
-		print_error(": permission denied\n", -1, path);
+		print_error(": permission denied\n", 1, path);
 }
 
-int execute_builtin_cd(t_resrc *resrc, t_command command)
+void execute_builtin_cd(t_resrc *resrc, t_command command)
 {
 	char *path;
 	char pwd[4096];
@@ -47,15 +47,13 @@ int execute_builtin_cd(t_resrc *resrc, t_command command)
 	else
 		path = command.full_cmd[1];
 	if (path == NULL)
-	{
 		print_error(": HOME not set", 1, "cd");
-		return (1);
-	}
 	if (is_a_directory(path) && access(path, X_OK) == 0)
 	{
 		getcwd(pwd, sizeof(pwd));
 		update_env("OLDPWD=", pwd, resrc);
 		chdir(path);
+		g_exit_status = 0;
 		getcwd(pwd, sizeof(pwd));
 		update_env("PWD=", pwd, resrc);
 	}
@@ -63,14 +61,15 @@ int execute_builtin_cd(t_resrc *resrc, t_command command)
 		cd_error(path);
 	if (!command.full_cmd[1])
 		free(path);
-	return (0);
 }
 
 void execute_builtin_pwd()
 {
-    char cwd[4096];
+    char *cwd;
 
-    if (getcwd(cwd, sizeof(cwd)) != NULL) 
+	cwd = NULL;
+	cwd = getcwd(cwd, sizeof(cwd));
+    if (cwd != NULL) 
     {
         write(STDOUT_FILENO, cwd, ft_strlen(cwd));
         write(STDOUT_FILENO, "\n", 1);
@@ -78,9 +77,10 @@ void execute_builtin_pwd()
     } 
     else 
 		print_error(": getcwd failed", 1, "pwd");
+	free(cwd);
 }
 
-int execute_builtin_exit()
+void execute_builtin_exit()
 {
 	write(1, "exit\n", 5);
 	exit (g_exit_status);
@@ -95,9 +95,8 @@ void execute_builtin_env(char **envp)
 	{
 		ft_putstr_fd(*tmp++, 1);
 		ft_putstr_fd("\n", 1);
-		g_exit_status = 0;
 	}
-
+	g_exit_status = 0;
 }
 
 int is_in_env(char *str, char **envp)
@@ -161,7 +160,7 @@ char **append_2d(char **twod, char *str_to_add)
 	return (new);
 }
 
-int execute_builtin_export(t_list *list, t_resrc *resrc)
+void execute_builtin_export(t_list *list, t_resrc *resrc)
 {
 	int j;
 	int i;
@@ -177,11 +176,9 @@ int execute_builtin_export(t_list *list, t_resrc *resrc)
 	}
 	i = 0;
 	if (!list->command.full_cmd[j])
-	{
 		while (resrc->envp[i])
 			printf("declare -x %s\n", resrc->envp[i++]);
-	}
-	return (1);
+	g_exit_status = 0;
 }
 
 char **rmv_str_twod(char **env, char *to_rmv)
@@ -220,6 +217,7 @@ void execute_builtin_unset(t_list *list, t_resrc *resrc)
 		resrc->envp = rmv_str_twod(resrc->envp, list->command.full_cmd[ac]);
 		ac++;
 	}
+	g_exit_status = 0;
 }
 
 void execute_builtin_echo(t_command cmd)

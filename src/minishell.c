@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/07 17:40:08 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/08 15:41:23 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -916,7 +916,7 @@ void	make_list(t_resrc *rs, char **array)
 		if (!array[v.ctr[1] + 1])
 			if (!get_new_command(rs, array))
 				return ;
-		make_list(rs, &rs->array[v.ctr[1] + 1]);
+		make_list(rs, &array[v.ctr[1] + 1]);
 	}
 }
 
