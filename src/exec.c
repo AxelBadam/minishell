@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/01 15:48:39 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/08 17:35:44 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ void execute_child(t_resrc *resrc, t_list *list)
 	else if (is_builtin(*list->command.full_cmd))
 		execute_builtin(resrc, list);
 	else
-		execve(*list->command.full_cmd, NULL, resrc->envp);
+		execve(*list->command.full_cmd, list->command.full_cmd, resrc->envp);
 	exit(g_exit_status);
 }
 

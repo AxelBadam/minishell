@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/01 16:00:30 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/08 17:35:45 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,5 +86,6 @@ void	free_all_nodes(t_list **head);
 int    is_builtin(char *str);
 int	print_error(char *str, int exit_status, char *filename);
 int	is_a_directory(char *filename);
+void	signal_handler(int signal);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/02 17:26:02 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/08 17:06:56 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -743,10 +743,8 @@ int	check_pipe_syntax(char **array, int *ctr)
 			|| array[ctr[0] + 1][0] == '|')
 			error = 258;
 	if (error)
-	{
-		print_error("syntax error near unexpected token `|'\n", 258, NULL);
-		return (0);
-	}
+		if (!print_error("syntax error near unexpected token `|'\n", 258, NULL))
+			return (0);
 	return (1);
 }
 
@@ -931,7 +929,7 @@ void	make_list(t_resrc *rs, char **array)
 		if (!array[v.ctr[1] + 1])
 			if (!get_new_command(rs, array))
 				return ;
-		make_list(rs, &rs->array[v.ctr[1] + 1]);
+		make_list(rs ,&array[v.ctr[1] + 1]);
 	}
 }
 
@@ -1007,7 +1005,7 @@ void	minishell(t_resrc *resrc)
 			if (resrc->array)
 			{
 				make_list(resrc, resrc->array);
-				//print_list(&resrc->list);
+				print_list(&resrc->list);
 				if (resrc->list)
 				{
 					execution(resrc, resrc->list);
@@ -1031,6 +1029,7 @@ void	*init_resources(char **envp)
 		error_exit("minishell: fatal malloc error\n", NULL);
 	resrc->envp = envp;
 	resrc->list = NULL;
+	resrc->array = NULL;
 	return (resrc);
 }
 
