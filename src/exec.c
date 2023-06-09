@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/09 16:45:29 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/09 17:19:26 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,20 +223,21 @@ int check_for_parent_builtin(t_resrc *resrc, t_list *list, char **cmd_arr, int l
 }
 
 void execution(t_resrc *resrc, t_list *list)
-{	
-	char **cmd_arr;
-	int len;
-	int lst_size;
+{
+    char	**cmd_arr;
+    int		len;
+    int		lst_size;
 
-	lst_size = linked_list_count(&list);
-	while (list)
-	{
-		cmd_arr = list->command.full_cmd;
-		if (cmd_arr)
-			len = ft_strlen(*cmd_arr);
-		if (!list->next)
-			if (!check_for_parent_builtin(resrc, list, cmd_arr, len) && cmd_check(list))
-					exec_cmd(resrc, list);
-		list = list->next;
-	}
-}	 
+    lst_size = linked_list_count(&list);
+    while (list)
+    {
+        cmd_arr = list->command.full_cmd;
+        if (cmd_arr)
+            len = ft_strlen(*cmd_arr);
+        if (!list->next)
+            check_for_parent_builtin(resrc, list, cmd_arr, len);
+        if (cmd_check(list))
+            exec_cmd(resrc, list);
+        list = list->next;
+    }
+}
