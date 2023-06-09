@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/08 15:41:23 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/09 14:27:15 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1084,6 +1084,8 @@ void	signal_handler(int signal)
 	if (signal == SIGINT)
 	{
 		g_exit_status = 1;
+		write(STDOUT_FILENO, "\r\033[K", 4);
+    	write(STDOUT_FILENO, "minishell-1.0$ ", 14);		
 		ioctl(STDIN_FILENO, TIOCSTI, "\n");
 		rl_replace_line("", 0);
 		rl_on_new_line();

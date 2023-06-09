@@ -1,17 +1,2 @@
-- malloc protection
-- error_handling
-- signals
------------------
 
-
-- exit_status
-127 = command not found
-2 = incorrect usage; invalid options or missing arguments
-status > 0 = error during expansion or redirection
-
-
-
-random checks
--is the command within 4096 bytes?
--if the  "parent builtin" cmd is part of the pipe line, does it get executed? "for example cd doesnt work in bash
-echo asd | grep asd | export
+./philo 5 800 200 200

@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/08 17:32:11 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/09 16:39:09 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void execute_builtin(t_resrc *resrc, t_list *list)
 	len = 0;
 	cmd = ft_strdup(*list->command.full_cmd);
 	if (!cmd)
-		return ; // g_states
+		return ;
 	cmd = str_to_lower(cmd);
 	if (*list->command.full_cmd)
 		len = ft_strlen(cmd);
@@ -105,6 +105,9 @@ void setup_pipe(int *fd)
 
 void child_process(t_resrc *resrc, t_list *list, int *fd)
 {
+	signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+	signal(SIGTSTP, SIG_DFL);
 	setup_redir(list);
 	if (list->next)
 		setup_pipe(fd);
@@ -112,31 +115,46 @@ void child_process(t_resrc *resrc, t_list *list, int *fd)
 	exit(g_exit_status);
 
 }
+void check_signal(t_list *list)
+{
+	int signal;
+	
+	signal = 0;
+	if (WIFEXITED(g_exit_status))
+		g_exit_status = WEXITSTATUS(g_exit_status);
+	else if (WIFSIGNALED(g_exit_status))
+		{
+			signal = WTERMSIG(g_exit_status);
+			if (signal == 3)
+				ft_putstr_fd("Quit: 3\n", 2);
+			g_exit_status = 128 + signal;
+		}
+	else if (WIFSTOPPED(g_exit_status))
+	{
+		write(STDOUT_FILENO, "\r\033[K", 4);
+		ft_putstr_fd(*list->command.full_cmd, 2);
+		g_exit_status = 146;
+		ft_putstr_fd(" was stopped\n", 2);
+	}
+}
 
 void do_fork(t_resrc *resrc, t_list *list, int *fd)
 {
-	pid_t pid;
-	
+	pid_t	pid;
+
+	signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
 	pid = fork();
 	if (pid < 0)
 		print_error(": fork error", 1, "fork");
 	if (!pid)
 		child_process(resrc, list, fd);
-	signal(SIGINT, SIG_IGN);
-    signal(SIGTERM, SIG_IGN);
-	waitpid(-1, &g_exit_status, 0);
-	printf("%d", g_exit_status);
-	if (WIFEXITED(g_exit_status))
-		g_exit_status = WEXITSTATUS(g_exit_status);
-	else if (WIFSIGNALED(g_exit_status))
-		g_exit_status = WTERMSIG(g_exit_status);
-	else if (WIFSTOPPED(g_exit_status))
-		g_exit_status = WSTOPSIG(g_exit_status);
-	else if (WTERMSIG(g_exit_status))
-		g_exit_status = _WSTATUS(g_exit_status);
-
+	waitpid(-1, &g_exit_status, WUNTRACED);
+	check_signal(list);
 	signal(SIGINT, signal_handler);
-    signal(SIGTERM, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+	signal(SIGTSTP, SIG_DFL);
 }
 
 void exec_cmd(t_resrc *resrc, t_list *list)
@@ -147,7 +165,7 @@ void exec_cmd(t_resrc *resrc, t_list *list)
 	{
 		close_pipes(list, fd);
 		print_error(": error creating pipe", -1, "pipe");
-		exit(g_exit_status); // exit gracefully?
+		exit(g_exit_status);
 	}
 	do_fork(resrc, list, fd);
 	close(fd[1]);
