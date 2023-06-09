@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 16:26:39 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/09 16:44:07 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -799,20 +799,21 @@ int	get_len_without_redirects(t_resrc *rs, char **ar, int *fd)
 	}
 	return (c[1]);
 }
-
-char	*create_full_path(char *cmd, char *path, int start, int len)
+char    *create_full_path(char *cmd, char *path, int start, int len)
 {
 	char	*full_path;
 	char	*tmp[2];
+    char    *full_path;
+    char    *tmp[2];
 
-	tmp[0] = ft_substr(path, start, len - 1);
-	tmp[1] = ft_strjoin(tmp[0], "/");
-	full_path = ft_strjoin(tmp[1], cmd);
-	free(tmp[0]);
-	free(tmp[1]);
-	if (!full_path)
-		return (NULL);
-	return (full_path);
+    tmp[0] = ft_substr(path, start, len - 1);
+    tmp[1] = ft_strjoin(tmp[0], "/");
+    full_path = ft_strjoin(tmp[1], cmd);
+    free(tmp[0]);
+    free(tmp[1]);
+    if (!full_path)
+        return (NULL);
+    return (full_path);
 }
 
 char	*get_full_path(t_resrc *rs, char *cmd, char *path)
@@ -847,30 +848,27 @@ char	*get_full_path(t_resrc *rs, char *cmd, char *path)
 int	is_builtin(char *str)
 {
 	char	*tmp;
-	int		ctr;
-	int		re;
+	int 	len;
 
+	len = ft_strlen(str);
 	tmp = ft_strdup(str);
-	ctr = -1;
-	re = 0;
-	while (tmp[++ctr])
-		tmp[ctr] = ft_tolower(tmp[ctr]);
-	if (!ft_strncmp(tmp, "pwd", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "env", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "cd", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "export", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "unset", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "echo", ctr))
-		re = 1;
-	else if (!ft_strncmp(tmp, "exit", ctr))
-		re = 1;
+	tmp = str_to_lower(tmp);
+	if (!ft_strncmp(tmp, "pwd", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "env", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "cd", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "export", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "unset", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "echo", len))
+		return (1);
+	else if (!ft_strncmp(tmp, "exit", len))
+		return (1);
 	free(tmp);
-    return (re);
+    return (0);
 }
 
 t_list	*create_node(char **full_cmd, int *fd, t_resrc *rs)
@@ -931,6 +929,7 @@ void	make_list(t_resrc *rs, char **array)
 			if (!get_new_command(rs, array))
 				return ;
 		make_list(rs ,&array[v.ctr[1] + 1]);
+		make_list(rs, &array[v.ctr[1] + 1]);
 	}
 }
 
@@ -989,6 +988,7 @@ void set_env(t_resrc *resrc)
 		resrc->envp = replace_str(str, resrc->envp);
 	else if (ft_strchr(str, '=') != NULL)
 		resrc->envp = append_2d(resrc->envp, str);
+	free(str);
 	free(str);
 }
 
@@ -1101,6 +1101,8 @@ void	signal_handler(int signal)
 	if (signal == SIGINT)
 	{
 		g_exit_status = 1;
+		write(STDOUT_FILENO, "\r\033[K", 4);
+    	write(STDOUT_FILENO, "minishell-1.0$ ", 14);		
 		ioctl(STDIN_FILENO, TIOCSTI, "\n");
 		rl_replace_line("", 0);
 		rl_on_new_line();

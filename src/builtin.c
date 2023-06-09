@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/07 15:51:49 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/09 16:44:30 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,41 +14,79 @@
 
 extern int g_exit_status;
 
-int execute_builtin_cd(t_list *list)
+int update_env(char *var, char *val, t_resrc *resrc)
 {
-	char *path;
+	char *env_var;
+
+	env_var = ft_strjoin(var, val);
+	if (is_in_env(env_var, resrc->envp))
+		resrc->envp = replace_str(env_var, resrc->envp);
+	else if (ft_strchr(env_var, '=') != NULL)
+		resrc->envp = append_2d(resrc->envp, env_var);
+	free(env_var);
+	return (1);
+}
 	
-	path = list->command.full_cmd[1];
-    if (chdir(path) != 0)
-	{
-        error_handling("cd erore");
-    }
-    g_exit_status = 1337;
-	return (g_exit_status);
+void cd_error(char *path)
+{
+	if (!is_a_directory(path) && access(path, F_OK) == 0)
+		print_error(": not a directory\n", 1, path);
+	if (access(path, F_OK) == -1)
+		print_error(": no such file or directory\n", 2, path);
+	else if (access(path, X_OK) == -1)
+		print_error(": permission denied\n", 1, path);
 }
 
-int execute_builtin_pwd()
+void execute_builtin_cd(t_resrc *resrc, t_command command)
 {
-    char cwd[4096];
+	char *path;
+	char pwd[4096];
+	
+	if (!command.full_cmd[1])
+		path = get_env("HOME", resrc->envp);
+	else
+		path = command.full_cmd[1];
+	if (path == NULL)
+		print_error(": HOME not set", 1, "cd");
+	if (is_a_directory(path) && access(path, X_OK) == 0)
+	{
+		getcwd(pwd, sizeof(pwd));
+		update_env("OLDPWD=", pwd, resrc);
+		chdir(path);
+		g_exit_status = 0;
+		getcwd(pwd, sizeof(pwd));
+		update_env("PWD=", pwd, resrc);
+	}
+	else
+		cd_error(path);
+	if (!command.full_cmd[1])
+		free(path);
+}
 
-    if (getcwd(cwd, sizeof(cwd)) != NULL) 
+void execute_builtin_pwd()
+{
+    char *cwd;
+
+	cwd = NULL;
+	cwd = getcwd(cwd, sizeof(cwd));
+    if (cwd != NULL) 
     {
         write(STDOUT_FILENO, cwd, ft_strlen(cwd));
         write(STDOUT_FILENO, "\n", 1);
+		g_exit_status = 0;
     } 
     else 
-		error_handling("pwd error");
-	g_exit_status = 1338; //?
-	return (g_exit_status);
+		print_error(": getcwd failed", 1, "pwd");
+	free(cwd);
 }
 
-int execute_builtin_exit()
+void execute_builtin_exit()
 {
 	write(1, "exit\n", 5);
-	exit (0);
+	exit (g_exit_status);
 }
 
-int execute_builtin_env(char **envp)
+void execute_builtin_env(char **envp)
 {
 	char **tmp;
 
@@ -58,7 +96,7 @@ int execute_builtin_env(char **envp)
 		ft_putstr_fd(*tmp++, 1);
 		ft_putstr_fd("\n", 1);
 	}
-	return (0);
+	g_exit_status = 0;
 }
 
 int is_in_env(char *str, char **envp)
@@ -122,9 +160,10 @@ char **append_2d(char **twod, char *str_to_add)
 	return (new);
 }
 
-int execute_builtin_export(t_list *list, t_resrc *resrc)
+void execute_builtin_export(t_list *list, t_resrc *resrc)
 {
 	int j;
+	int i;
 
 	j = 1;
 	while (list->command.full_cmd[j])
@@ -135,7 +174,11 @@ int execute_builtin_export(t_list *list, t_resrc *resrc)
 			resrc->envp = append_2d(resrc->envp, list->command.full_cmd[j]);
 		j++;
 	}
-	return (1);
+	i = 0;
+	if (!list->command.full_cmd[j])
+		while (resrc->envp[i])
+			printf("declare -x %s\n", resrc->envp[i++]);
+	g_exit_status = 0;
 }
 
 char **rmv_str_twod(char **env, char *to_rmv)
@@ -164,7 +207,7 @@ char **rmv_str_twod(char **env, char *to_rmv)
 	return(new);
 }
 
-int execute_builtin_unset(t_list *list, t_resrc *resrc)
+void execute_builtin_unset(t_list *list, t_resrc *resrc)
 {
 	int ac;
 
@@ -174,10 +217,10 @@ int execute_builtin_unset(t_list *list, t_resrc *resrc)
 		resrc->envp = rmv_str_twod(resrc->envp, list->command.full_cmd[ac]);
 		ac++;
 	}
-	return (1);
+	g_exit_status = 0;
 }
 
-int execute_builtin_echo(t_command cmd)
+void execute_builtin_echo(t_command cmd)
 {
     int newline;
 	int i;
@@ -198,5 +241,5 @@ int execute_builtin_echo(t_command cmd)
     }
     if (newline)
         ft_putstr_fd("\n", 1);
-    return (0);
+    g_exit_status = 0;
 }
