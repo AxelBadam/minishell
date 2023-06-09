@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/08 17:06:56 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/09 16:26:39 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -566,7 +566,8 @@ void	create_heredoc(int *fd, char *delimitor)
 		line = readline("> ");
 		if (!line || ft_strncmp(line, delimitor, len) == 0)
 		{
-			write(1, "\033[1A\033[2C", 9);
+			if (!line)
+				write(1, "\033[1A\033[2C", 9);
 			break ;
 		}
 		ft_putendl_fd(line, fd[1]);
@@ -1005,7 +1006,7 @@ void	minishell(t_resrc *resrc)
 			if (resrc->array)
 			{
 				make_list(resrc, resrc->array);
-				print_list(&resrc->list);
+				//print_list(&resrc->list);
 				if (resrc->list)
 				{
 					execution(resrc, resrc->list);

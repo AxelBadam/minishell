@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/08 17:35:44 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/09 14:23:23 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,17 +126,18 @@ void exec_cmd(t_resrc *resrc, t_list *list)
 {
 	int fd[2];
 
-	if (pipe(fd) < 0)
+	if (list->next)
 	{
-		close_pipes(list, fd);
-		error_handling("pipe error");
+		if (pipe(fd) < 0)
+		{
+			close_pipes(list, fd);
+			error_handling("pipe error");
+		}
+		else if (list->next->command.input_fd == 0)
+			list->next->command.input_fd = fd[0];
 	}
 	do_fork(resrc, list, fd);
 	close(fd[1]);
-	if (list->next && list->next->command.input_fd == 0)
-		list->next->command.input_fd = fd[0];
-	else
-		close_pipes(list, fd);
 }
 
 int cmd_check(t_list *list)
