@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:30:05 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:31:12 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 13:05:42 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 extern int g_exit_status;
 
-void	add_array_to_array(t_resrc *resource, char **array, char **pipe_command)
+char	**add_array_to_array(t_resrc *resource, char **array, char **pipe_command)
 {
 	char	**n_arr;
 	int		ctr[2];
@@ -30,12 +30,11 @@ void	add_array_to_array(t_resrc *resource, char **array, char **pipe_command)
 	while (pipe_command[ctr[1]])
 		n_arr[ctr[0]++] = ft_strdup(pipe_command[ctr[1]++]);
 	n_arr[ctr[0]] = 0;
-	free_string_array(array);
 	free_string_array(pipe_command);
-	resource->array = n_arr;
+	return (n_arr);
 }
 
-int	get_new_command(t_resrc *resource, char **array)
+char	**get_new_command(t_resrc *resource, char **array)
 {
 	char	*line;
 	char	**pipe_command;
@@ -50,14 +49,18 @@ int	get_new_command(t_resrc *resource, char **array)
 	if (line && g_exit_status != 1)
 	{
 		while (!*line)
+		{
 			line = readline("> ");
+			if (!*line)
+				free(line);
+		}
 		pipe_command = split_command(resource, line);
-		add_array_to_array(resource, array, pipe_command);
+		pipe_command = add_array_to_array(resource, array, pipe_command);
 		free(line);
-		return (1);
+		return (pipe_command);
 	}
 	free_all_nodes(&resource->list);
-	return (0);
+	return (NULL);
 }
 
 void	create_heredoc(int *fd, char *delimitor)
@@ -78,6 +81,7 @@ void	create_heredoc(int *fd, char *delimitor)
 		}
 		ft_putendl_fd(line, fd[1]);
 		free(line);
+		line = NULL;
 	}
 	close(fd[1]);
 	if (g_exit_status == 1)

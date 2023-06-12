@@ -6,13 +6,28 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:31:52 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:33:29 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 13:24:11 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 extern int g_exit_status;
+
+char	*create_full_path(char *cmd, char *path, int start, int len)
+{
+	char	*full_path;
+	char	*tmp[2];
+
+	tmp[0] = ft_substr(path, start, len - 1);
+	tmp[1] = ft_strjoin(tmp[0], "/");
+	full_path = ft_strjoin(tmp[1], cmd);
+	free(tmp[0]);
+	free(tmp[1]);
+	if (!full_path)
+		return (NULL);
+	return (full_path);
+}
 
 int	len_ctr(char *line)
 {

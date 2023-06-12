@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:35:57 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 13:24:29 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ void	make_list(t_resrc *rs, char **array);
 void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len);
 t_list	*create_node(char **full_cmd, int *fd, t_resrc *rs);
 char	*get_full_path(t_resrc *rs, char *cmd, char *path);
-char	*create_full_path(char *cmd, char *path, int start, int len);
+void	get_next_node(t_resrc *rs, char **array, int *ctr);
 /*
 ** UTILS_2
 */
@@ -169,13 +169,14 @@ int		check_pipe_syntax(char **array, int *ctr);
 ** HEREDOC
 */
 void	create_heredoc(int *fd, char *delimitor);
-int		get_new_command(t_resrc *resource, char **array);
-void	add_array_to_array(t_resrc *resource, char **array, char **pipe_command);
+char	**get_new_command(t_resrc *resource, char **array);
+char	**add_array_to_array(t_resrc *resource, char **array, char **pipe_command);
 /*
 ** UTILS_3
 */
 int		get_len_without_redirects(t_resrc *rs, char **ar, int *fd);
 int		count(char **array, int *ctr, int strings);
 int		len_ctr(char *line);
+char	*create_full_path(char *cmd, char *path, int start, int len);
 
 #endif

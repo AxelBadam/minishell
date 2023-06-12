@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:25:27 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:29:40 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 13:16:42 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@ void	free_all_nodes(t_list **head)
 	{
 		if ((*head)->command.full_cmd)
 			free_string_array((*head)->command.full_cmd);
+		if ((*head)->command.full_path)
+			free((*head)->command.full_path);
 		*head = (*head)->next;
 		if (tmp)
 			free(tmp);
