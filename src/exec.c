@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/09 16:56:17 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/12 11:17:30 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,18 +161,18 @@ void exec_cmd(t_resrc *resrc, t_list *list)
 {
 	int fd[2];
 
-	if (pipe(fd) < 0)
+	if (list->next)
 	{
-		close_pipes(list, fd);
-		print_error(": error creating pipe", -1, "pipe");
-		exit(g_exit_status);
+		if (pipe(fd) < 0)
+		{
+			close_pipes(list, fd);
+			error_handling("pipe error");
+		}
+		else if (list->next->command.input_fd == 0)
+			list->next->command.input_fd = fd[0];
 	}
 	do_fork(resrc, list, fd);
 	close(fd[1]);
-	if (list->next && list->next->command.input_fd == 0)
-		list->next->command.input_fd = fd[0];
-	else
-		close_pipes(list, fd);
 }
 
 int cmd_check(t_list *list)
@@ -223,20 +223,21 @@ int check_for_parent_builtin(t_resrc *resrc, t_list *list, char **cmd_arr, int l
 }
 
 void execution(t_resrc *resrc, t_list *list)
-{	
-	char **cmd_arr;
-	int len;
-	int lst_size;
+{
+    char	**cmd_arr;
+    int		len;
+    int		lst_size;
 
-	lst_size = linked_list_count(&list);
-	while (list)
-	{
-		cmd_arr = list->command.full_cmd;
-		if (cmd_arr)
-			len = ft_strlen(*cmd_arr);
-		if (!list->next)
-			if (!check_for_parent_builtin(resrc, list, cmd_arr, len) && cmd_check(list))
-					exec_cmd(resrc, list);
-		list = list->next;
-	}
-}	 
+    lst_size = linked_list_count(&list);
+    while (list)
+    {
+        cmd_arr = list->command.full_cmd;
+        if (cmd_arr)
+            len = ft_strlen(*cmd_arr);
+        if (!list->next)
+            check_for_parent_builtin(resrc, list, cmd_arr, len);
+        if (cmd_check(list))
+            exec_cmd(resrc, list);
+        list = list->next;
+    }
+}
