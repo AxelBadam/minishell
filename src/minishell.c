@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/12 14:59:51 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 15:54:22 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ int	main(int argc, char **argv, char **env)
 	(void)argv;
 	g_exit_status = 0;
 	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, SIG_IGN);
 	resrc = init_resources(create_env(env));
 	minishell(resrc);
 	free_string_array(resrc->envp);

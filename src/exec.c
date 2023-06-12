@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/09 17:19:26 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 15:24:22 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,6 @@ void do_fork(t_resrc *resrc, t_list *list, int *fd)
 	pid_t	pid;
 
 	signal(SIGINT, SIG_IGN);
-    signal(SIGQUIT, SIG_IGN);
 	signal(SIGTSTP, SIG_IGN);
 	pid = fork();
 	if (pid < 0)
@@ -153,7 +152,6 @@ void do_fork(t_resrc *resrc, t_list *list, int *fd)
 	waitpid(-1, &g_exit_status, WUNTRACED);
 	check_signal(list);
 	signal(SIGINT, signal_handler);
-    signal(SIGQUIT, SIG_DFL);
 	signal(SIGTSTP, SIG_DFL);
 }
 

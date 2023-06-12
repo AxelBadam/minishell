@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:54:28 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:03:55 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 15:06:59 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	add_expansion(char **ar, char *dst, char *src, int rm_len)
 	while (dst[c[1]])
 	{
 		if (!c[3])
-			if (dst[c[1]] == '$' || (!dst[c[1] - 1] && dst[c[1]] == '~'
+			if (dst[c[1]] == '$' || (c[1] == 0 && dst[c[1]] == '~'
 					&& (ar[c[0]][c[1] + 1] == '/' || !ar[c[0]][c[1] + 1])))
 				expand_string(src, new_str, c, rm_len);
 		if (dst[c[1]])
