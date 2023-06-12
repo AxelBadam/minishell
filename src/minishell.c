@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/12 12:26:37 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 14:59:51 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	minishell(t_resrc *resrc)
 			if (resrc->array)
 			{
 				make_list(resrc, resrc->array);
-				print_list(&resrc->list);
+				//print_list(&resrc->list);
 				if (resrc->list)
 				{
 					execution(resrc, resrc->list);

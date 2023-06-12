@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/12 13:24:29 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 14:28:23 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,6 @@
 # include <dirent.h>
 # include <sys/wait.h>
 # include <termios.h>
-
-typedef struct s_variables
-{
-	int		ctr[2];
-	int		len;
-	char	**full_cmd;
-	int		fd[2];
-}	t_variables;
 
 typedef struct s_command
 {

@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/12 13:24:40 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 14:58:58 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,36 +77,41 @@ void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len)
 
 void	get_next_node(t_resrc *rs, char **array, int *ctr)
 {
-	if (!array[ctr[1] + 1])
+	if (array[ctr[1]] && array[ctr[1]][0] == '|')
 	{
-		free_string_array(rs->array);
-		rs->array = get_new_command(rs, array);
-		array = rs->array;
+		if (!array[ctr[1] + 1])
+		{
+			free_string_array(rs->array);
+			rs->array = get_new_command(rs, array);
+			array = rs->array;
+		}
+		if (!array)
+			return ;
+		make_list(rs, &array[ctr[1] + 1]);
 	}
-	if (!array)
-		return ;
-	make_list(rs, &array[ctr[1] + 1]);
 }
 
 void	make_list(t_resrc *rs, char **array)
 {
-	t_variables	v;
+	int		ctr[2];
+	int		fd[2];
+	int		len;
+	char	**full_cmd;
 
-	v.ctr[1] = 0;
-	v.ctr[0] = 0;
-	v.fd[0] = 0;
-	v.fd[1] = 1;
-	v.len = get_len_without_redirects(rs, array, v.fd);
-	if (!v.len)
+	ctr[1] = 0;
+	ctr[0] = 0;
+	fd[0] = 0;
+	fd[1] = 1;
+	len = get_len_without_redirects(rs, array, fd);
+	if (!len)
 		return ;
-	v.full_cmd = (char **)malloc(sizeof(char *) * (v.len + 1));
-	if (!v.full_cmd)
+	full_cmd = (char **)malloc(sizeof(char *) * (len + 1));
+	if (!full_cmd)
 		error_exit("minishell: fatal malloc error\n", rs);
-	while (array[v.ctr[1]] && array[v.ctr[1]][0] != '|')
-		create_full_cmd(v.full_cmd, array, v.ctr, v.len);
-	v.full_cmd[v.ctr[0]] = 0;
-	remove_quotes(rs, v.full_cmd);
-	ft_lstadd_back(&rs->list, create_node(v.full_cmd, v.fd, rs));
-	if (array[v.ctr[1]] && array[v.ctr[1]][0] == '|')
-		get_next_node(rs, array, v.ctr);
+	while (array[ctr[1]] && array[ctr[1]][0] != '|')
+		create_full_cmd(full_cmd, array, ctr, len);
+	full_cmd[ctr[0]] = 0;
+	remove_quotes(rs, full_cmd);
+	ft_lstadd_back(&rs->list, create_node(full_cmd, fd, rs));
+	get_next_node(rs, array, ctr);
 }
