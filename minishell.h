@@ -3,22 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:36:58 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 13:23:15 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
+# include "libft/libft.h"
 # include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <fcntl.h>
 # include <unistd.h>
 # include <signal.h>
-# include "libft/libft.h"
 # include <sys/ioctl.h>
 # include <sys/stat.h>
 # include <dirent.h>
@@ -165,6 +165,8 @@ int		print_error(char *str, int exit_status, char *filename);
 int		is_builtin(char *str);
 int		check_syntax(char **array, int *ctr, char d);
 int		check_pipe_syntax(char **array, int *ctr);
+void 	check_signal(t_list *list);
+int 	cmd_check(t_list *list);
 /*
 ** HEREDOC
 */
@@ -177,5 +179,11 @@ void	add_array_to_array(t_resrc *resource, char **array, char **pipe_command);
 int		get_len_without_redirects(t_resrc *rs, char **ar, int *fd);
 int		count(char **array, int *ctr, int strings);
 int		len_ctr(char *line);
+/*
+** PIPE
+*/
+void 	setup_redir(t_list *list);
+void 	setup_pipe(int *fd);
+void 	close_pipes(t_list *list, int *fd);
 
 #endif

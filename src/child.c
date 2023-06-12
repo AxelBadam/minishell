@@ -1,19 +1,14 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   child.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/24 11:41:47 by atuliara          #+#    #+#             */
-/*   Updated: 2023/05/30 13:45:51 by ekoljone         ###   ########.fr       */
+/*   Created: 2023/06/12 12:42:01 by atuliara          #+#    #+#             */
+/*   Updated: 2023/06/12 12:42:11 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void error_handling(char *str)
-{
-	printf("%s", str);
-	exit (1);
-}

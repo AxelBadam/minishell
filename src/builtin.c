@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/09 18:37:05 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 11:57:09 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ void execute_builtin_export(t_list *list, t_resrc *resrc)
 		j++;
 	}
 	i = 0;
-	if (!list->command.full_cmd[j])
+	if (!list->command.full_cmd[1])
 		while (resrc->envp[i])
 			printf("declare -x %s\n", resrc->envp[i++]);
 	g_exit_status = 0;
