@@ -6,28 +6,13 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:17:55 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/12 13:24:40 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 extern int g_exit_status;
-
-char	*create_full_path(char *cmd, char *path, int start, int len)
-{
-	char	*full_path;
-	char	*tmp[2];
-
-	tmp[0] = ft_substr(path, start, len - 1);
-	tmp[1] = ft_strjoin(tmp[0], "/");
-	full_path = ft_strjoin(tmp[1], cmd);
-	free(tmp[0]);
-	free(tmp[1]);
-	if (!full_path)
-		return (NULL);
-	return (full_path);
-}
 
 char	*get_full_path(t_resrc *rs, char *cmd, char *path)
 {
@@ -90,6 +75,19 @@ void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len)
 	}
 }
 
+void	get_next_node(t_resrc *rs, char **array, int *ctr)
+{
+	if (!array[ctr[1] + 1])
+	{
+		free_string_array(rs->array);
+		rs->array = get_new_command(rs, array);
+		array = rs->array;
+	}
+	if (!array)
+		return ;
+	make_list(rs, &array[ctr[1] + 1]);
+}
+
 void	make_list(t_resrc *rs, char **array)
 {
 	t_variables	v;
@@ -109,12 +107,6 @@ void	make_list(t_resrc *rs, char **array)
 	v.full_cmd[v.ctr[0]] = 0;
 	remove_quotes(rs, v.full_cmd);
 	ft_lstadd_back(&rs->list, create_node(v.full_cmd, v.fd, rs));
-	if (array[v.ctr[1]])
-	{
-		if (!array[v.ctr[1] + 1])
-			if (!get_new_command(rs, array))
-				return ;
-		array = rs->array;
-		make_list(rs, &array[v.ctr[1] + 1]);
-	}
+	if (array[v.ctr[1]] && array[v.ctr[1]][0] == '|')
+		get_next_node(rs, array, v.ctr);
 }
