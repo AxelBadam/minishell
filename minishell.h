@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/12 15:00:58 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/13 15:39:17 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,6 +157,7 @@ int		print_error(char *str, int exit_status, char *filename);
 int		is_builtin(char *str);
 int		check_syntax(char **array, int *ctr, char d);
 int		check_pipe_syntax(char **array, int *ctr);
+int		print_syntax_error(char *s, int exit);
 /*
 ** HEREDOC
 */

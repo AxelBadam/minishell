@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:11:26 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:28:56 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/13 14:52:41 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,11 @@ int	open_output_redirect(char *redirect, char *filename, int *fd)
 {
 	if (access(filename, F_OK) == 0 && access(filename, W_OK) == -1
 		&& (ft_strncmp(redirect, ">", SIZE_MAX) == 0
-			|| ft_strncmp(redirect, ">>", SIZE_MAX) == 0))
+			|| ft_strncmp(redirect, ">>", SIZE_MAX) == 0
+			|| ft_strncmp(redirect, ">|", SIZE_MAX) == 0))
 		if (!print_error(": permission denied\n", 69, filename))
 			return (-1);
-	if (ft_strncmp(redirect, ">", SIZE_MAX) == 0)
+	if (ft_strncmp(redirect, ">", SIZE_MAX) == 0 || ft_strncmp(redirect, ">|", SIZE_MAX) == 0)
 		fd[1] = open(filename, O_CREAT | O_WRONLY, 0644);
 	else if (ft_strncmp(redirect, ">>", SIZE_MAX) == 0)
 		fd[1] = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
