@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/12 13:24:55 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/14 17:02:38 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,8 @@ void child_process(t_resrc *resrc, t_list *list, int *fd)
 	if (list->next)
 		setup_pipe(fd);
 	execute_child(resrc, list);
+	close(fd[0]);
+	close(fd[1]);
 	exit(g_exit_status);
 }
 

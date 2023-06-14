@@ -1,2 +1,10 @@
 
 ./philo 5 800 200 200
+
+
+tests : 
+| -- unexpected token
+echo -nnnnnn
+(cat /dev/random | head -n 1 | cat -e ???)
+
+

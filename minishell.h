@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/12 13:28:58 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/14 16:31:01 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include <dirent.h>
 # include <sys/wait.h>
 # include <termios.h>
+# include <errno.h>
 
 typedef struct s_variables
 {

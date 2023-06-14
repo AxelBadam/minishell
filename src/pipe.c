@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/12 12:40:46 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/12 12:49:14 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/14 16:46:01 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ extern int g_exit_status;
 
 void setup_redir(t_list *list)
 {
-    if (list->command.input_fd != STDIN_FILENO) 
+    if (list->command.input_fd != STDIN_FILENO)
 	{
 		if (dup2(list->command.input_fd, STDIN_FILENO) == -1)
 		{
