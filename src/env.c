@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:07:24 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:11:02 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/14 14:15:45 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,18 @@ void	set_env(t_resrc *resrc)
 	int		size;
 	char	*str;
 	
+	if (resrc->list->next)
+	{
+		replace_str("_=", resrc->envp);
+		return ;
+	}
 	prefix = "_=";
 	size = get_2d_array_size(resrc->list->command.full_cmd);
 	last_arg = resrc->list->command.full_cmd[size - 1];
-	str = ft_strjoin(prefix, last_arg);
+	if (resrc->list->command.full_path)
+		str = ft_strjoin(prefix, resrc->list->command.full_path);
+	else
+		str = ft_strjoin(prefix, last_arg);
 	if (!str)
 		error_exit("minishell: fatal malloc error\n", resrc);
 	if (is_in_env(str, resrc->envp))

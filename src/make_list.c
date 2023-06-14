@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/14 15:01:12 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/14 17:14:40 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ char	*get_full_path(t_resrc *rs, char *cmd, char *path)
 	ctr[0] = -1;
 	ctr[1] = 0;
 	len = 0;
+	if (!path)
+		return (NULL);
 	while (path[++ctr[0]])
 	{
 		if (path[ctr[0]] == ':')
@@ -57,6 +59,7 @@ t_list	*create_node(char **full_cmd, int *fd, t_resrc *rs)
 	new_node->command.full_cmd = full_cmd;
 	new_node->command.output_fd = fd[1];
 	new_node->command.input_fd = fd[0];
+	new_node->command.pid = -2;
 	new_node->next = NULL;
 	return (new_node);
 }
@@ -77,36 +80,40 @@ void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len)
 
 void	get_next_node(t_resrc *rs, char **array, int *ctr)
 {
-	if (!array[ctr[1] + 1])
+	if (array[ctr[1]] && array[ctr[1]][0] == '|')
 	{
-		free_string_array(rs->array);
-		rs->array = get_new_command(rs, array);
-		array = rs->array;
+		if (!array[ctr[1] + 1])
+			array = get_new_command(rs);
+		else
+			array = array_dup(&array[ctr[1] + 1]);
+		if (!array)
+			return ;
+		make_list(rs, array);
+		free_string_array(array);
 	}
-	if (!array)
-		return ;
-	make_list(rs, &array[ctr[1] + 1]);
 }
 
 void	make_list(t_resrc *rs, char **array)
 {
-	t_variables	v;
+	int		ctr[2];
+	int		fd[2];
+	int		len;
+	char	**full_cmd;
 
-	v.ctr[1] = 0;
-	v.ctr[0] = 0;
-	v.fd[0] = 0;
-	v.fd[1] = 1;
-	v.len = get_len_without_redirects(rs, array, v.fd);
-	if (!v.len)
+	ctr[1] = 0;
+	ctr[0] = 0;
+	fd[0] = 0;
+	fd[1] = 1;
+	len = get_len_without_redirects(rs, array, fd);
+	if (!len)
 		return ;
-	v.full_cmd = (char **)malloc(sizeof(char *) * (v.len + 1));
-	if (!v.full_cmd)
+	full_cmd = (char **)malloc(sizeof(char *) * (len + 1));
+	if (!full_cmd)
 		error_exit("minishell: fatal malloc error\n", rs);
-	while (array[v.ctr[1]] && array[v.ctr[1]][0] != '|')
-		create_full_cmd(v.full_cmd, array, v.ctr, v.len);
-	v.full_cmd[v.ctr[0]] = 0;
-	remove_quotes(rs, v.full_cmd);
-	ft_lstadd_back(&rs->list, create_node(v.full_cmd, v.fd, rs));
-	if (array[v.ctr[1]] && array[v.ctr[1]][0] == '|')
-		get_next_node(rs, array, v.ctr);
+	while (array[ctr[1]] && array[ctr[1]][0] != '|')
+		create_full_cmd(full_cmd, array, ctr, len);
+	full_cmd[ctr[0]] = 0;
+	remove_quotes(rs, full_cmd);
+	ft_lstadd_back(&rs->list, create_node(full_cmd, fd, rs));
+	get_next_node(rs, array, ctr);
 }

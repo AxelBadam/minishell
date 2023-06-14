@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:54:28 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:03:55 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/14 15:32:33 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	add_expansion(char **ar, char *dst, char *src, int rm_len)
 	while (dst[c[1]])
 	{
 		if (!c[3])
-			if (dst[c[1]] == '$' || (!dst[c[1] - 1] && dst[c[1]] == '~'
+			if (dst[c[1]] == '$' || (c[1] == 0 && dst[c[1]] == '~'
 					&& (ar[c[0]][c[1] + 1] == '/' || !ar[c[0]][c[1] + 1])))
 				expand_string(src, new_str, c, rm_len);
 		if (dst[c[1]])
@@ -113,11 +113,11 @@ void	expand(char **array, char **env)
 	{
 		while (array[ctr[0]][++ctr[1]])
 		{
-			expand_dollar_sign(array, ctr, env);
 			if (ctr[1] == 0 && array[ctr[0]][ctr[1]] == '~'
 				&& (array[ctr[0]][ctr[1] + 1] == '/'
 					|| !array[ctr[0]][ctr[1] + 1]))
 				add_expansion(array, array[ctr[0]], get_env("HOME", env), 1);
+			expand_dollar_sign(array, ctr, env);
 			if (array[ctr[0]][ctr[1] - 1] == '\'')
 				if (ft_strchr(&array[ctr[0]][ctr[1]], '\''))
 					iterate_quotes(array[ctr[0]], &ctr[1], '\'', 0);

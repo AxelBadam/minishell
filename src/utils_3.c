@@ -6,13 +6,28 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:31:52 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/12 13:24:11 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/14 13:33:03 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 extern int g_exit_status;
+
+char	**array_dup(char **array)
+{
+	char	**new_array;
+	int		ctr;
+
+	ctr = -1;
+	new_array = (char **)malloc(sizeof(char *) * (get_array_size(array) + 1));
+	if (!new_array)
+		return (NULL);
+	while (array[++ctr])
+		new_array[ctr] = ft_strdup(array[ctr]);
+	new_array[ctr] = 0;
+	return (new_array);
+}
 
 char	*create_full_path(char *cmd, char *path, int start, int len)
 {

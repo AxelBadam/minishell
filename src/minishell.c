@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/12 16:52:49 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/14 17:15:12 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,8 @@ void	minishell(t_resrc *resrc)
 				//print_list(&resrc->list);
 				if (resrc->list)
 				{
-					execution(resrc, resrc->list);
 					set_env(resrc);
+					execution(resrc, resrc->list);
 				}
 				free_string_array(resrc->array);
 				free_all_nodes(&resrc->list);
@@ -95,6 +95,7 @@ int	main(int argc, char **argv, char **env)
 	(void)argv;
 	g_exit_status = 0;
 	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, SIG_IGN);
 	resrc = init_resources(create_env(env));
 	minishell(resrc);
 	free_string_array(resrc->envp);

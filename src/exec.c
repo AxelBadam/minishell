@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/14 17:02:38 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/14 17:12:01 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,13 +72,39 @@ void child_process(t_resrc *resrc, t_list *list, int *fd)
 	signal(SIGINT, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
 	signal(SIGTSTP, SIG_DFL);
+	signal(SIGPIPE, SIG_DFL);
 	setup_redir(list);
-	if (list->next)
+	if (list->next && list->command.output_fd == STDOUT_FILENO)
 		setup_pipe(fd);
 	execute_child(resrc, list);
 	close(fd[0]);
 	close(fd[1]);
+	close(list->command.output_fd);
+	close(list->command.input_fd);
 	exit(g_exit_status);
+
+}
+void check_signal(t_list *list)
+{
+	int signal;
+	
+	signal = 0;
+	if (WIFEXITED(g_exit_status))
+		g_exit_status = WEXITSTATUS(g_exit_status);
+	else if (WIFSIGNALED(g_exit_status))
+		{
+			signal = WTERMSIG(g_exit_status);
+			if (signal == 3)
+				ft_putstr_fd("Quit: 3\n", 2);
+			g_exit_status = 128 + signal;
+		}
+	else if (WIFSTOPPED(g_exit_status))
+	{
+		write(STDOUT_FILENO, "\r\033[K", 4);
+		ft_putstr_fd(*list->command.full_cmd, 2);
+		g_exit_status = 146;
+		ft_putstr_fd(" was stopped\n", 2);
+	}
 }
 
 void do_fork(t_resrc *resrc, t_list *list, int *fd)
@@ -86,17 +112,14 @@ void do_fork(t_resrc *resrc, t_list *list, int *fd)
 	pid_t	pid;
 
 	signal(SIGINT, SIG_IGN);
-    signal(SIGQUIT, SIG_IGN);
 	signal(SIGTSTP, SIG_IGN);
 	pid = fork();
 	if (pid < 0)
 		print_error(": error", 1, "fork");
 	if (!pid)
 		child_process(resrc, list, fd);
-	waitpid(-1, &g_exit_status, WUNTRACED);
-	check_signal(list);
+	list->command.pid = pid;
 	signal(SIGINT, signal_handler);
-    signal(SIGQUIT, SIG_DFL);
 	signal(SIGTSTP, SIG_DFL);
 }
 
@@ -131,8 +154,12 @@ int check_for_parent_builtin(t_resrc *resrc, t_list *list, int len)
 void execution(t_resrc *resrc, t_list *list)
 {
     int		len;
+    int		lst_size;
+	t_list	*tmp;
 	int 	fd[2];
 
+	tmp = list;
+    lst_size = linked_list_count(&list);
     while (list)
     {
         if (*list->command.full_cmd)
@@ -153,4 +180,13 @@ void execution(t_resrc *resrc, t_list *list)
 		}
         list = list->next;
     }
+	while (tmp)
+	{
+		if (tmp->command.pid != -2)
+		{
+			waitpid(tmp->command.pid, &g_exit_status, WUNTRACED);
+			check_signal(list);
+		}
+		tmp = tmp->next;
+	}
 }
