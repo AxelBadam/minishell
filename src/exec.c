@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/14 17:12:01 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/14 17:16:18 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ int check_for_parent_builtin(t_resrc *resrc, t_list *list, int len)
 	tmp = ft_strdup(*list->command.full_cmd);
 	tmp = str_to_lower(tmp);
 	if (!ft_strncmp(tmp, "exit", len) && len == 4)
-      	execute_builtin_exit();
+      	execute_builtin_exit(list->command.full_cmd);
 	if (!ft_strncmp(tmp, "cd", len) && len == 2)
 	{
  	   	execute_builtin_cd(resrc, list->command);
