@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:30:05 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/13 15:24:54 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/14 13:30:52 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,7 @@
 
 extern int g_exit_status;
 
-char	**add_array_to_array(t_resrc *resource, char **array, char **pipe_command)
-{
-	char	**n_arr;
-	int		ctr[2];
-
-	ctr[0] = 0;
-	ctr[1] = 0;
-	n_arr = (char **)malloc(sizeof(char *)
-			* (get_array_size(array) + get_array_size(pipe_command) + 1));
-	if (!n_arr)
-		error_exit("minishell: fatal malloc error\n", resource);
-	while (array[ctr[0]])
-		n_arr[ctr[0]++] = ft_strdup(array[ctr[0]]);
-	while (pipe_command[ctr[1]])
-		n_arr[ctr[0]++] = ft_strdup(pipe_command[ctr[1]++]);
-	n_arr[ctr[0]] = 0;
-	free_string_array(pipe_command);
-	return (n_arr);
-}
-
-char	**get_new_command(t_resrc *resource, char **array)
+char	**get_new_command(t_resrc *resource)
 {
 	char	*line;
 	char	**pipe_command;
@@ -55,7 +35,6 @@ char	**get_new_command(t_resrc *resource, char **array)
 				free(line);
 		}
 		pipe_command = split_command(resource, line);
-		pipe_command = add_array_to_array(resource, array, pipe_command);
 		free(line);
 		return (pipe_command);
 	}

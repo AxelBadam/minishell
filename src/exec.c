@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/12 15:24:22 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/14 17:01:55 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,8 +99,6 @@ void setup_pipe(int *fd)
 		print_error(": dup2 error", 1, "dup2");
 		exit(g_exit_status);
 	}
-	close(fd[1]);
-	close(fd[0]);
 }
 
 void child_process(t_resrc *resrc, t_list *list, int *fd)
@@ -108,12 +106,14 @@ void child_process(t_resrc *resrc, t_list *list, int *fd)
 	signal(SIGINT, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
 	signal(SIGTSTP, SIG_DFL);
+	signal(SIGPIPE, SIG_DFL);
 	setup_redir(list);
-	if (list->next)
+	if (list->next && list->command.output_fd == STDOUT_FILENO)
 		setup_pipe(fd);
 	execute_child(resrc, list);
+	close(list->command.output_fd);
+	close(list->command.input_fd);
 	exit(g_exit_status);
-
 }
 void check_signal(t_list *list)
 {
@@ -149,8 +149,7 @@ void do_fork(t_resrc *resrc, t_list *list, int *fd)
 		print_error(": fork error", 1, "fork");
 	if (!pid)
 		child_process(resrc, list, fd);
-	waitpid(-1, &g_exit_status, WUNTRACED);
-	check_signal(list);
+	list->command.pid = pid;
 	signal(SIGINT, signal_handler);
 	signal(SIGTSTP, SIG_DFL);
 }
@@ -170,7 +169,7 @@ void exec_cmd(t_resrc *resrc, t_list *list)
 			list->next->command.input_fd = fd[0];
 	}
 	do_fork(resrc, list, fd);
-	close(fd[1]);
+	//close(fd[1]);
 }
 
 int cmd_check(t_list *list)
@@ -201,7 +200,7 @@ int check_for_parent_builtin(t_resrc *resrc, t_list *list, char **cmd_arr, int l
 	tmp = ft_strdup(*cmd_arr);
 	tmp = str_to_lower(tmp);
 	if (!ft_strncmp(tmp, "exit", len))
-      	execute_builtin_exit();
+      	execute_builtin_exit(cmd_arr);
 	if (!ft_strncmp(tmp, "cd", len))
 	{
  	   	execute_builtin_cd(resrc, list->command);
@@ -225,7 +224,9 @@ void execution(t_resrc *resrc, t_list *list)
     char	**cmd_arr;
     int		len;
     int		lst_size;
+	t_list	*tmp;
 
+	tmp = list;
     lst_size = linked_list_count(&list);
     while (list)
     {
@@ -238,4 +239,13 @@ void execution(t_resrc *resrc, t_list *list)
             exec_cmd(resrc, list);
         list = list->next;
     }
+	while (tmp)
+	{
+		if (tmp->command.pid != -2)
+		{
+			waitpid(tmp->command.pid, &g_exit_status, WUNTRACED);
+			check_signal(list);
+		}
+		tmp = tmp->next;
+	}
 }

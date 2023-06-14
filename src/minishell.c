@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/13 15:13:02 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/14 15:22:20 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,8 @@ void	minishell(t_resrc *resrc)
 				//print_list(&resrc->list);
 				if (resrc->list)
 				{
-					execution(resrc, resrc->list);
 					set_env(resrc);
+					execution(resrc, resrc->list);
 				}
 				free_string_array(resrc->array);
 				free_all_nodes(&resrc->list);

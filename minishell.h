@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/13 15:39:17 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/14 16:34:39 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,11 @@
 # include <dirent.h>
 # include <sys/wait.h>
 # include <termios.h>
+# include <errno.h>
 
 typedef struct s_command
 {
+	pid_t	pid;
 	char	*full_path;
 	char	**full_cmd;
 	int		output_fd;
@@ -56,12 +58,13 @@ void	execution(t_resrc *resrc, t_list *list);
 ** BUILTINS
 */
 void	execute_builtin_pwd();
-void	execute_builtin_exit();
+void	execute_builtin_exit(char **array);
 void	execute_builtin_cd(t_resrc *resrc, t_command command);
 void	execute_builtin_echo(t_command cmd);
 void	execute_builtin_env(char **envp);
 void	execute_builtin_unset(t_list *list, t_resrc *resrc);
 void	execute_builtin_export(t_list *list, t_resrc *resrc);
+int		check_for_option(char *str);
 /*
 ** ERRORRR
 */
@@ -162,7 +165,7 @@ int		print_syntax_error(char *s, int exit);
 ** HEREDOC
 */
 void	create_heredoc(int *fd, char *delimitor);
-char	**get_new_command(t_resrc *resource, char **array);
+char	**get_new_command(t_resrc *resource);
 char	**add_array_to_array(t_resrc *resource, char **array, char **pipe_command);
 /*
 ** UTILS_3
@@ -171,5 +174,6 @@ int		get_len_without_redirects(t_resrc *rs, char **ar, int *fd);
 int		count(char **array, int *ctr, int strings);
 int		len_ctr(char *line);
 char	*create_full_path(char *cmd, char *path, int start, int len);
+char	**array_dup(char **array);
 
 #endif

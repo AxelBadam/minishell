@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:54:28 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/12 15:06:59 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/14 15:32:33 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,11 +113,11 @@ void	expand(char **array, char **env)
 	{
 		while (array[ctr[0]][++ctr[1]])
 		{
-			expand_dollar_sign(array, ctr, env);
 			if (ctr[1] == 0 && array[ctr[0]][ctr[1]] == '~'
 				&& (array[ctr[0]][ctr[1] + 1] == '/'
 					|| !array[ctr[0]][ctr[1] + 1]))
 				add_expansion(array, array[ctr[0]], get_env("HOME", env), 1);
+			expand_dollar_sign(array, ctr, env);
 			if (array[ctr[0]][ctr[1] - 1] == '\'')
 				if (ft_strchr(&array[ctr[0]][ctr[1]], '\''))
 					iterate_quotes(array[ctr[0]], &ctr[1], '\'', 0);

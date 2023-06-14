@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/12 15:21:43 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/14 15:11:32 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,10 +80,18 @@ void execute_builtin_pwd()
 	free(cwd);
 }
 
-void execute_builtin_exit()
+void execute_builtin_exit(char **array)
 {
-	write(1, "exit\n", 5);
-	exit (g_exit_status);
+	if (get_array_size(array) > 2)
+		print_error("exit: too many arguments\n", 1, NULL);
+	else
+	{
+		write(1, "exit\n", 5);
+		if (array[1])
+			exit(ft_atoi(array[1]));
+		else
+			exit(0);
+	}
 }
 
 void execute_builtin_env(char **envp)
@@ -175,7 +183,7 @@ void execute_builtin_export(t_list *list, t_resrc *resrc)
 		j++;
 	}
 	i = 0;
-	if (!list->command.full_cmd[j])
+	if (!list->command.full_cmd[1])
 		while (resrc->envp[i])
 			printf("declare -x %s\n", resrc->envp[i++]);
 	g_exit_status = 0;
@@ -220,6 +228,27 @@ void execute_builtin_unset(t_list *list, t_resrc *resrc)
 	g_exit_status = 0;
 }
 
+int	check_for_option(char *str)
+{
+	int ctr;
+
+	ctr = 0;
+	if (!str)
+		return (0);
+	if (str[ctr] && str[ctr] == '-')
+	{
+		ctr++;
+		while (str[ctr] == 'n')
+		{
+			ctr++;
+			if (str[ctr] == 0)
+				return (1);
+		}
+	}
+	return (0);
+}
+
+
 void execute_builtin_echo(t_command cmd)
 {
     int newline;
@@ -227,8 +256,8 @@ void execute_builtin_echo(t_command cmd)
 
 	newline = 1;
 	i = 1;
-    if (*cmd.full_cmd != 0 && cmd.full_cmd[i] != 0 \
-	&& ft_strncmp(cmd.full_cmd[i], "-n", 2) == 0)
+    while (*cmd.full_cmd != 0 && cmd.full_cmd[i] != 0 \
+	&& check_for_option(cmd.full_cmd[i]))
     {
 		newline = 0;
 		i++;
