@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/14 17:16:18 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/14 17:18:30 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,28 +83,6 @@ void child_process(t_resrc *resrc, t_list *list, int *fd)
 	close(list->command.input_fd);
 	exit(g_exit_status);
 
-}
-void check_signal(t_list *list)
-{
-	int signal;
-	
-	signal = 0;
-	if (WIFEXITED(g_exit_status))
-		g_exit_status = WEXITSTATUS(g_exit_status);
-	else if (WIFSIGNALED(g_exit_status))
-		{
-			signal = WTERMSIG(g_exit_status);
-			if (signal == 3)
-				ft_putstr_fd("Quit: 3\n", 2);
-			g_exit_status = 128 + signal;
-		}
-	else if (WIFSTOPPED(g_exit_status))
-	{
-		write(STDOUT_FILENO, "\r\033[K", 4);
-		ft_putstr_fd(*list->command.full_cmd, 2);
-		g_exit_status = 146;
-		ft_putstr_fd(" was stopped\n", 2);
-	}
 }
 
 void do_fork(t_resrc *resrc, t_list *list, int *fd)
