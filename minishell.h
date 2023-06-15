@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/15 14:57:06 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/15 17:00:41 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	execution(t_resrc *resrc, t_list *list);
 ** BUILTINS
 */
 void	execute_builtin_pwd();
-void	execute_builtin_exit(char **array);
+void	execute_builtin_exit(char **array, int check);
 void	execute_builtin_cd(t_resrc *resrc, t_command command);
 void	execute_builtin_echo(t_command cmd);
 void	execute_builtin_env(char **envp);

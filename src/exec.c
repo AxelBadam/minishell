@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/15 16:20:13 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/15 17:02:10 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,9 @@ void execute_builtin(t_resrc *resrc, t_list *list)
 	else if (!ft_strncmp(cmd, "env", len) && len == 3)
     	execute_builtin_env(resrc->envp);
 	else if (!ft_strncmp(cmd, "export", 6) && len == 6)
-        execute_builtin_export(resrc->list, resrc);
+        execute_builtin_export(list, resrc);
+	else if (!ft_strncmp(cmd, "exit", 4) && len == 4)
+		execute_builtin_exit(list->command.full_cmd, 1);
 	free(cmd);
 }
 
@@ -195,8 +197,8 @@ int check_for_parent_builtin(t_resrc *resrc, t_list *list, int len)
 	ret = 0;
 	tmp = ft_strdup(*list->command.full_cmd);
 	tmp = str_to_lower(tmp);
-	if (!ft_strncmp(tmp, "exit", len) && len == 4)
-      	execute_builtin_exit(list->command.full_cmd);
+	if (!ft_strncmp(tmp, "exit", len) && len == 4 && linked_list_count(&resrc->list) == 1)
+      	execute_builtin_exit(list->command.full_cmd, 0);
 	if (!ft_strncmp(tmp, "cd", len) && len == 2)
 	{
  	   	execute_builtin_cd(resrc, list->command);
@@ -207,7 +209,7 @@ int check_for_parent_builtin(t_resrc *resrc, t_list *list, int len)
         execute_builtin_unset(list, resrc);
 		ret = 1;
 	}
-	else if (!ft_strncmp(tmp, "export", 6) && len == 6)
+	else if (!ft_strncmp(tmp, "export", 6) && len == 6 && get_array_size(list->command.full_cmd) > 1)
     {    
 		execute_builtin_export(list, resrc);
 		ret = 1;
