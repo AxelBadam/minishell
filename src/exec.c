@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/15 18:02:07 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/15 18:04:00 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,25 +69,6 @@ void exec_cmd(t_resrc *resrc, t_list *list)
 	}
 	do_fork(resrc, list, list->command.fd);
 	close(list->command.fd[1]);
-}
-
-void	close_wait(t_list *list)
-{
-    int		len;
-
-    while (list)
-    {
-        if (list->command.full_cmd)
-            len = ft_strlen(*list->command.full_cmd);
-        if (!list->next)
-            check_for_parent_builtin(resrc, list, len);
-        if (cmd_check(list))
-            exec_cmd(resrc, list);
-        list = list->next;
-    }
-	close_wait(resrc->list);
-	signal(SIGINT, signal_handler);
-	signal(SIGTSTP, SIG_DFL);
 }
 
 void execution(t_resrc *resrc, t_list *list)

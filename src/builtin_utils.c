@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/15 17:51:03 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/15 18:05:06 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
