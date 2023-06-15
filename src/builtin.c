@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/14 17:14:07 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/15 17:05:44 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,17 +80,18 @@ void execute_builtin_pwd()
 	free(cwd);
 }
 
-void execute_builtin_exit(char **array)
+void	execute_builtin_exit(char **array, int check)
 {
 	if (get_array_size(array) > 2)
 		print_error("exit: too many arguments\n", 1, NULL);
 	else
 	{
-		write(1, "exit\n", 5);
+		if (!check)
+			write(1, "exit\n", 5);
 		if (array[1])
 			exit(ft_atoi(array[1]));
 		else
-			exit(0);
+			exit(g_exit_status);
 	}
 }
 
@@ -171,7 +172,6 @@ char **append_2d(char **twod, char *str_to_add)
 void execute_builtin_export(t_list *list, t_resrc *resrc)
 {
 	int j;
-	int i;
 
 	j = 1;
 	while (list->command.full_cmd[j])
@@ -182,11 +182,14 @@ void execute_builtin_export(t_list *list, t_resrc *resrc)
 			resrc->envp = append_2d(resrc->envp, list->command.full_cmd[j]);
 		j++;
 	}
-	i = 0;
+	j = 0;
 	if (!list->command.full_cmd[1])
-	if (!list->command.full_cmd[1])
-		while (resrc->envp[i])
-			printf("declare -x %s\n", resrc->envp[i++]);
+		while (resrc->envp[j])
+	{
+		ft_putstr_fd("declare -x ", 1);
+		ft_putstr_fd(resrc->envp[j++], 1);
+		ft_putstr_fd("\n", 1);
+	}
 	g_exit_status = 0;
 }
 

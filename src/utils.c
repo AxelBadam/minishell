@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:04:53 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/12 11:44:21 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/05 13:05:54 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,12 @@ int linked_list_count(t_list **lst)
 		head = head->next;
 	}
     return (count + 1);
+}
+
+void wait_for_child(int command_count)
+{
+	while (command_count-- > 0)
+		wait(&g_exit_status);
 }
 
 int	get_2d_array_size(char **array)
