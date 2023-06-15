@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:04:53 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/05 13:05:54 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/15 17:44:34 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,3 +57,25 @@ char *str_to_lower(char *tmp)
 	return (tmp);
 }
 
+void	close_wait(t_list *list)
+{
+	t_list	*tmp;
+
+	tmp = list;
+	while (tmp)
+	{
+		if (tmp->command.fd[0] != -2)
+			close(tmp->command.fd[0]);
+		tmp = tmp->next;
+	}
+	tmp = list;
+	while (tmp)
+	{
+		if (tmp->command.pid != -2)
+		{
+			waitpid(tmp->command.pid, &g_exit_status, WUNTRACED);
+			check_signal(list);
+		}
+		tmp = tmp->next;
+	}
+}

@@ -1,6 +1,6 @@
 NAME = minishell
-SRC = minishell.c exec.c error.c builtin.c utils.c check.c env.c expand.c free.c heredoc.c make_list.c \
-open_redirects.c remove_quotes.c split_by_operator.c split_command.c utils_2.c utils_3.c
+SRC = minishell.c exec.c error.c builtin.c builtin_2.c builtin_utils.c utils.c check.c check_2.c env.c expand.c free.c heredoc.c make_list.c \
+open_redirects.c remove_quotes.c split_by_operator.c split_command.c utils_2.c utils_3.c pipes.c 
 LIBFT = libft
 OBJECT = $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 CC = cc

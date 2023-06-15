@@ -3,29 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/15 17:05:44 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/15 17:54:18 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 extern int g_exit_status;
-
-int update_env(char *var, char *val, t_resrc *resrc)
-{
-	char *env_var;
-
-	env_var = ft_strjoin(var, val);
-	if (is_in_env(env_var, resrc->envp))
-		resrc->envp = replace_str(env_var, resrc->envp);
-	else if (ft_strchr(env_var, '=') != NULL)
-		resrc->envp = append_2d(resrc->envp, env_var);
-	free(env_var);
-	return (1);
-}
 	
 void cd_error(char *path)
 {
@@ -63,38 +50,6 @@ void execute_builtin_cd(t_resrc *resrc, t_command command)
 		free(path);
 }
 
-void execute_builtin_pwd()
-{
-    char *cwd;
-
-	cwd = NULL;
-	cwd = getcwd(cwd, sizeof(cwd));
-    if (cwd != NULL) 
-    {
-        write(STDOUT_FILENO, cwd, ft_strlen(cwd));
-        write(STDOUT_FILENO, "\n", 1);
-		g_exit_status = 0;
-    } 
-    else 
-		print_error(": getcwd failed", 1, "pwd");
-	free(cwd);
-}
-
-void	execute_builtin_exit(char **array, int check)
-{
-	if (get_array_size(array) > 2)
-		print_error("exit: too many arguments\n", 1, NULL);
-	else
-	{
-		if (!check)
-			write(1, "exit\n", 5);
-		if (array[1])
-			exit(ft_atoi(array[1]));
-		else
-			exit(g_exit_status);
-	}
-}
-
 void execute_builtin_env(char **envp)
 {
 	char **tmp;
@@ -106,67 +61,6 @@ void execute_builtin_env(char **envp)
 		ft_putstr_fd("\n", 1);
 	}
 	g_exit_status = 0;
-}
-
-int is_in_env(char *str, char **envp)
-{
-	int len;
-	int count;
-	int i;
-
-	i = 0;
-	count = 0;
-	len = 0;
-	while (str[len] && str[len] != '=')
-		len++;
-	while (envp[i] && str[0] != 0)
-	{
-		if (!ft_strncmp(envp[i], str, len) && envp[i][len] == '=')
-			count++;
-		i++;
-	}
-	return (count);
-}
-
-char **replace_str(char *str, char **envp)
-{
-	int len;
-	int count;
-	int i;
-
-	len = 0;
-	i = 0;
-	count = 0;
-	while (str[len] != '=')
-		len++;
-	while (envp[i] && str[0] != 0)
-	{
-		if (!ft_strncmp(envp[i], str, len) && envp[i][len] == '=')
-		{
-			free(envp[i]);
-			envp[i] = ft_strdup(str);
-		}
-		i++;
-	}
-	return (envp);
-}
-
-char **append_2d(char **twod, char *str_to_add)
-{
-	char **new;
-	int i;
-
-	i = 0;
-	while(twod[i])
-		i++;
-	new = (char **)malloc(sizeof(char *) * (i + 2));
-	i = -1;
-	while (twod[++i])
-		new[i] = ft_strdup(twod[i]);
-	new[i] = ft_strdup(str_to_add);
-	new[++i] = 0;
-	free_string_array(twod);
-	return (new);
 }
 
 void execute_builtin_export(t_list *list, t_resrc *resrc)
@@ -193,86 +87,27 @@ void execute_builtin_export(t_list *list, t_resrc *resrc)
 	g_exit_status = 0;
 }
 
-char **rmv_str_twod(char **env, char *to_rmv)
+void execute_builtin(t_resrc *resrc, t_list *list) 
 {
-	char **new;
-	int i;
+	char *cmd;
 	int len;
-	int j;
-
-	i = 0;
-	j = 0;
-	len = ft_strlen(to_rmv);
-	while(env[i])
-		i++;
-	new = (char **)malloc(sizeof(char *) * \
-	(i + 1 - is_in_env(to_rmv, env)));
-	i = 0;
-	while (env[i])
-	{			
-		if (ft_strnstr(env[i], to_rmv, len))
-			i++;
-		new[j++] = ft_strdup(env[i++]);
-	}
-	new[j] = 0;
-	free_string_array(env);
-	return(new);
-}
-
-void execute_builtin_unset(t_list *list, t_resrc *resrc)
-{
-	int ac;
-
-	ac = 1;
-	while (list->command.full_cmd[ac] && is_in_env(list->command.full_cmd[ac], resrc->envp))
-	{
-		resrc->envp = rmv_str_twod(resrc->envp, list->command.full_cmd[ac]);
-		ac++;
-	}
-	g_exit_status = 0;
-}
-
-int	check_for_option(char *str)
-{
-	int ctr;
-
-	ctr = 0;
-	if (!str)
-		return (0);
-	if (str[ctr] && str[ctr] == '-')
-	{
-		ctr++;
-		while (str[ctr] == 'n')
-		{
-			ctr++;
-			if (str[ctr] == 0)
-				return (1);
-		}
-	}
-	return (0);
-}
-
-
-void execute_builtin_echo(t_command cmd)
-{
-    int newline;
-	int i;
-
-	newline = 1;
-	i = 1;
-    while (*cmd.full_cmd != 0 && cmd.full_cmd[i] != 0 \
-	&& check_for_option(cmd.full_cmd[i]))
-    {
-		newline = 0;
-		i++;
-	}
-    while (cmd.full_cmd[i] != 0)
-    {
-    	ft_putstr_fd(cmd.full_cmd[i], STDOUT_FILENO);
-        if (cmd.full_cmd[++i] != 0)
-            write(1, " ", 1);
-    }
-    if (newline)
-        ft_putstr_fd("\n", 1);
-    g_exit_status = 0;
+	
+	len = 0;
+	cmd = ft_strdup(*list->command.full_cmd);
+	if (!cmd)
+		error_exit("malloc error", resrc);
+	cmd = str_to_lower(cmd);
+	if (*list->command.full_cmd)
+		len = ft_strlen(cmd);
+    if (!ft_strncmp(cmd, "pwd", len) && len == 3)
+    	execute_builtin_pwd();
+ 	else if (!ft_strncmp(cmd, "echo", len) && len == 4)
+    	execute_builtin_echo(list->command);
+	else if (!ft_strncmp(cmd, "env", len) && len == 3)
+    	execute_builtin_env(resrc->envp);
+	else if (!ft_strncmp(cmd, "export", 6) && len == 6)
+        execute_builtin_export(list, resrc);
+	else if (!ft_strncmp(cmd, "exit", 4) && len == 4)
+		execute_builtin_exit(list->command.full_cmd, 1);
+	free(cmd);
 }
