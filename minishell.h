@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/14 16:34:39 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/15 14:57:06 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 typedef struct s_command
 {
 	pid_t	pid;
+	int		fd[2];
 	char	*full_path;
 	char	**full_cmd;
 	int		output_fd;

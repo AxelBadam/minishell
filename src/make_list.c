@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/14 15:26:21 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/15 15:12:48 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ t_list	*create_node(char **full_cmd, int *fd, t_resrc *rs)
 	new_node->command.output_fd = fd[1];
 	new_node->command.input_fd = fd[0];
 	new_node->command.pid = -2;
+	new_node->command.fd[0] = -2;
+	new_node->command.fd[1] = -2;
 	new_node->next = NULL;
 	return (new_node);
 }

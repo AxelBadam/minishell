@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/14 17:01:55 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/15 16:20:13 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,17 +49,17 @@ void execute_builtin(t_resrc *resrc, t_list *list)
 	len = 0;
 	cmd = ft_strdup(*list->command.full_cmd);
 	if (!cmd)
-		return ;
+		error_exit("malloc error", resrc);
 	cmd = str_to_lower(cmd);
 	if (*list->command.full_cmd)
 		len = ft_strlen(cmd);
-    if (!ft_strncmp(cmd, "pwd", len))
+    if (!ft_strncmp(cmd, "pwd", len) && len == 3)
     	execute_builtin_pwd();
- 	else if (!ft_strncmp(cmd, "echo", len))
+ 	else if (!ft_strncmp(cmd, "echo", len) && len == 4)
     	execute_builtin_echo(list->command);
-	else if (!ft_strncmp(cmd, "env", len))
+	else if (!ft_strncmp(cmd, "env", len) && len == 3)
     	execute_builtin_env(resrc->envp);
-	else if (!ft_strncmp(cmd, "export", 6))
+	else if (!ft_strncmp(cmd, "export", 6) && len == 6)
         execute_builtin_export(resrc->list, resrc);
 	free(cmd);
 }
@@ -99,6 +99,7 @@ void setup_pipe(int *fd)
 		print_error(": dup2 error", 1, "dup2");
 		exit(g_exit_status);
 	}
+	close(fd[1]);
 }
 
 void child_process(t_resrc *resrc, t_list *list, int *fd)
@@ -110,9 +111,8 @@ void child_process(t_resrc *resrc, t_list *list, int *fd)
 	setup_redir(list);
 	if (list->next && list->command.output_fd == STDOUT_FILENO)
 		setup_pipe(fd);
+	close(fd[0]);
 	execute_child(resrc, list);
-	close(list->command.output_fd);
-	close(list->command.input_fd);
 	exit(g_exit_status);
 }
 void check_signal(t_list *list)
@@ -150,26 +150,22 @@ void do_fork(t_resrc *resrc, t_list *list, int *fd)
 	if (!pid)
 		child_process(resrc, list, fd);
 	list->command.pid = pid;
-	signal(SIGINT, signal_handler);
-	signal(SIGTSTP, SIG_DFL);
 }
 
 void exec_cmd(t_resrc *resrc, t_list *list)
 {
-	int fd[2];
-
 	if (list->next)
 	{
-		if (pipe(fd) < 0)
+		if (pipe(list->command.fd) < 0)
 		{
-			close_pipes(list, fd);
+			close_pipes(list, list->command.fd);
 			error_handling("pipe error");
 		}
-		else if (list->next->command.input_fd == 0)
-			list->next->command.input_fd = fd[0];
+		if (list->next->command.input_fd == 0)
+			list->next->command.input_fd = list->command.fd[0];
 	}
-	do_fork(resrc, list, fd);
-	//close(fd[1]);
+	do_fork(resrc, list, list->command.fd);
+	close(list->command.fd[1]);
 }
 
 int cmd_check(t_list *list)
@@ -191,27 +187,27 @@ int cmd_check(t_list *list)
 }
 
 
-int check_for_parent_builtin(t_resrc *resrc, t_list *list, char **cmd_arr, int len)
+int check_for_parent_builtin(t_resrc *resrc, t_list *list, int len)
 {	
 	char	*tmp;
 	int		ret;
 
 	ret = 0;
-	tmp = ft_strdup(*cmd_arr);
+	tmp = ft_strdup(*list->command.full_cmd);
 	tmp = str_to_lower(tmp);
-	if (!ft_strncmp(tmp, "exit", len))
-      	execute_builtin_exit(cmd_arr);
-	if (!ft_strncmp(tmp, "cd", len))
+	if (!ft_strncmp(tmp, "exit", len) && len == 4)
+      	execute_builtin_exit(list->command.full_cmd);
+	if (!ft_strncmp(tmp, "cd", len) && len == 2)
 	{
  	   	execute_builtin_cd(resrc, list->command);
 		ret = 1;
 	}
-	else if (!ft_strncmp(tmp, "unset", len) && check_input(cmd_arr))
+	else if (!ft_strncmp(tmp, "unset", len) && len == 5 && check_input(list->command.full_cmd))
 	{
         execute_builtin_unset(list, resrc);
 		ret = 1;
 	}
-	else if (!ft_strncmp(tmp, "export", 6))
+	else if (!ft_strncmp(tmp, "export", 6) && len == 6)
     {    
 		execute_builtin_export(list, resrc);
 		ret = 1;
@@ -219,26 +215,18 @@ int check_for_parent_builtin(t_resrc *resrc, t_list *list, char **cmd_arr, int l
 	return (free(tmp), ret);
 }
 
-void execution(t_resrc *resrc, t_list *list)
+void	close_wait(t_list *list)
 {
-    char	**cmd_arr;
-    int		len;
-    int		lst_size;
 	t_list	*tmp;
 
 	tmp = list;
-    lst_size = linked_list_count(&list);
-    while (list)
-    {
-        cmd_arr = list->command.full_cmd;
-        if (cmd_arr)
-            len = ft_strlen(*cmd_arr);
-        if (!list->next)
-            check_for_parent_builtin(resrc, list, cmd_arr, len);
-        if (cmd_check(list))
-            exec_cmd(resrc, list);
-        list = list->next;
-    }
+	while (tmp)
+	{
+		if (tmp->command.fd[0] != -2)
+			close(tmp->command.fd[0]);
+		tmp = tmp->next;
+	}
+	tmp = list;
 	while (tmp)
 	{
 		if (tmp->command.pid != -2)
@@ -248,4 +236,23 @@ void execution(t_resrc *resrc, t_list *list)
 		}
 		tmp = tmp->next;
 	}
+}
+
+void execution(t_resrc *resrc, t_list *list)
+{
+    int		len;
+
+    while (list)
+    {
+        if (list->command.full_cmd)
+            len = ft_strlen(*list->command.full_cmd);
+        if (!list->next)
+            check_for_parent_builtin(resrc, list, len);
+        if (cmd_check(list))
+            exec_cmd(resrc, list);
+        list = list->next;
+    }
+	close_wait(resrc->list);
+	signal(SIGINT, signal_handler);
+	signal(SIGTSTP, SIG_DFL);
 }
