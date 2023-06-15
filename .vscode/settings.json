@@ -1,5 +1,8 @@
 {
 	"files.associations": {
-		"signal.h": "c"
+		"signal.h": "c",
+		"errno.h": "c",
+		"termios.h": "c",
+		"readline.h": "c"
 	}
 }
