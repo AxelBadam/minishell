@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:04:53 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/15 17:44:34 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/16 12:44:58 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,6 @@ int linked_list_count(t_list **lst)
 		head = head->next;
 	}
     return (count + 1);
-}
-
-void wait_for_child(int command_count)
-{
-	while (command_count-- > 0)
-		wait(&g_exit_status);
 }
 
 int	get_2d_array_size(char **array)

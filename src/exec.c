@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/15 18:04:00 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:07:09 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ void child_process(t_resrc *resrc, t_list *list, int *fd)
 	signal(SIGINT, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
 	signal(SIGTSTP, SIG_DFL);
-	signal(SIGPIPE, SIG_DFL);
 	setup_redir(list);
 	if (list->next && list->command.output_fd == STDOUT_FILENO)
 		setup_pipe(fd);
