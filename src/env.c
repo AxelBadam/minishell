@@ -3,24 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:07:24 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/14 14:15:45 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 11:28:22 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-extern int g_exit_status;
-
 void	set_env(t_resrc *resrc)
 {
 	char	*prefix;
-	char 	*last_arg;
+	char	*last_arg;
 	int		size;
 	char	*str;
-	
+
 	if (resrc->list->next)
 	{
 		replace_str("_=", resrc->envp);

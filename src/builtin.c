@@ -6,15 +6,15 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/15 17:54:18 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:01:35 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-extern int g_exit_status;
-	
-void cd_error(char *path)
+extern int	g_exit_status;
+
+void	cd_error(char *path)
 {
 	if (!is_a_directory(path) && access(path, F_OK) == 0)
 		print_error(": not a directory\n", 1, path);
@@ -24,11 +24,11 @@ void cd_error(char *path)
 		print_error(": permission denied\n", 1, path);
 }
 
-void execute_builtin_cd(t_resrc *resrc, t_command command)
+void	execute_builtin_cd(t_resrc *resrc, t_command command)
 {
-	char *path;
-	char pwd[4096];
-	
+	char	*path;
+	char	pwd[4096];
+
 	if (!command.full_cmd[1])
 		path = get_env("HOME", resrc->envp);
 	else
@@ -50,9 +50,9 @@ void execute_builtin_cd(t_resrc *resrc, t_command command)
 		free(path);
 }
 
-void execute_builtin_env(char **envp)
+void	execute_builtin_env(char **envp)
 {
-	char **tmp;
+	char	**tmp;
 
 	tmp = envp;
 	while (*tmp)
@@ -63,9 +63,9 @@ void execute_builtin_env(char **envp)
 	g_exit_status = 0;
 }
 
-void execute_builtin_export(t_list *list, t_resrc *resrc)
+void	execute_builtin_export(t_list *list, t_resrc *resrc)
 {
-	int j;
+	int	j;
 
 	j = 1;
 	while (list->command.full_cmd[j])
@@ -78,20 +78,22 @@ void execute_builtin_export(t_list *list, t_resrc *resrc)
 	}
 	j = 0;
 	if (!list->command.full_cmd[1])
-		while (resrc->envp[j])
 	{
-		ft_putstr_fd("declare -x ", 1);
-		ft_putstr_fd(resrc->envp[j++], 1);
-		ft_putstr_fd("\n", 1);
+		while (resrc->envp[j])
+		{
+			ft_putstr_fd("declare -x ", 1);
+			ft_putstr_fd(resrc->envp[j++], 1);
+			ft_putstr_fd("\n", 1);
+		}
 	}
 	g_exit_status = 0;
 }
 
-void execute_builtin(t_resrc *resrc, t_list *list) 
+void	execute_builtin(t_resrc *resrc, t_list *list)
 {
-	char *cmd;
-	int len;
-	
+	char	*cmd;
+	int		len;
+
 	len = 0;
 	cmd = ft_strdup(*list->command.full_cmd);
 	if (!cmd)
@@ -99,14 +101,14 @@ void execute_builtin(t_resrc *resrc, t_list *list)
 	cmd = str_to_lower(cmd);
 	if (*list->command.full_cmd)
 		len = ft_strlen(cmd);
-    if (!ft_strncmp(cmd, "pwd", len) && len == 3)
-    	execute_builtin_pwd();
- 	else if (!ft_strncmp(cmd, "echo", len) && len == 4)
-    	execute_builtin_echo(list->command);
+	if (!ft_strncmp(cmd, "pwd", len) && len == 3)
+		execute_builtin_pwd();
+	else if (!ft_strncmp(cmd, "echo", len) && len == 4)
+		execute_builtin_echo(list->command);
 	else if (!ft_strncmp(cmd, "env", len) && len == 3)
-    	execute_builtin_env(resrc->envp);
+		execute_builtin_env(resrc->envp);
 	else if (!ft_strncmp(cmd, "export", 6) && len == 6)
-        execute_builtin_export(list, resrc);
+		execute_builtin_export(list, resrc);
 	else if (!ft_strncmp(cmd, "exit", 4) && len == 4)
 		execute_builtin_exit(list->command.full_cmd, 1);
 	free(cmd);

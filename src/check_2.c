@@ -6,46 +6,49 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:36:44 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/15 17:46:48 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:05:07 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-extern int g_exit_status;
+extern int	g_exit_status;
 
-int cmd_check(t_list *list)
+int	cmd_check(t_list *list)
 {
 	if (is_a_directory(*list->command.full_cmd))
-		return(print_error(": is a directory\n", 126, *list->command.full_cmd));
-	if (!is_builtin(*list->command.full_cmd) && !list->command.full_path &&\
+		return (print_error(": is a directory\n", 126, *list->command.full_cmd));
+	if (!is_builtin(*list->command.full_cmd) && !list->command.full_path && \
 	access(*list->command.full_cmd, F_OK) == -1)
 	{
 		if (ft_strchr(*list->command.full_cmd, '/'))
-			return(print_error(": no such file or directory\n", 127, *list->command.full_cmd));
+			return (print_error \
+			(": no such file or directory\n", 127, *list->command.full_cmd));
 		else
-			return(print_error(": command not found\n", 127, *list->command.full_cmd));
+			return (print_error \
+			(": command not found\n", 127, *list->command.full_cmd));
 	}
-	else if (!is_builtin(*list->command.full_cmd) && !list->command.full_path &&\
-	access(*list->command.full_cmd, X_OK) == -1)
-		return(print_error(": permission denied\n", 127, *list->command.full_cmd));
+	else if (!is_builtin(*list->command.full_cmd) && \
+	!list->command.full_path && access(*list->command.full_cmd, X_OK) == -1)
+		return (print_error \
+		(": permission denied\n", 127, *list->command.full_cmd));
 	return (1);
 }
 
-void check_signal(t_list *list)
+void	check_signal(t_list *list)
 {
-	int signal;
-	
+	int	signal;
+
 	signal = 0;
 	if (WIFEXITED(g_exit_status))
 		g_exit_status = WEXITSTATUS(g_exit_status);
 	else if (WIFSIGNALED(g_exit_status))
-		{
-			signal = WTERMSIG(g_exit_status);
-			if (signal == 3)
-				ft_putstr_fd("Quit: 3\n", 2);
-			g_exit_status = 128 + signal;
-		}
+	{
+		signal = WTERMSIG(g_exit_status);
+		if (signal == 3)
+			ft_putstr_fd("Quit: 3\n", 2);
+		g_exit_status = 128 + signal;
+	}
 	else if (WIFSTOPPED(g_exit_status))
 	{
 		write(STDOUT_FILENO, "\r\033[K", 4);
@@ -55,19 +58,19 @@ void check_signal(t_list *list)
 	}
 }
 
-int check_input(char **cmd_arr)
+int	check_input(char **cmd_arr)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (cmd_arr[i])
 	{
 		if (ft_strchr(cmd_arr[i], '=') != NULL)
-			{
-				write(1, "invalid identifier\n", 19);
-				g_exit_status = 1;
-				return (0);
-			}
+		{
+			write(1, "invalid identifier\n", 19);
+			g_exit_status = 1;
+			return (0);
+		}
 		i++;
 	}
 	return (1);
@@ -75,7 +78,7 @@ int check_input(char **cmd_arr)
 
 int	check_for_option(char *str)
 {
-	int ctr;
+	int	ctr;
 
 	ctr = 0;
 	if (!str)
@@ -92,4 +95,3 @@ int	check_for_option(char *str)
 	}
 	return (0);
 }
-
