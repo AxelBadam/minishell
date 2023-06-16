@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 13:10:33 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 16:30:13 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ char	**replace_str(char *str, char **envp)
 		{
 			free(envp[i]);
 			envp[i] = ft_strdup(str);
+			if (!envp[i])
+				error_exit("malloc failed", NULL);
 		}
 		i++;
 	}
