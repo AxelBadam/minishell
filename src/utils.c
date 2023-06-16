@@ -3,16 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:04:53 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 13:02:14 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:48:09 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 extern int	g_exit_status;
+
+char	*check_access(char *full_path, int *ctr, int *len)
+{
+	if (access(full_path, F_OK) == 0)
+		return (full_path);
+	free(full_path);
+	full_path = NULL;
+	ctr[1] = ctr[0] + 1;
+	*len = 0;
+	return (NULL);
+}
 
 int	linked_list_count(t_list **lst)
 {
@@ -27,12 +38,6 @@ int	linked_list_count(t_list **lst)
 		head = head->next;
 	}
 	return (count + 1);
-}
-
-void	wait_for_child(int command_count)
-{
-	while (command_count-- > 0)
-		wait(&g_exit_status);
 }
 
 int	get_2d_array_size(char **array)

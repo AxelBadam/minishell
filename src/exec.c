@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 13:04:55 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/16 14:07:33 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	do_fork(t_resrc *resrc, t_list *list, int *fd)
 {
 	pid_t	pid;
 
-	signal(SIGINT, SIG_IGN);
+	signal(SIGINT, siginthandler);
 	signal(SIGTSTP, SIG_IGN);
 	pid = fork();
 	if (pid < 0)

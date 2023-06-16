@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:27:29 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 13:01:57 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/16 14:40:26 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,19 +79,19 @@ int	is_builtin(char *str)
 	re = 0;
 	while (tmp[++ctr])
 		tmp[ctr] = ft_tolower(tmp[ctr]);
-	if (!ft_strncmp(tmp, "pwd", ctr))
+	if (!ft_strncmp(tmp, "pwd", ctr) && ctr == 3)
 		re = 1;
-	else if (!ft_strncmp(tmp, "env", ctr))
+	else if (!ft_strncmp(tmp, "env", ctr) && ctr == 3)
 		re = 1;
-	else if (!ft_strncmp(tmp, "cd", ctr))
+	else if (!ft_strncmp(tmp, "cd", ctr) && ctr == 2)
 		re = 1;
-	else if (!ft_strncmp(tmp, "export", ctr))
+	else if (!ft_strncmp(tmp, "export", ctr) && ctr == 6)
 		re = 1;
-	else if (!ft_strncmp(tmp, "unset", ctr))
+	else if (!ft_strncmp(tmp, "unset", ctr) && ctr == 5)
 		re = 1;
-	else if (!ft_strncmp(tmp, "echo", ctr))
+	else if (!ft_strncmp(tmp, "echo", ctr) && ctr == 4)
 		re = 1;
-	else if (!ft_strncmp(tmp, "exit", ctr))
+	else if (!ft_strncmp(tmp, "exit", ctr) && ctr == 4)
 		re = 1;
 	free(tmp);
 	return (re);
