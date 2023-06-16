@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 13:11:19 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 14:05:40 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,7 @@ int		is_a_directory(char *filename);
 char	*str_to_lower(char *tmp);
 void	signal_handler(int signal);
 void	close_wait(t_list *list);
+char	*check_access(char *full_path, int *ctr, int *len);
 /*
 ** SPLIT_COMMAND
 */
@@ -179,6 +180,7 @@ int		cmd_check(t_list *list);
 void	check_signal(t_list *list);
 int		check_input(char **cmd_arr);
 int		check_for_option(char *str);
+void	siginthandler(int signal);
 /*
 ** HEREDOC
 */

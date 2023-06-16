@@ -6,13 +6,24 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:04:53 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 13:10:20 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:48:09 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 extern int	g_exit_status;
+
+char	*check_access(char *full_path, int *ctr, int *len)
+{
+	if (access(full_path, F_OK) == 0)
+		return (full_path);
+	free(full_path);
+	full_path = NULL;
+	ctr[1] = ctr[0] + 1;
+	*len = 0;
+	return (NULL);
+}
 
 int	linked_list_count(t_list **lst)
 {

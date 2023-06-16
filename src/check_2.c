@@ -3,16 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   check_2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:36:44 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 13:05:07 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/16 14:05:30 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 extern int	g_exit_status;
+
+void	siginthandler(int signal)
+{
+	if (signal == SIGINT)
+		write(1, "\n", 1);
+}
 
 int	cmd_check(t_list *list)
 {
@@ -51,7 +57,7 @@ void	check_signal(t_list *list)
 	}
 	else if (WIFSTOPPED(g_exit_status))
 	{
-		write(STDOUT_FILENO, "\r\033[K", 4);
+		write(1, "\n", 1);
 		ft_putstr_fd(*list->command.full_cmd, 2);
 		g_exit_status = 146;
 		ft_putstr_fd(" was stopped\n", 2);

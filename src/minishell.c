@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 13:10:55 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 14:14:43 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ void	minishell(t_resrc *resrc)
 		free(line);
 		line = readline("minishell-1.0$ ");
 	}
+	ft_putstr_fd("\033[1Aminishell-1.0$ exit\n", 1);
 }
 
 void	*init_resources(char **envp)
@@ -100,5 +101,5 @@ int	main(int argc, char **argv, char **env)
 	minishell(resrc);
 	free_string_array(resrc->envp);
 	free(resrc);
-	return (0);
+	return (g_exit_status);
 }

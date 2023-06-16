@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   make_list.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 13:05:45 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:52:20 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,9 @@ char	*get_full_path(t_resrc *rs, char *cmd, char *path)
 			full_path = create_full_path(cmd, path, ctr[1], len);
 			if (!full_path)
 				error_exit("minishell: fatal malloc error\n", rs);
-			if (access(full_path, F_OK) == 0)
+			full_path = check_access(full_path, ctr, &len);
+			if (full_path)
 				break ;
-			free(full_path);
-			full_path = NULL;
-			ctr[1] = ctr[0] + 1;
-			len = 0;
 		}
 		len++;
 	}
