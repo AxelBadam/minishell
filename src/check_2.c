@@ -6,19 +6,13 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:36:44 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 14:05:30 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 14:34:58 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 extern int	g_exit_status;
-
-void	siginthandler(int signal)
-{
-	if (signal == SIGINT)
-		write(1, "\n", 1);
-}
 
 int	cmd_check(t_list *list)
 {

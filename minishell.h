@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 14:05:40 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 14:34:50 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include <dirent.h>
 # include <sys/wait.h>
 # include <errno.h>
+# include "termios.h"
 
 typedef struct s_command
 {
@@ -78,14 +79,11 @@ int		update_env(char *var, char *val, t_resrc *resrc);
 ** ERRORRR
 */
 int		print_error(char *str, int exit_status, char *filename);
-void	error_handling(char *str);
-int		print_error(char *str, int exit_status, char *filename);
 /*
 ** UTILS
 */
 void	free_string_array(char **array);
 int		linked_list_count(t_list **lst);
-void	wait_for_child(int command_count);
 int		is_in_env(char *str, char **envp);
 int		get_2d_array_size(char **array);
 char	**append_2d(char **twod, char *str_to_add);
@@ -95,7 +93,6 @@ int		is_builtin(char *str);
 int		print_error(char *str, int exit_status, char *filename);
 int		is_a_directory(char *filename);
 char	*str_to_lower(char *tmp);
-void	signal_handler(int signal);
 void	close_wait(t_list *list);
 char	*check_access(char *full_path, int *ctr, int *len);
 /*
@@ -180,7 +177,6 @@ int		cmd_check(t_list *list);
 void	check_signal(t_list *list);
 int		check_input(char **cmd_arr);
 int		check_for_option(char *str);
-void	siginthandler(int signal);
 /*
 ** HEREDOC
 */
@@ -200,5 +196,12 @@ char	**array_dup(char **array);
 int		setup_redir(t_list *list);
 void	setup_pipe(int *fd);
 void	close_pipes(t_list *list, int *fd);
+/*
+** SIGNAL
+*/
+void	signal_handler(int signal);
+void	open_echo_control(struct termios *t);
+void	close_echo_control(struct termios *t);
+void	siginthandler(int signal);
 
 #endif

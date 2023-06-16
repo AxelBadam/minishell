@@ -3,6 +3,7 @@
 		"signal.h": "c",
 		"errno.h": "c",
 		"termios.h": "c",
-		"readline.h": "c"
+		"readline.h": "c",
+		"minishell.h": "c"
 	}
 }
