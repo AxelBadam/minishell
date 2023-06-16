@@ -6,13 +6,14 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 12:45:59 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:10:55 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "termios.h"
 
-int g_exit_status;
+int	g_exit_status;
 
 void	print_list(t_list **head)
 {
@@ -48,7 +49,6 @@ void	minishell(t_resrc *resrc)
 			if (resrc->array)
 			{
 				make_list(resrc, resrc->array);
-				//print_list(&resrc->list);
 				if (resrc->list)
 				{
 					set_env(resrc);

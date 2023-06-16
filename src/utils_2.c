@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   utils_2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:19:40 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:27:24 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:02:24 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-extern int g_exit_status;
+extern int	g_exit_status;
 
 void	iterate_over_spaces(char *line, int *tmp)
 {

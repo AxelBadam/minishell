@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/15 18:03:46 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:11:19 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 # include <sys/stat.h>
 # include <dirent.h>
 # include <sys/wait.h>
-# include <termios.h>
 # include <errno.h>
 
 typedef struct s_command
@@ -58,8 +57,8 @@ void	execution(t_resrc *resrc, t_list *list);
 /*
 ** BUILTINS
 */
-void execute_builtin(t_resrc *resrc, t_list *list);
-void	execute_builtin_pwd();
+void	execute_builtin(t_resrc *resrc, t_list *list);
+void	execute_builtin_pwd(void);
 void	execute_builtin_exit(char **array, int check);
 void	execute_builtin_cd(t_resrc *resrc, t_command command);
 void	execute_builtin_echo(t_command cmd);
@@ -70,11 +69,11 @@ int		check_for_option(char *str);
 /*
 ** BUILTIN_UTIL
 */
-char 	**rmv_str_twod(char **env, char *to_rmv);
-char 	**append_2d(char **twod, char *str_to_add);
-char 	**replace_str(char *str, char **envp);
-int 	is_in_env(char *str, char **envp);
-int 	update_env(char *var, char *val, t_resrc *resrc);
+char	**rmv_str_twod(char **env, char *to_rmv);
+char	**append_2d(char **twod, char *str_to_add);
+char	**replace_str(char *str, char **envp);
+int		is_in_env(char *str, char **envp);
+int		update_env(char *var, char *val, t_resrc *resrc);
 /*
 ** ERRORRR
 */
@@ -172,14 +171,14 @@ int		is_builtin(char *str);
 int		check_syntax(char **array, int *ctr, char d);
 int		check_pipe_syntax(char **array, int *ctr);
 int		print_syntax_error(char *s, int exit);
-int 	check_for_parent_builtin(t_resrc *resrc, t_list *list, int len);
+int		check_for_parent_builtin(t_resrc *resrc, t_list *list, int len);
 /*
 ** CHECK 2
 */
-int cmd_check(t_list *list);
-void check_signal(t_list *list);
-int check_input(char **cmd_arr);
-int	check_for_option(char *str);
+int		cmd_check(t_list *list);
+void	check_signal(t_list *list);
+int		check_input(char **cmd_arr);
+int		check_for_option(char *str);
 /*
 ** HEREDOC
 */
@@ -196,8 +195,8 @@ char	**array_dup(char **array);
 /*
 ** PIPES
 */
-int 	setup_redir(t_list *list);
-void 	setup_pipe(int *fd);
-void 	close_pipes(t_list *list, int *fd);
+int		setup_redir(t_list *list);
+void	setup_pipe(int *fd);
+void	close_pipes(t_list *list, int *fd);
 
 #endif

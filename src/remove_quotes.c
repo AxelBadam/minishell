@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   remove_quotes.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:22:44 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:23:52 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 12:45:55 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-extern int g_exit_status;
 
 char	*make_new_str(char *old_str, int len)
 {

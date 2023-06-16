@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   split_by_operator.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:01:17 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:07:12 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 12:45:31 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-extern int g_exit_status;
 
 int	count_strings(char **array)
 {
@@ -39,8 +37,6 @@ int	count_strings(char **array)
 	}
 	return (strings);
 }
-
-//potential problems
 
 int	fill(char **n_arr, char **o_arr, int *c, int *i)
 {
@@ -112,8 +108,9 @@ char	**split_by_operator(char **array)
 {
 	int		strings;
 	char	**n_arr;
+	int		ctr;
 
-	int ctr = 0;
+	ctr = 0;
 	strings = count_strings(array);
 	if (!strings)
 		return (array);

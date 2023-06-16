@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   make_list.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/15 15:12:48 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:05:45 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-extern int g_exit_status;
 
 char	*get_full_path(t_resrc *rs, char *cmd, char *path)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split_command.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:50:55 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/09 18:02:46 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 12:44:10 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ int	iterate_quotes(char *line, int *ctr, char d, int count)
 	print_error("syntax error unclosed quotes\n", 69, NULL);
 	return (0);
 }
+
 int	count_words(char *line)
 {
 	int	ctr[2];

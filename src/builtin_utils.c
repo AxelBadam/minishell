@@ -6,23 +6,23 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 12:00:49 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/16 13:10:33 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char **rmv_str_twod(char **env, char *to_rmv)
+char	**rmv_str_twod(char **env, char *to_rmv)
 {
-	char **new;
-	int i;
-	int len;
-	int j;
+	char	**new;
+	int		i;
+	int		len;
+	int		j;
 
 	i = 0;
 	j = 0;
 	len = ft_strlen(to_rmv);
-	while(env[i])
+	while (env[i])
 		i++;
 	new = (char **)malloc(sizeof(char *) * \
 	(i + 1 - is_in_env(to_rmv, env)));
@@ -35,16 +35,16 @@ char **rmv_str_twod(char **env, char *to_rmv)
 	}
 	new[j] = 0;
 	free_string_array(env);
-	return(new);
+	return (new);
 }
 
-char **append_2d(char **twod, char *str_to_add)
+char	**append_2d(char **twod, char *str_to_add)
 {
-	char **new;
-	int i;
+	char	**new;
+	int		i;
 
 	i = 0;
-	while(twod[i])
+	while (twod[i])
 		i++;
 	new = (char **)malloc(sizeof(char *) * (i + 2));
 	i = -1;
@@ -56,11 +56,11 @@ char **append_2d(char **twod, char *str_to_add)
 	return (new);
 }
 
-char **replace_str(char *str, char **envp)
+char	**replace_str(char *str, char **envp)
 {
-	int len;
-	int count;
-	int i;
+	int	len;
+	int	count;
+	int	i;
 
 	len = 0;
 	i = 0;
@@ -79,11 +79,11 @@ char **replace_str(char *str, char **envp)
 	return (envp);
 }
 
-int is_in_env(char *str, char **envp)
+int	is_in_env(char *str, char **envp)
 {
-	int len;
-	int count;
-	int i;
+	int	len;
+	int	count;
+	int	i;
 
 	i = 0;
 	count = 0;
@@ -99,9 +99,9 @@ int is_in_env(char *str, char **envp)
 	return (count);
 }
 
-int update_env(char *var, char *val, t_resrc *resrc)
+int	update_env(char *var, char *val, t_resrc *resrc)
 {
-	char *env_var;
+	char	*env_var;
 
 	env_var = ft_strjoin(var, val);
 	if (is_in_env(env_var, resrc->envp))
