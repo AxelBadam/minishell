@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 14:34:50 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 13:51:52 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,8 @@ char	**append_2d(char **twod, char *str_to_add);
 char	**replace_str(char *str, char **envp);
 int		is_in_env(char *str, char **envp);
 int		update_env(char *var, char *val, t_resrc *resrc);
+void	declare_env(t_resrc *resrc);
+int		export_check(char *arg);
 /*
 ** ERRORRR
 */

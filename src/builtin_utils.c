@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 13:10:33 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 13:50:52 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ char	**replace_str(char *str, char **envp)
 		{
 			free(envp[i]);
 			envp[i] = ft_strdup(str);
+			if (!envp[i])
+				error_exit("malloc failed", NULL);
 		}
 		i++;
 	}

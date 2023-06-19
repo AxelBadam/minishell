@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 13:48:00 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 13:53:22 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,25 +68,21 @@ void	execute_builtin_export(t_list *list, t_resrc *resrc)
 	int	j;
 
 	j = 1;
+	g_exit_status = 0;
 	while (list->command.full_cmd[j])
 	{
-		if (is_in_env(list->command.full_cmd[j], resrc->envp))
-			resrc->envp = replace_str(list->command.full_cmd[j], resrc->envp);
-		else if (ft_strchr(list->command.full_cmd[j], '=') != NULL)
-			resrc->envp = append_2d(resrc->envp, list->command.full_cmd[j]);
+		if (export_check(list->command.full_cmd[j]))
+		{
+			if (is_in_env(list->command.full_cmd[j], resrc->envp))
+				resrc->envp = replace_str(list->command.full_cmd[j], \
+				resrc->envp);
+			else if (ft_strchr(list->command.full_cmd[j], '=') != NULL)
+				resrc->envp = append_2d(resrc->envp, list->command.full_cmd[j]);
+		}
 		j++;
 	}
-	j = 0;
 	if (!list->command.full_cmd[1])
-	{
-		while (resrc->envp[j])
-		{
-			ft_putstr_fd("declare -x ", 1);
-			ft_putstr_fd(resrc->envp[j++], 1);
-			ft_putstr_fd("\n", 1);
-		}
-	}
-	g_exit_status = 0;
+		declare_env(resrc);
 }
 
 void	execute_builtin(t_resrc *resrc, t_list *list)
@@ -107,7 +103,8 @@ void	execute_builtin(t_resrc *resrc, t_list *list)
 		execute_builtin_echo(list->command);
 	else if (!ft_strncmp(cmd, "env", len) && len == 3)
 		execute_builtin_env(resrc->envp);
-	else if (!ft_strncmp(cmd, "export", 6) && len == 6)
+	else if (!ft_strncmp(cmd, "export", 6) && len == 6 && \
+	!list->command.full_cmd[1])
 		execute_builtin_export(list, resrc);
 	else if (!ft_strncmp(cmd, "exit", 4) && len == 4
 		&& linked_list_count(&resrc->list) > 1)
