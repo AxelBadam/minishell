@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 18:46:09 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 19:00:06 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,7 @@ char	**array_dup(char **array);
 /*
 ** PIPES
 */
-int		setup_redir(t_list *list);
+void	setup_redir(t_list *list);
 void	setup_pipe(int *fd);
 void	close_pipes(t_list *list, int *fd);
 /*

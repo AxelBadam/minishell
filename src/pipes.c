@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:38:18 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 13:02:34 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/19 18:14:19 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	setup_pipe(int *fd)
 	close(fd[1]);
 }
 
-int	setup_redir(t_list *list)
+void	setup_redir(t_list *list)
 {
 	if (list->command.input_fd != STDIN_FILENO)
 	{
@@ -47,7 +47,6 @@ int	setup_redir(t_list *list)
 		}
 		close(list->command.output_fd);
 	}
-	return (0);
 }
 
 void	close_pipes(t_list *list, int *fd)

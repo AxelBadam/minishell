@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 18:52:45 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 19:00:50 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@ char	**rmv_str_twod(char **env, char *to_rmv)
 	len = ft_strlen(to_rmv);
 	while (env[i])
 		i++;
-	new = (char **)malloc(sizeof(char *) * \
-	(i + 1 - is_in_env(to_rmv, env)));
+	new = (char **)malloc(sizeof(char *)
+			* (i + 1 - is_in_env(to_rmv, env)));
 	i = 0;
 	while (env[i])
 	{			
@@ -33,6 +33,8 @@ char	**rmv_str_twod(char **env, char *to_rmv)
 			i++;
 		if (env[i])
 			new[j++] = ft_strdup(env[i++]);
+		if (new[j - 1] == NULL)
+			return (NULL);
 	}
 	new[j] = 0;
 	free_string_array(env);
@@ -48,10 +50,18 @@ char	**append_2d(char **twod, char *str_to_add)
 	while (twod[i])
 		i++;
 	new = (char **)malloc(sizeof(char *) * (i + 2));
+	if (!new)
+		return (NULL);
 	i = -1;
 	while (twod[++i])
+	{
 		new[i] = ft_strdup(twod[i]);
+		if (!new[i])
+			return (NULL);
+	}
 	new[i] = ft_strdup(str_to_add);
+	if (!new[i])
+		return (NULL);
 	new[++i] = 0;
 	free_string_array(twod);
 	return (new);
@@ -75,7 +85,7 @@ char	**replace_str(char *str, char **envp)
 			free(envp[i]);
 			envp[i] = ft_strdup(str);
 			if (!envp[i])
-				error_exit("malloc failed", NULL);
+				return (NULL);
 		}
 		i++;
 	}
@@ -111,6 +121,8 @@ int	update_env(char *var, char *val, t_resrc *resrc)
 		resrc->envp = replace_str(env_var, resrc->envp);
 	else if (ft_strchr(env_var, '=') != NULL)
 		resrc->envp = append_2d(resrc->envp, env_var);
+	if (resrc->envp == NULL)
+		error_exit("malloc error", resrc);
 	free(env_var);
 	return (1);
 }
