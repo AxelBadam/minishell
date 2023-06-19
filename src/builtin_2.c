@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:51:25 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 14:16:50 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 17:09:11 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,12 @@ void	execute_builtin_unset(t_list *list, t_resrc *resrc)
 	int	ac;
 
 	ac = 1;
-	while (list->command.full_cmd[ac] \
-	&& is_in_env(list->command.full_cmd[ac], resrc->envp))
+	while (list->command.full_cmd[ac]
+		&& is_in_env(list->command.full_cmd[ac], resrc->envp))
 	{
 		resrc->envp = rmv_str_twod(resrc->envp, list->command.full_cmd[ac]);
+		if (resrc->envp == NULL)
+			error_exit("malloc errorasd", resrc);
 		ac++;
 	}
 	g_exit_status = 0;

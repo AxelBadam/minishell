@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 13:50:52 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 17:20:07 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,17 @@ char	**rmv_str_twod(char **env, char *to_rmv)
 	len = ft_strlen(to_rmv);
 	while (env[i])
 		i++;
-	new = (char **)malloc(sizeof(char *) * \
-	(i + 1 - is_in_env(to_rmv, env)));
+	new = (char **)malloc(sizeof(char *)
+			* (i + 1 - is_in_env(to_rmv, env)));
 	i = 0;
 	while (env[i])
 	{			
 		if (ft_strnstr(env[i], to_rmv, len))
 			i++;
-		new[j++] = ft_strdup(env[i++]);
+		if (env[i])
+			new[j++] = ft_strdup(env[i++]);
+		if (new[j - 1] == NULL)
+			return (NULL);
 	}
 	new[j] = 0;
 	free_string_array(env);
@@ -47,10 +50,18 @@ char	**append_2d(char **twod, char *str_to_add)
 	while (twod[i])
 		i++;
 	new = (char **)malloc(sizeof(char *) * (i + 2));
+	if (!new)
+		return (NULL);
 	i = -1;
 	while (twod[++i])
+	{
 		new[i] = ft_strdup(twod[i]);
+		if (!new[i])
+			return (NULL);
+	}
 	new[i] = ft_strdup(str_to_add);
+	if (!new[i])
+		return (NULL);
 	new[++i] = 0;
 	free_string_array(twod);
 	return (new);
@@ -74,7 +85,7 @@ char	**replace_str(char *str, char **envp)
 			free(envp[i]);
 			envp[i] = ft_strdup(str);
 			if (!envp[i])
-				error_exit("malloc failed", NULL);
+				return (NULL);
 		}
 		i++;
 	}
