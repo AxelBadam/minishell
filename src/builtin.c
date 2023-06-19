@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 13:09:00 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 13:48:00 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,8 @@ void	execute_builtin(t_resrc *resrc, t_list *list)
 		execute_builtin_env(resrc->envp);
 	else if (!ft_strncmp(cmd, "export", 6) && len == 6)
 		execute_builtin_export(list, resrc);
-	else if (!ft_strncmp(cmd, "exit", 4) && len == 4)
+	else if (!ft_strncmp(cmd, "exit", 4) && len == 4
+		&& linked_list_count(&resrc->list) > 1)
 		execute_builtin_exit(list->command.full_cmd, 1);
 	free(cmd);
 }

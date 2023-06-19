@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:51:25 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 11:00:05 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/19 13:48:02 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,38 @@ void	execute_builtin_pwd(void)
 	free(cwd);
 }
 
+int	check_numeric(char *s, int check)
+{
+	int	ctr;
+
+	ctr = 0;
+	if (s[ctr] == '-' || s[ctr] == '+')
+		ctr++;
+	while (s[ctr])
+	{
+		if (!ft_isdigit(s[ctr]))
+		{
+			if (!check)
+				ft_putendl_fd("exit", 2);
+			ft_putstr_fd("minishell: exit: ", 2);
+			ft_putstr_fd(s, 2);
+			ft_putendl_fd(": numeric argument required", 2);
+			return (0);
+		}
+		ctr++;
+	}
+	return (1);
+}
+
 void	execute_builtin_exit(char **array, int check)
 {
+	int	ctr;
+
+	ctr = 1;
+	while (array[ctr])
+		if (!check_numeric(array[ctr++], check))
+			if (!check)
+				exit(255);
 	if (get_array_size(array) > 2)
 		print_error("exit: too many arguments\n", 1, NULL);
 	else
