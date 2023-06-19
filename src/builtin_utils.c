@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 13:50:52 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 18:52:45 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ char	**rmv_str_twod(char **env, char *to_rmv)
 	{			
 		if (ft_strnstr(env[i], to_rmv, len))
 			i++;
-		new[j++] = ft_strdup(env[i++]);
+		if (env[i])
+			new[j++] = ft_strdup(env[i++]);
 	}
 	new[j] = 0;
 	free_string_array(env);

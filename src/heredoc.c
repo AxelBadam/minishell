@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:30:05 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 13:06:25 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/19 16:07:40 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,12 @@ char	**get_new_command(t_resrc *resource)
 void	create_heredoc(int *fd, char *delimitor)
 {
 	char	*line;
-	int		len;
 
 	g_exit_status = 0;
-	len = ft_strlen(delimitor);
 	while (g_exit_status != 1)
 	{
 		line = readline("> ");
-		if (!line || ft_strncmp(line, delimitor, len) == 0)
+		if (!line || (ft_strncmp(line, delimitor, SIZE_MAX) == 0))
 		{
 			if (!line)
 				write(1, "\033[1A\033[2C", 9);

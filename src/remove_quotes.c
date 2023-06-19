@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   remove_quotes.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:22:44 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 12:45:55 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/19 17:52:02 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

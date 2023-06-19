@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split_command.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:50:55 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 12:44:10 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/19 17:33:17 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	fill_array(char *line, char **array)
 	array[index[0]] = 0;
 }
 
-char	**make_array(char *line)
+char	**make_array(t_resrc *rs, char *line)
 {
 	int		tmp[3];
 	int		ctr;
@@ -99,14 +99,14 @@ char	**make_array(char *line)
 		return (NULL);
 	array = (char **)malloc(sizeof(char *) * (tmp[2] + 1));
 	if (!array)
-		return (NULL);
+		error_exit("minishell: fatal malloc error\n", rs);
 	while (tmp[2] > 0)
 	{
 		tmp[1] = len_ctr(&line[tmp[0]]);
 		tmp[0] += tmp[1];
 		array[ctr] = (char *)malloc(sizeof(char) * (tmp[1] + 1));
 		if (!array[ctr++])
-			return (NULL);
+			error_exit("minishell: fatal malloc error\n", rs);
 		while (line[tmp[0]] == ' ')
 			tmp[0]++;
 		tmp[2]--;
@@ -118,11 +118,12 @@ char	**split_command(t_resrc *rs, char *line)
 {
 	char	**array;
 
-	array = make_array(line);
+	array = make_array(rs, line);
 	if (!array)
 		return (NULL);
 	fill_array(line, array);
-	expand(array, rs->envp);
+	if (expand(array, rs->envp) == -1)
+		error_exit("minishell: fatal malloc error\n", rs);
 	array = split_by_operator(array);
 	if (!array)
 		error_exit("minishell: fatal malloc error\n", rs);
