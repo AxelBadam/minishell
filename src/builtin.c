@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 16:33:39 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/19 12:52:29 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,25 +71,18 @@ void	execute_builtin_export(t_list *list, t_resrc *resrc)
 	g_exit_status = 0;
 	while (list->command.full_cmd[j])
 	{
-		if (list->command.full_cmd[j][0] == '=')
-			print_error(" : export: not a valid identifier\n", 1, \
-			list->command.full_cmd[j]);
-		else if (is_in_env(list->command.full_cmd[j], resrc->envp))
-			resrc->envp = replace_str(list->command.full_cmd[j], resrc->envp);
-		else if (ft_strchr(list->command.full_cmd[j], '=') != NULL)
-			resrc->envp = append_2d(resrc->envp, list->command.full_cmd[j]);
+		if (export_check(list->command.full_cmd[j]))
+		{
+			if (is_in_env(list->command.full_cmd[j], resrc->envp))
+				resrc->envp = replace_str(list->command.full_cmd[j], \
+				resrc->envp);
+			else if (ft_strchr(list->command.full_cmd[j], '=') != NULL)
+				resrc->envp = append_2d(resrc->envp, list->command.full_cmd[j]);
+		}
 		j++;
 	}
-	j = 0;
 	if (!list->command.full_cmd[1])
-	{
-		while (resrc->envp[j])
-		{
-			ft_putstr_fd("declare -x ", 1);
-			ft_putstr_fd(resrc->envp[j++], 1);
-			ft_putstr_fd("\n", 1);
-		}
-	}
+		declare_env(resrc);
 }
 
 void	execute_builtin(t_resrc *resrc, t_list *list)
@@ -113,7 +106,5 @@ void	execute_builtin(t_resrc *resrc, t_list *list)
 	else if (!ft_strncmp(cmd, "export", 6) && len == 6 && \
 	!list->command.full_cmd[1])
 		execute_builtin_export(list, resrc);
-	else if (!ft_strncmp(cmd, "exit", 4) && len == 4)
-		execute_builtin_exit(list->command.full_cmd, 1);
 	free(cmd);
 }
