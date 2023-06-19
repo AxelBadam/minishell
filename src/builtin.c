@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 15:31:20 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/19 18:53:46 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ void	execute_builtin_export(t_list *list, t_resrc *resrc)
 						resrc->envp);
 			else if (ft_strchr(list->command.full_cmd[j], '=') != NULL)
 				resrc->envp = append_2d(resrc->envp, list->command.full_cmd[j]);
+			if (resrc->envp == NULL)
+				error_exit("malloc error", resrc);
 		}
 		j++;
 	}

@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 17:20:07 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/19 18:55:59 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,8 @@ int	update_env(char *var, char *val, t_resrc *resrc)
 		resrc->envp = replace_str(env_var, resrc->envp);
 	else if (ft_strchr(env_var, '=') != NULL)
 		resrc->envp = append_2d(resrc->envp, env_var);
+	if (resrc->envp == NULL)
+		error_exit("malloc error", resrc);
 	free(env_var);
 	return (1);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 14:27:52 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 18:10:15 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,7 +196,7 @@ char	**array_dup(char **array);
 /*
 ** PIPES
 */
-int		setup_redir(t_list *list);
+void	setup_redir(t_list *list);
 void	setup_pipe(int *fd);
 void	close_pipes(t_list *list, int *fd);
 /*
