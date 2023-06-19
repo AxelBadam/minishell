@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 13:53:22 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 13:54:52 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,9 @@ void	cd_error(char *path)
 void	execute_builtin_cd(t_resrc *resrc, t_command command)
 {
 	char	*path;
-	char	pwd[4096];
+	char	*pwd;
 
+	pwd = NULL;
 	if (!command.full_cmd[1])
 		path = get_env("HOME", resrc->envp);
 	else
@@ -37,12 +38,13 @@ void	execute_builtin_cd(t_resrc *resrc, t_command command)
 		print_error(": HOME not set", 1, "cd");
 	if (is_a_directory(path) && access(path, X_OK) == 0)
 	{
-		getcwd(pwd, sizeof(pwd));
+		pwd = getcwd(pwd, sizeof(pwd));
 		update_env("OLDPWD=", pwd, resrc);
 		chdir(path);
 		g_exit_status = 0;
 		getcwd(pwd, sizeof(pwd));
 		update_env("PWD=", pwd, resrc);
+		free(pwd);
 	}
 	else
 		cd_error(path);

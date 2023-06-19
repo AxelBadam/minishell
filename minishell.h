@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 13:51:52 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 14:27:52 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ typedef struct s_list
 {
 	t_command		command;
 	struct s_list	*next;
+	struct s_list	*prev;
 }	t_list;
 
 typedef struct s_resrc
@@ -95,7 +96,7 @@ int		is_builtin(char *str);
 int		print_error(char *str, int exit_status, char *filename);
 int		is_a_directory(char *filename);
 char	*str_to_lower(char *tmp);
-void	close_wait(t_list *list);
+void	wait_child(t_list *list);
 char	*check_access(char *full_path, int *ctr, int *len);
 /*
 ** SPLIT_COMMAND

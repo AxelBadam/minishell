@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:04:53 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 13:48:09 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 14:28:17 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,17 +62,10 @@ char	*str_to_lower(char *tmp)
 	return (tmp);
 }
 
-void	close_wait(t_list *list)
+void	wait_child(t_list *list)
 {
 	t_list	*tmp;
 
-	tmp = list;
-	while (tmp)
-	{
-		if (tmp->command.fd[0] != -2)
-			close(tmp->command.fd[0]);
-		tmp = tmp->next;
-	}
 	tmp = list;
 	while (tmp)
 	{

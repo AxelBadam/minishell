@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:51:25 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 13:48:02 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 14:16:50 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ void	execute_builtin_pwd(void)
 	free(cwd);
 }
 
-int	check_numeric(char *s, int check)
+int	child_numeric(char *s, int child)
 {
 	int	ctr;
 
@@ -80,11 +80,12 @@ int	check_numeric(char *s, int check)
 	{
 		if (!ft_isdigit(s[ctr]))
 		{
-			if (!check)
+			if (!child)
 				ft_putendl_fd("exit", 2);
 			ft_putstr_fd("minishell: exit: ", 2);
 			ft_putstr_fd(s, 2);
 			ft_putendl_fd(": numeric argument required", 2);
+			g_exit_status = 255;
 			return (0);
 		}
 		ctr++;
@@ -92,20 +93,23 @@ int	check_numeric(char *s, int check)
 	return (1);
 }
 
-void	execute_builtin_exit(char **array, int check)
+void	execute_builtin_exit(char **array, int child)
 {
 	int	ctr;
 
 	ctr = 1;
 	while (array[ctr])
-		if (!check_numeric(array[ctr++], check))
-			if (!check)
-				exit(255);
+		if (!child_numeric(array[ctr++], child))
+			exit(g_exit_status);
 	if (get_array_size(array) > 2)
-		print_error("exit: too many arguments\n", 1, NULL);
+	{
+		if (!print_error("exit: too many arguments\n", 1, NULL))
+			if (child)
+				exit(g_exit_status);
+	}
 	else
 	{
-		if (!check)
+		if (!child)
 			write(1, "exit\n", 5);
 		if (array[1])
 			exit(ft_atoi(array[1]));

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:19:40 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 13:02:24 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/19 14:24:33 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,5 +61,6 @@ void	ft_lstadd_back(t_list **head, t_list *new)
 	}
 	tmp = ft_lst_last(*head);
 	tmp->next = new;
+	new->prev = tmp;
 	new->next = NULL;
 }

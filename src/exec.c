@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/23 15:06:37 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 13:49:51 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/19 14:52:43 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	do_fork(t_resrc *resrc, t_list *list, int *fd)
 	pid = fork();
 	if (pid < 0)
 	{
-		perror("fork error");
+		perror("minishell: fork error");
 		g_exit_status = 1;
 		exit(g_exit_status);
 	}
@@ -65,9 +65,9 @@ void	exec_cmd(t_resrc *resrc, t_list *list)
 	{
 		if (pipe(list->command.fd) < 0)
 		{
-			perror("pipe error");
+			perror("minishell: pipe error");
 			g_exit_status = 1;
-			exit (g_exit_status);
+			exit(g_exit_status);
 		}
 		if (list->next->command.input_fd == 0)
 			list->next->command.input_fd = list->command.fd[0];
@@ -88,9 +88,14 @@ void	execution(t_resrc *resrc, t_list *list)
 			check_for_parent_builtin(resrc, list, len);
 		if (cmd_check(list))
 			exec_cmd(resrc, list);
+		if (list->prev)
+		{
+			if (list->prev->command.fd[0] != -2)
+				close(list->prev->command.fd[0]);
+		}
 		list = list->next;
 	}
-	close_wait(resrc->list);
+	wait_child(resrc->list);
 	signal(SIGINT, signal_handler);
 	signal(SIGTSTP, SIG_DFL);
 }
