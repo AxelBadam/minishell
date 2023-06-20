@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 18:10:15 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/20 13:45:08 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ char	**replace_str(char *str, char **envp);
 int		is_in_env(char *str, char **envp);
 int		update_env(char *var, char *val, t_resrc *resrc);
 void	declare_env(t_resrc *resrc);
-int		export_check(char *arg);
+int		check_identifier(char *arg);
 /*
 ** ERRORRR
 */
@@ -102,7 +102,7 @@ char	*check_access(char *full_path, int *ctr, int *len);
 ** SPLIT_COMMAND
 */
 char	**split_command(t_resrc *rs, char *line);
-char	**make_array(char *line);
+char	**make_array(t_resrc *rs, char *line);
 void	fill_array(char *line, char **array);
 int		iterate_quotes(char *line, int *ctr, char d, int count);
 int		count_words(char *line);
@@ -112,15 +112,14 @@ int		count_words(char *line);
 int		count_strings(char **array);
 char	**split_by_operator(char **array);
 char	**make_array_with_operators(char **array, int strings);
-void	fill_array_with_operators(char **n_arr, char **o_arr);
+int		fill_array_with_operators(char **n_arr, char **o_arr);
 int		fill(char **n_arr, char **o_arr, int *c, int *i);
 /*
 ** EXPAND
 */
-void	expand(char **array, char **env);
-void	expand_dollar_sign(char **ar, int *ctr, char **env);
-void	add_expansion(char **ar, char *dst, char *src, int rm_len);
-void	expand_string(char *src, char *new_str, int *ctr, int rm_len);
+int		expand(char **array, char **env);
+int		expand_dollar_sign(char **ar, int *ctr, char **env, int len);
+int		add_exp(char **ar, char *dst, char *src, int rm_len);
 char	*create_expanded_string(char *dst, char *src, int rm_len);
 /*
 ** ENV
@@ -206,5 +205,21 @@ void	signal_handler(int signal);
 void	open_echo_control(struct termios *t);
 void	close_echo_control(struct termios *t);
 void	siginthandler(int signal);
+/*
+** SPLIT_BY_OPERATOR_UTILS
+*/
+int		get_last_string(char **o_arr, char **n_arr, int *c, int *i);
+void	check_for_quotes(char **o_arr, int *c);
+/*
+** EXPAND_UTILS
+*/
+void	expand_string(char *src, char *new_str, int *ctr, int rm_len);
+char	*get_string(char **ar, int *ctr, int *len);
+/*
+** MAIN
+*/
+void	*init_resources(char **envp);
+void	minishell(t_resrc *resrc);
+void	command_line(t_resrc *resrc, char *line);
 
 #endif

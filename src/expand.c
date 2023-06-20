@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:54:28 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 12:42:07 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/20 15:35:18 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,19 +31,7 @@ char	*create_expanded_string(char *dst, char *src, int rm_len)
 	return (new_str);
 }
 
-void	expand_string(char *src, char *new_str, int *ctr, int rm_len)
-{
-	if (src)
-		while (src[ctr[3]])
-			new_str[ctr[2]++] = src[ctr[3]++];
-	while (rm_len > 0)
-	{
-		ctr[1]++;
-		rm_len--;
-	}
-}
-
-void	add_expansion(char **ar, char *dst, char *src, int rm_len)
+int	add_exp(char **ar, char *dst, char *src, int rm_len)
 {
 	int		c[4];
 	char	*new_str;
@@ -56,7 +44,7 @@ void	add_expansion(char **ar, char *dst, char *src, int rm_len)
 		c[0]++;
 	new_str = create_expanded_string(dst, src, rm_len);
 	if (!new_str)
-		return ;
+		return (-1);
 	while (dst[c[1]])
 	{
 		if (!c[3])
@@ -68,40 +56,40 @@ void	add_expansion(char **ar, char *dst, char *src, int rm_len)
 	}
 	new_str[c[2]] = 0;
 	free(ar[c[0]]);
-	free(src);
 	ar[c[0]] = new_str;
+	return (free(src), 0);
 }
 
-void	expand_dollar_sign(char **ar, int *ctr, char **env)
+int	expand_dollar_sign(char **ar, int *ctr, char **env, int len)
 {
 	char	*ptr;
-	int		len;
 
-	len = 0;
 	ptr = NULL;
 	if (ar[ctr[0]][ctr[1] - 1] == '$')
 	{
 		len++;
 		if (ar[ctr[0]][ctr[1]] == '?')
-			add_expansion(ar, ar[ctr[0]], ft_itoa(g_exit_status), len + 1);
+		{
+			if (add_exp(ar, ar[ctr[0]],
+					ft_itoa(g_exit_status), len + 1) == -1)
+				return (-1);
+		}
 		else
 		{
-			while (ft_isalpha(ar[ctr[0]][ctr[1]])
-				|| ar[ctr[0]][ctr[1]] == '_')
-			{
-				ctr[1]++;
-				len++;
-			}
-			ptr = ft_substr(ar[ctr[0]], ctr[1] - len, len);
-			add_expansion(ar, ar[ctr[0]], get_env(ptr + 1, env), len);
+			ptr = get_string(ar, ctr, &len);
+			if (!ptr)
+				return (-1);
+			if (add_exp(ar, ar[ctr[0]], get_env(ptr + 1, env), len) == -1)
+				return (-1);
 		}
 		ctr[1] = 0;
 		if (ptr)
 			free(ptr);
 	}
+	return (0);
 }
 
-void	expand(char **array, char **env)
+int	expand(char **ar, char **env)
 {
 	int		ctr[2];
 	char	*ptr;
@@ -109,20 +97,23 @@ void	expand(char **array, char **env)
 	ctr[0] = 0;
 	ctr[1] = -1;
 	ptr = NULL;
-	while (array[ctr[0]])
+	while (ar[ctr[0]])
 	{
-		while (array[ctr[0]][++ctr[1]])
+		while (ar[ctr[0]][++ctr[1]])
 		{
-			if (ctr[1] == 0 && array[ctr[0]][ctr[1]] == '~'
-				&& (array[ctr[0]][ctr[1] + 1] == '/'
-					|| !array[ctr[0]][ctr[1] + 1]))
-				add_expansion(array, array[ctr[0]], get_env("HOME", env), 1);
-			expand_dollar_sign(array, ctr, env);
-			if (array[ctr[0]][ctr[1] - 1] == '\'')
-				if (ft_strchr(&array[ctr[0]][ctr[1]], '\''))
-					iterate_quotes(array[ctr[0]], &ctr[1], '\'', 0);
+			if (ctr[1] == 0 && ar[ctr[0]][ctr[1]] == '~'
+				&& (ar[ctr[0]][ctr[1] + 1] == '/'
+					|| !ar[ctr[0]][ctr[1] + 1]))
+				if (add_exp(ar, ar[ctr[0]], get_env("HOME", env), 1) == -1)
+					return (-1);
+			if (expand_dollar_sign(ar, ctr, env, 0) == -1)
+				return (-1);
+			if (ar[ctr[0]][ctr[1] - 1] == '\'')
+				if (ft_strchr(&ar[ctr[0]][ctr[1]], '\''))
+					iterate_quotes(ar[ctr[0]], &ctr[1], '\'', 0);
 		}
 		ctr[1] = -1;
 		ctr[0]++;
 	}
+	return (0);
 }

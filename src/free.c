@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:25:27 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 17:16:18 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/20 15:54:20 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ void	free_all_nodes(t_list **head)
 	}
 	if (*head)
 		free(*head);
+	*head = NULL;
 }
 
 void	free_string_array(char **array)
@@ -72,5 +73,6 @@ void	free_string_array(char **array)
 		while (array[ctr])
 			free(array[ctr++]);
 		free(array);
+		array = NULL;
 	}
 }
