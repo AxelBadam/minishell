@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:22:44 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 17:52:02 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/20 17:29:33 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ char	*make_new_str(char *old_str, int len)
 			ctr[0]++;
 		}
 		if (old_str[ctr[0]] && (old_str[ctr[0]] != '"'
-				|| old_str[ctr[0]] != '\''))
+				&& old_str[ctr[0]] != '\''))
 			new_str[ctr[1]++] = old_str[ctr[0]++];
 	}
 	new_str[ctr[1]] = 0;
@@ -46,18 +46,22 @@ int	str_len_without_quotes(char *str)
 	int		ctr[2];
 	char	d;
 
-	ctr[0] = -1;
+	ctr[0] = 0;
 	ctr[1] = 0;
-	while (str[++ctr[0]])
+	while (str[ctr[0]])
 	{
 		if (str[ctr[0]] == '\'' || str[ctr[0]] == '"')
 		{
-			ctr[1] -= 2;
+			ctr[1] += 2;
 			d = str[ctr[0]++];
 			while (str[ctr[0]] && str[ctr[0]] != d)
 				ctr[0]++;
+			if (!str[ctr[0]])
+				break ;
 			ctr[0]++;
 		}
+		else
+			ctr[0]++;
 	}
 	return (ctr[0] - ctr[1]);
 }
