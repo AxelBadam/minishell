@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 18:53:46 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/20 15:49:15 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,11 @@ extern int	g_exit_status;
 
 void	cd_error(char *path)
 {
-	if (!is_a_directory(path) && access(path, F_OK) == 0)
+	if (path == NULL)
+		print_error(": HOME not set\n", 1, "cd");
+	else if (!is_a_directory(path) && access(path, F_OK) == 0)
 		print_error(": not a directory\n", 1, path);
-	if (access(path, F_OK) == -1)
+	else if (access(path, F_OK) == -1)
 		print_error(": no such file or directory\n", 2, path);
 	else if (access(path, X_OK) == -1)
 		print_error(": permission denied\n", 1, path);
@@ -34,8 +36,6 @@ void	execute_builtin_cd(t_resrc *resrc, t_command command)
 		path = get_env("HOME", resrc->envp);
 	else
 		path = command.full_cmd[1];
-	if (path == NULL)
-		print_error(": HOME not set", 1, "cd");
 	if (is_a_directory(path) && access(path, X_OK) == 0)
 	{
 		pwd = getcwd(pwd, sizeof(pwd));

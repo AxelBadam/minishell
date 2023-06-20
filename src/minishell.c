@@ -6,33 +6,13 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 18:09:56 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/19 19:04:06 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 int	g_exit_status;
-
-void	print_list(t_list **head)
-{
-	t_list	*tmp;
-	int		ctr;
-
-	ctr = 0;
-	tmp = *head;
-	while (tmp)
-	{
-		printf("FULL CMD = ");
-		while (tmp->command.full_cmd[ctr])
-			printf("%s ", tmp->command.full_cmd[ctr++]);
-		printf("\nFULL PATH = %s\n", tmp->command.full_path);
-		printf("OUTPUT_FD = %i\nINPUT_FD = %i\n",
-			tmp->command.output_fd, tmp->command.input_fd);
-		tmp = tmp->next;
-		ctr = 0;
-	}
-}
 
 void	command_line(t_resrc *resrc, char *line)
 {
