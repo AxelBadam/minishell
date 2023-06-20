@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 19:04:06 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/20 15:52:51 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ int	main(int argc, char **argv, char **env)
 	resrc = init_resources(create_env(env));
 	minishell(resrc);
 	free_string_array(resrc->envp);
-	free(resrc);
+	if (resrc)
+		free(resrc);
 	return (g_exit_status);
 }

@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 17:31:19 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 17:48:20 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/20 15:37:38 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ char	*get_string(char **ar, int *ctr, int *len)
 	char	*ptr;
 
 	ptr = NULL;
-	while (ft_isalpha(ar[ctr[0]][ctr[1]])
+	while (ft_isalnum(ar[ctr[0]][ctr[1]])
 		|| ar[ctr[0]][ctr[1]] == '_')
 	{
 		ctr[1]++;

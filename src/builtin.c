@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 18:53:46 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/20 13:45:06 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void	execute_builtin_export(t_list *list, t_resrc *resrc)
 	g_exit_status = 0;
 	while (list->command.full_cmd[j])
 	{
-		if (export_check(list->command.full_cmd[j]))
+		if (check_identifier(list->command.full_cmd[j]))
 		{
 			if (is_in_env(list->command.full_cmd[j], resrc->envp))
 				resrc->envp = replace_str(list->command.full_cmd[j],

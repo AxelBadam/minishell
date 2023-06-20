@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   open_redirects.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:11:26 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 13:04:25 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/20 15:49:20 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

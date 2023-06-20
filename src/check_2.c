@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:36:44 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/16 14:34:58 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/20 14:54:04 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,11 +66,7 @@ int	check_input(char **cmd_arr)
 	while (cmd_arr[i])
 	{
 		if (ft_strchr(cmd_arr[i], '=') != NULL)
-		{
-			write(1, "invalid identifier\n", 19);
-			g_exit_status = 1;
-			return (0);
-		}
+			print_error(": not a valid identifier\n", 1, cmd_arr[i]);
 		i++;
 	}
 	return (1);

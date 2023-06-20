@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 14:24:29 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/20 15:52:31 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,14 @@ t_list	*create_node(char **full_cmd, int *fd, t_resrc *rs)
 
 void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len)
 {
+	while (array[ctr[1]]
+		&& (array[ctr[1]][0] == '>' || array[ctr[1]][0] == '<'))
+	{
+		if (array[ctr[1] + 1])
+			ctr[1] += 2;
+		else
+			ctr[1]++;
+	}
 	if (ctr[0] < len)
 		full_cmd[ctr[0]++] = ft_strdup(array[ctr[1]++]);
 	while (array[ctr[1]]

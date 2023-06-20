@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:30:05 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 16:07:40 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/20 13:22:09 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,8 @@ char	**get_new_command(t_resrc *resource)
 	{
 		while (!*line)
 		{
+			free(line);
 			line = readline("> ");
-			if (!*line)
-				free(line);
 		}
 		pipe_command = split_command(resource, line);
 		free(line);
