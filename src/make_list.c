@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/21 16:38:50 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/21 16:47:26 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,10 @@ void	make_list(t_resrc *rs, char **array)
 	fd[1] = 1;
 	len = get_len_without_redirects(rs, array, fd);
 	if (!len)
+	{
+		free_all_nodes(&rs->list);
 		return ;
+	}
 	full_cmd = (char **)malloc(sizeof(char *) * (len + 1));
 	if (!full_cmd)
 		error_exit("minishell: fatal malloc error\n", rs);
