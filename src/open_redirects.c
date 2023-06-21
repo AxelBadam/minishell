@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:11:26 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/20 15:49:20 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/21 16:34:16 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 
 int	open_output_redirect(char *redirect, char *filename, int *fd)
 {
+	if (!*filename)
+		if (!print_error(": no such file or directory\n", 1, filename))
+			return (-1);
 	if (access(filename, F_OK) == 0 && access(filename, W_OK) == -1
 		&& (ft_strncmp(redirect, ">", SIZE_MAX) == 0
 			|| ft_strncmp(redirect, ">>", SIZE_MAX) == 0
@@ -58,7 +61,7 @@ int	open_input_redirect(char *redirect, char *filename, int *fd)
 	return (0);
 }
 
-int	open_file(t_resrc *rs, char *redirect, char *filename, int *fd)
+char	*get_filename(t_resrc *rs, char *filename)
 {
 	int		tmp;
 	char	*f_name;
@@ -66,13 +69,30 @@ int	open_file(t_resrc *rs, char *redirect, char *filename, int *fd)
 	if (!filename)
 		if (!print_error("syntax error near unexpected token `newline'\n", \
 			258, filename))
-			return (-1);
+			return (NULL);
 	f_name = ft_strdup(filename);
+	if (!f_name)
+		error_exit("minishell: fatal malloc error\n", rs);
 	tmp = str_len_without_quotes(f_name);
 	if (tmp != ft_strlen(f_name))
 		f_name = make_new_str(f_name, tmp);
 	if (!f_name)
 		error_exit("minishell: fatal malloc error\n", rs);
+	return (f_name);
+}
+
+int	open_file(t_resrc *rs, char *redirect, char *filename, int *fd)
+{
+	int		tmp;
+	char	*f_name;
+	int		prev_fd[2];
+
+	prev_fd[0] = fd[0];
+	prev_fd[1] = fd[1];
+	tmp = 1;
+	f_name = get_filename(rs, filename);
+	if (!f_name)
+		return (-1);
 	if (is_a_directory(f_name))
 	{
 		if (!print_error(": is a directory\n", 258, f_name))
@@ -82,6 +102,10 @@ int	open_file(t_resrc *rs, char *redirect, char *filename, int *fd)
 		tmp = -1;
 	else if (open_output_redirect(redirect, f_name, fd) == -1)
 		tmp = -1;
+	if (prev_fd[0] != 0 && prev_fd[0] != fd[0])
+		close(prev_fd[0]);
+	if (prev_fd[1] != 1 && prev_fd[1] != fd[1])
+		close(prev_fd[1]);
 	free(f_name);
 	return (tmp);
 }

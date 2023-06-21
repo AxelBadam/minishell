@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:50:55 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/20 17:29:34 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/21 15:43:01 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,15 +41,15 @@ int	count_words(char *line)
 	ctr[1] = 0;
 	while (line[ctr[0]])
 	{
-		while (line[ctr[0]] == ' ')
+		while (ft_is_white_space(line[ctr[0]]))
 			ctr[0]++;
-		while (line[ctr[0]] && line[ctr[0]] != ' ')
+		while (line[ctr[0]] && !ft_is_white_space(line[ctr[0]]))
 		{
 			ctr[0]++;
 			if (line[ctr[0] - 1] == '"' || line[ctr[0] - 1] == '\'')
 				if (!iterate_quotes(line, ctr, line[ctr[0] - 1], 0))
 					return (0);
-			if (line[ctr[0]] == ' ' || !line[ctr[0]])
+			if (ft_is_white_space(line[ctr[0]]) || !line[ctr[0]])
 				ctr[1]++;
 		}
 	}
@@ -107,7 +107,7 @@ char	**make_array(t_resrc *rs, char *line)
 		array[ctr] = (char *)malloc(sizeof(char) * (tmp[1] + 1));
 		if (!array[ctr++])
 			error_exit("minishell: fatal malloc error\n", rs);
-		while (line[tmp[0]] == ' ')
+		while (ft_is_white_space(line[tmp[0]]))
 			tmp[0]++;
 		tmp[2]--;
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_3.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:31:52 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/16 13:02:21 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/21 16:38:23 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,11 @@ char	**array_dup(char **array)
 	if (!new_array)
 		return (NULL);
 	while (array[++ctr])
+	{
 		new_array[ctr] = ft_strdup(array[ctr]);
+		if (!new_array[ctr])
+			return (NULL);
+	}
 	new_array[ctr] = 0;
 	return (new_array);
 }
@@ -52,15 +56,15 @@ int	len_ctr(char *line)
 	ctr[1] = 0;
 	while (line[ctr[0]])
 	{
-		while (line[ctr[0]] == ' ')
+		while (ft_is_white_space(line[ctr[0]]))
 			ctr[0]++;
-		while (line[ctr[0]] && line[ctr[0]] != ' ')
+		while (line[ctr[0]] && !ft_is_white_space(line[ctr[0]]))
 		{
 			ctr[0]++;
 			ctr[1]++;
 			if (line[ctr[0] - 1] == '"' || line[ctr[0] - 1] == '\'')
 				iterate_quotes(line, ctr, line[ctr[0] - 1], 1);
-			if (line[ctr[0]] == ' ' || !line[ctr[0]])
+			if (ft_is_white_space(line[ctr[0]]) || !line[ctr[0]])
 				return (ctr[1]);
 		}
 	}
@@ -101,8 +105,6 @@ int	get_len_without_redirects(t_resrc *rs, char **ar, int *fd)
 				return (0);
 			if (ar[c[0]][0] == '|')
 				break ;
-			if (fd[1] != 1)
-				close(fd[1]);
 			if (open_file(rs, ar[c[0]], ar[c[0] + 1], fd) == -1)
 				return (0);
 			if (ar[c[0] + 1])

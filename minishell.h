@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/20 13:45:08 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/21 15:31:53 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ int		is_in_env(char *str, char **envp);
 int		update_env(char *var, char *val, t_resrc *resrc);
 void	declare_env(t_resrc *resrc);
 int		check_identifier(char *arg);
+int		is_alpha_digit(char c);
 /*
 ** ERRORRR
 */
@@ -98,6 +99,7 @@ int		is_a_directory(char *filename);
 char	*str_to_lower(char *tmp);
 void	wait_child(t_list *list);
 char	*check_access(char *full_path, int *ctr, int *len);
+int		ft_is_white_space(char d);
 /*
 ** SPLIT_COMMAND
 */
@@ -121,6 +123,7 @@ int		expand(char **array, char **env);
 int		expand_dollar_sign(char **ar, int *ctr, char **env, int len);
 int		add_exp(char **ar, char *dst, char *src, int rm_len);
 char	*create_expanded_string(char *dst, char *src, int rm_len);
+void	expand_double_quotes(char **ar, int *ctr);
 /*
 ** ENV
 */
@@ -135,6 +138,7 @@ void	set_env(t_resrc *resrc);
 int		open_file(t_resrc *rs, char *redirect, char *filename, int *fd);
 int		open_input_redirect(char *redirect, char *filename, int *fd);
 int		open_output_redirect(char *redirect, char *filename, int *fd);
+char	*get_filename(t_resrc *rs, char *filename);
 /*
 ** MAKE_LIST
 */

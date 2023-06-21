@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:01:17 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/20 15:42:44 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/21 14:34:35 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@ int	count_strings(char **array)
 
 	strings = 0;
 	ctr[0] = 0;
-	ctr[1] = -1;
+	ctr[1] = 0;
 	while (array[ctr[0]])
 	{
-		while (array[ctr[0]][++ctr[1]])
+		while (array[ctr[0]][ctr[1]])
 		{
 			if (array[ctr[0]][ctr[1]] == '"' || array[ctr[0]][ctr[1]] == '\'')
 			{
@@ -31,8 +31,11 @@ int	count_strings(char **array)
 					&ctr[1], array[ctr[0]][ctr[1] - 1], 0);
 			}
 			strings = count(array, ctr, strings);
+			if (array[ctr[0]][ctr[1]] && (array[ctr[0]][ctr[1]] != '"'
+				&& array[ctr[0]][ctr[1]] != '\''))
+				ctr[1]++;
 		}
-		ctr[1] = -1;
+		ctr[1] = 0;
 		ctr[0]++;
 	}
 	return (strings);

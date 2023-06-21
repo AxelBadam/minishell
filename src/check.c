@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:27:29 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/20 14:22:47 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/21 16:14:37 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	check_pipe_syntax(char **array, int *ctr)
 	int	error;
 
 	error = 0;
-	if (array[ctr[0]][1])
+	if (array[ctr[0]][1] || ctr[0] == 0)
 		error = 258;
 	if (array[ctr[0] + 1])
 		if (array[ctr[0] + 1][0] == '>' || array[ctr[0] + 1][0] == '<'

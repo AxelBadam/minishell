@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/20 17:29:31 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/21 16:38:50 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,6 @@ void	get_next_node(t_resrc *rs, char **array, int *ctr)
 		free_string_array(array);
 	}
 }
-
-/*echo "asd""asd" nayttaa viela syntax erroria*/
 
 void	make_list(t_resrc *rs, char **array)
 {

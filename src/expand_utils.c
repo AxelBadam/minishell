@@ -6,13 +6,18 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 17:31:19 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/20 15:37:38 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/21 15:55:39 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-extern int	g_exit_status;
+int	ft_is_white_space(char d)
+{
+	if (d == 32 || (d >= 9 && d <= 13))
+		return (1);
+	return (0);
+}
 
 char	*get_string(char **ar, int *ctr, int *len)
 {

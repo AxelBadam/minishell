@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:19:40 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/19 14:24:33 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/21 16:32:03 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ extern int	g_exit_status;
 
 void	iterate_over_spaces(char *line, int *tmp)
 {
-	while (line[tmp[0]] == ' ')
+	while (ft_is_white_space(line[tmp[0]]))
 		tmp[0]++;
 }
 
