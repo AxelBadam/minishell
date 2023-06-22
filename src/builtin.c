@@ -6,7 +6,7 @@
 /*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/20 15:55:36 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/22 11:48:56 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void	execute_builtin_export(t_list *list, t_resrc *resrc)
 	g_exit_status = 0;
 	while (list->command.full_cmd[j])
 	{
-		if (check_identifier(list->command.full_cmd[j]))
+		if (check_identifier(list->command.full_cmd[j], 1))
 		{
 			if (is_in_env(list->command.full_cmd[j], resrc->envp))
 				resrc->envp = replace_str(list->command.full_cmd[j],

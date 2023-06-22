@@ -4,8 +4,7 @@ open_redirects.c remove_quotes.c split_by_operator.c split_command.c utils_2.c u
 LIBFT = libft
 OBJECT = $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I. -g -I/Users/atuliara/.brew/opt/readline/include
-#CFLAGS = -Wall -Wextra -Werror -I. -I/opt/homebrew/opt/readline/include
+CFLAGS = -Wall -Wextra -Werror -I. -g -I/$(HOME)/.brew/opt/readline/include
 RM = rm -f
 OBJDIR = obj
 SRCDIR = src
@@ -20,8 +19,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 $(NAME): $(OBJECT)
 	@make -s -C $(LIBFT)
-#$(CC) $(OBJECT) -L/opt/homebrew/opt/readline/lib -lreadline $(LIBFT)/libft.a -o $(NAME)
-	$(CC) $(OBJECT) -L/Users/atuliara/.brew/opt/readline/lib -lreadline $(LIBFT)/libft.a -o $(NAME)
+	$(CC) $(OBJECT) -L/$(HOME)/.brew/opt/readline/lib -lreadline $(LIBFT)/libft.a -o $(NAME)
 	
 clean:
 	rm -rf $(OBJDIR)
