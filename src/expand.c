@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:54:28 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/21 16:07:44 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/22 12:18:37 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,21 +89,46 @@ int	expand_dollar_sign(char **ar, int *ctr, char **env, int len)
 	return (0);
 }
 
+void	get_double_quotes(char **ar, int *ctr, int *d_quote)
+{
+	int	tmp;
+
+	tmp = 0;
+	while (ar[ctr[0]][tmp])
+	{
+		if (ar[ctr[0]][tmp] == '"')
+		{
+			if (d_quote[0] == -1)
+				d_quote[0] = tmp;
+			else
+				d_quote[1] = tmp;
+		}
+		if (d_quote[1] > -1)
+		{
+			if ((ctr[1] - 1) > d_quote[1])
+			{
+				d_quote[0] = -1;
+				d_quote[1] = -1;
+			}
+			else
+				break ;
+		}
+		tmp++;
+	}
+}
+
 void	expand_double_quotes(char **ar, int *ctr)
 {
-	static int	d_quote;
+	int	d_quote[2];
 
-	if (ar[ctr[0]][ctr[1] - 1] == '"')
-	{
-		if (!d_quote)
-			d_quote = 1;
-		else
-			d_quote = 0;
-	}
-	if (!d_quote)
-		if (ar[ctr[0]][ctr[1] - 1] == '\'')
-			if (ft_strchr(&ar[ctr[0]][ctr[1]], '\''))
-				iterate_quotes(ar[ctr[0]], &ctr[1], '\'', 0);
+	d_quote[0] = -1;
+	d_quote[1] = -1;
+	get_double_quotes(ar, ctr, d_quote);
+	if ((ctr[1] - 1) < d_quote[1] && (ctr[1] - 1) > d_quote[0])
+		return ;
+	if (ar[ctr[0]][ctr[1] - 1] == '\'')
+		if (ft_strchr(&ar[ctr[0]][ctr[1]], '\''))
+			iterate_quotes(ar[ctr[0]], &ctr[1], '\'', 0);
 }
 
 int	expand(char **ar, char **env)
@@ -118,7 +143,8 @@ int	expand(char **ar, char **env)
 	{
 		while (ar[ctr[0]][++ctr[1]])
 		{
-			expand_double_quotes(ar, ctr);
+			if (ar[ctr[0]][ctr[1] - 1] == '\'')
+				expand_double_quotes(ar, ctr);
 			if (ctr[1] == 0 && ar[ctr[0]][ctr[1]] == '~'
 				&& (ar[ctr[0]][ctr[1] + 1] == '/'
 					|| !ar[ctr[0]][ctr[1] + 1]))
