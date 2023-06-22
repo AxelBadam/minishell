@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/22 12:23:14 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/22 12:32:09 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,6 @@ typedef struct s_resrc
 	char	**envp;
 }	t_resrc;
 
-void	ft_lstadd_back(t_list **head, t_list *new);
-t_list	*ft_lst_last(t_list *head);
 /*
 ** EXEC
 */

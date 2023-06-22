@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:27:29 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/22 12:22:03 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/22 14:52:03 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,6 @@ int	check_pipe_syntax(char **array, int *ctr)
 	error = 0;
 	if (array[ctr[0]][1] || ctr[0] == 0)
 		error = 258;
-	if (array[ctr[0] + 1])
-		if (array[ctr[0] + 1][0] == '>' || array[ctr[0] + 1][0] == '<'
-			|| array[ctr[0] + 1][0] == '|')
-			error = 258;
 	if (error)
 		if (!print_error("syntax error near unexpected token `|'\n", 258, NULL))
 			return (0);
@@ -46,11 +42,14 @@ int	check_syntax(char **ar, int *ctr, char d)
 
 	error = 0;
 	if (d == '|')
+	{
 		if (!check_pipe_syntax(ar, ctr))
 			return (0);
-	if (((ar[ctr[0]][1] && d == '<' && ar[ctr[0]][1] != d) || ar[ctr[0]][2])
+		return (1);
+	}
+	if (ar[ctr[0]][1] && (((d == '<' && ar[ctr[0]][1] != d) || ar[ctr[0]][2])
 		|| (ar[ctr[0]][1] && d == '>'
-			&& ar[ctr[0]][1] != '|' && ar[ctr[0]][1] != '>'))
+			&& ar[ctr[0]][1] != '|' && ar[ctr[0]][1] != '>')))
 	{
 		if (ar[ctr[0]][2])
 			print_syntax_error(&ar[ctr[0]][2], 258);
