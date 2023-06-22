@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_utils2.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 12:34:29 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/20 15:06:29 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/22 11:46:29 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,17 @@ int	is_alpha_digit(char c)
 	return (0);
 }
 
-int	check_identifier(char *arg)
+int	check_identifier(char *arg, int export)
 {
 	int	i;
 
 	i = 0;
-	if (arg[0] == '=' || ft_isdigit(arg[0]))
+	if (ft_isdigit(arg[0]))
+	{
+		print_error(": not a valid identifier\n", 1, arg);
+		return (0);
+	}
+	if (export == 0 && ft_strchr(arg, '=') != NULL)
 	{
 		print_error(": not a valid identifier\n", 1, arg);
 		return (0);

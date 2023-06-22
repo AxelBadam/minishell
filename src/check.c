@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:27:29 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/21 16:14:37 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/22 12:22:03 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,8 +108,7 @@ int	check_for_parent_builtin(t_resrc *resrc, t_list *list, int len)
 		execute_builtin_exit(list->command.full_cmd, 0);
 	if (!ft_strncmp(tmp, "cd", len) && len == 2)
 		return (execute_builtin_cd(resrc, list->command), free(tmp), 1);
-	else if (!ft_strncmp(tmp, "unset", len) && len == 5 \
-	&& check_input(list->command.full_cmd))
+	else if (!ft_strncmp(tmp, "unset", len) && len == 5)
 		return (execute_builtin_unset(list, resrc), free(tmp), 1);
 	else if (!ft_strncmp(tmp, "export", 6) && len == 6 \
 	&& get_array_size(list->command.full_cmd) > 1)

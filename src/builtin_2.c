@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:51:25 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/20 15:01:17 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/22 11:46:45 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,10 @@ void	execute_builtin_unset(t_list *list, t_resrc *resrc)
 	int	ac;
 
 	ac = 1;
+	g_exit_status = 0;
 	while (list->command.full_cmd[ac])
 	{
-		if (check_identifier(list->command.full_cmd[ac])
+		if (check_identifier(list->command.full_cmd[ac], 0)
 			&& is_in_env(list->command.full_cmd[ac], resrc->envp)
 			&& !ft_strchr(list->command.full_cmd[ac], '='))
 		{
@@ -31,7 +32,6 @@ void	execute_builtin_unset(t_list *list, t_resrc *resrc)
 		}
 		ac++;
 	}
-	g_exit_status = 0;
 }
 
 void	execute_builtin_echo(t_command cmd)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:36:44 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/20 14:54:04 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/22 11:43:19 by atuliara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,20 +56,6 @@ void	check_signal(t_list *list)
 		g_exit_status = 146;
 		ft_putstr_fd(" was stopped\n", 2);
 	}
-}
-
-int	check_input(char **cmd_arr)
-{
-	int	i;
-
-	i = 0;
-	while (cmd_arr[i])
-	{
-		if (ft_strchr(cmd_arr[i], '=') != NULL)
-			print_error(": not a valid identifier\n", 1, cmd_arr[i]);
-		i++;
-	}
-	return (1);
 }
 
 int	check_for_option(char *str)
