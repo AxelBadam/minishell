@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_utils2.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 12:34:29 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/22 11:46:29 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/06/22 12:28:35 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	check_identifier(char *arg, int export)
 	int	i;
 
 	i = 0;
-	if (ft_isdigit(arg[0]))
+	if (ft_isdigit(arg[0]) || arg[0] == '=')
 	{
 		print_error(": not a valid identifier\n", 1, arg);
 		return (0);
