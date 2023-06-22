@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:54:28 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/22 12:18:37 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/22 12:20:25 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,34 +87,6 @@ int	expand_dollar_sign(char **ar, int *ctr, char **env, int len)
 			free(ptr);
 	}
 	return (0);
-}
-
-void	get_double_quotes(char **ar, int *ctr, int *d_quote)
-{
-	int	tmp;
-
-	tmp = 0;
-	while (ar[ctr[0]][tmp])
-	{
-		if (ar[ctr[0]][tmp] == '"')
-		{
-			if (d_quote[0] == -1)
-				d_quote[0] = tmp;
-			else
-				d_quote[1] = tmp;
-		}
-		if (d_quote[1] > -1)
-		{
-			if ((ctr[1] - 1) > d_quote[1])
-			{
-				d_quote[0] = -1;
-				d_quote[1] = -1;
-			}
-			else
-				break ;
-		}
-		tmp++;
-	}
 }
 
 void	expand_double_quotes(char **ar, int *ctr)

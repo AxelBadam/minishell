@@ -6,11 +6,39 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 17:31:19 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/21 16:47:25 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/06/22 12:20:32 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	get_double_quotes(char **ar, int *ctr, int *d_quote)
+{
+	int	tmp;
+
+	tmp = 0;
+	while (ar[ctr[0]][tmp])
+	{
+		if (ar[ctr[0]][tmp] == '"')
+		{
+			if (d_quote[0] == -1)
+				d_quote[0] = tmp;
+			else
+				d_quote[1] = tmp;
+		}
+		if (d_quote[1] > -1)
+		{
+			if ((ctr[1] - 1) > d_quote[1])
+			{
+				d_quote[0] = -1;
+				d_quote[1] = -1;
+			}
+			else
+				break ;
+		}
+		tmp++;
+	}
+}
 
 int	ft_is_white_space(char d)
 {
