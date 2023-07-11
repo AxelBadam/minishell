@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/22 12:26:42 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/11 12:46:47 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	g_exit_status;
 
-void	command_line(t_resrc *resrc, char *line)
+void	command_line(struct termios *t, t_resrc *resrc, char *line)
 {
 	if (*line)
 	{
@@ -23,6 +23,7 @@ void	command_line(t_resrc *resrc, char *line)
 		if (resrc->array)
 		{
 			make_list(resrc, resrc->array);
+			open_echo_control(t);
 			if (resrc->list)
 			{
 				set_env(resrc);
@@ -46,8 +47,7 @@ void	minishell(t_resrc *resrc)
 		line = readline("minishell-1.0$ ");
 		if (!line)
 			break ;
-		open_echo_control(&t);
-		command_line(resrc, line);
+		command_line(&t, resrc, line);
 		free(line);
 	}
 	ft_putstr_fd("\033[1Aminishell-1.0$ exit\n", 1);

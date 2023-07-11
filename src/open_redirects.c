@@ -6,11 +6,13 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:11:26 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/21 16:34:16 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/11 12:46:49 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+extern int	g_exit_status;
 
 int	open_output_redirect(char *redirect, char *filename, int *fd)
 {
@@ -42,6 +44,8 @@ int	open_input_redirect(char *redirect, char *filename, int *fd)
 			if (!print_error("fatal: pipe fail\n", 1, NULL))
 				return (-1);
 		create_heredoc(fd, filename);
+		if (g_exit_status == 1)
+			return (-1);
 	}
 	else if (ft_strncmp(redirect, "<", SIZE_MAX) == 0)
 	{

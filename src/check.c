@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:27:29 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/22 14:52:03 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/10 12:36:57 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,6 @@ int	print_syntax_error(char *s, int exit)
 
 int	check_syntax(char **ar, int *ctr, char d)
 {
-	int	error;
-
-	error = 0;
 	if (d == '|')
 	{
 		if (!check_pipe_syntax(ar, ctr))

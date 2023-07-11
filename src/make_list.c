@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/22 11:48:30 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/11 13:17:13 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,20 @@ char	*get_full_path(t_resrc *rs, char *cmd, char *path)
 		return (NULL);
 	while (path[++ctr[0]])
 	{
-		if (path[ctr[0]] == ':')
+		len++;
+		if (path[ctr[0]] == ':' || !path[ctr[0] + 1])
 		{
-			full_path = create_full_path(cmd, path, ctr[1], len);
+			if (path[ctr[0]] == ':')
+				len -= 1;
+			full_path = create_full_path(cmd, path, ctr[1], &len);
 			if (!full_path)
 				error_exit("minishell: fatal malloc error\n", rs);
-			full_path = check_access(full_path, ctr, &len);
+			full_path = check_access(full_path, ctr);
 			if (full_path)
 				break ;
 		}
-		len++;
 	}
-	free(path);
-	return (full_path);
+	return (free(path), full_path);
 }
 
 t_list	*create_node(char **full_cmd, int *fd, t_resrc *rs)

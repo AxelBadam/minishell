@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:04:53 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/19 14:28:17 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/11 13:06:34 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,13 @@
 
 extern int	g_exit_status;
 
-char	*check_access(char *full_path, int *ctr, int *len)
+char	*check_access(char *full_path, int *ctr)
 {
 	if (access(full_path, F_OK) == 0)
 		return (full_path);
 	free(full_path);
 	full_path = NULL;
 	ctr[1] = ctr[0] + 1;
-	*len = 0;
 	return (NULL);
 }
 

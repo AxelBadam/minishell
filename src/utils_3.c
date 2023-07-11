@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:31:52 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/22 14:21:22 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/11 13:17:12 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,18 +33,24 @@ char	**array_dup(char **array)
 	return (new_array);
 }
 
-char	*create_full_path(char *cmd, char *path, int start, int len)
+char	*create_full_path(char *cmd, char *path, int start, int *len)
 {
 	char	*full_path;
 	char	*tmp[2];
 
-	tmp[0] = ft_substr(path, start, len - 1);
-	tmp[1] = ft_strjoin(tmp[0], "/");
-	full_path = ft_strjoin(tmp[1], cmd);
+	tmp[0] = ft_substr(path, start, *len);
+	tmp[1] = NULL;
+	if (tmp[0][ft_strlen(tmp[0]) - 1] != '/')
+	{
+		tmp[1] = ft_strjoin(tmp[0], "/");
+		full_path = ft_strjoin(tmp[1], cmd);
+	}
+	else
+		full_path = ft_strjoin(tmp[0], cmd);
 	free(tmp[0]);
-	free(tmp[1]);
-	if (!full_path)
-		return (NULL);
+	if (tmp[1])
+		free(tmp[1]);
+	*len = 0;
 	return (full_path);
 }
 
@@ -73,15 +79,11 @@ int	len_ctr(char *line)
 
 int	count(char **array, int *ctr, int strings)
 {
-	int	start;
-
-	start = 0;
 	if (array[ctr[0]][ctr[1]] == '>' || array[ctr[0]][ctr[1]] == '<'
 		|| array[ctr[0]][ctr[1]] == '|')
 	{
-		start = ctr[1];
 		if (ctr[1] > 0)
-		strings++;
+			strings++;
 		while (array[ctr[0]][ctr[1]] && (array[ctr[0]][ctr[1]] == '>'
 			|| array[ctr[0]][ctr[1]] == '<' || array[ctr[0]][ctr[1]] == '|'))
 			ctr[1]++;

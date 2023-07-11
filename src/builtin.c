@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/22 12:32:11 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/11 13:30:44 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,9 @@ void	execute_builtin_cd(t_resrc *resrc, t_command command)
 {
 	char	*path;
 	char	*pwd;
+	char	*oldpwd;
 
+	oldpwd = NULL;
 	pwd = NULL;
 	if (!command.full_cmd[1])
 		path = get_env("HOME", resrc->envp);
@@ -38,11 +40,12 @@ void	execute_builtin_cd(t_resrc *resrc, t_command command)
 		path = command.full_cmd[1];
 	if (is_a_directory(path) && access(path, X_OK) == 0)
 	{
-		pwd = getcwd(pwd, sizeof(pwd));
-		update_env("OLDPWD=", pwd, resrc);
 		chdir(path);
 		g_exit_status = 0;
-		getcwd(pwd, sizeof(pwd));
+		oldpwd = get_env("PWD", resrc->envp);
+		update_env("OLDPWD=", oldpwd, resrc);
+		free(oldpwd);
+		pwd = getcwd(pwd, sizeof(pwd));
 		update_env("PWD=", pwd, resrc);
 		free(pwd);
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/22 10:56:23 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/07/11 13:26:02 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,8 @@ int	update_env(char *var, char *val, t_resrc *resrc)
 {
 	char	*env_var;
 
+	if (val == NULL)
+		return (1);
 	env_var = ft_strjoin(var, val);
 	if (is_in_env(env_var, resrc->envp))
 		resrc->envp = replace_str(env_var, resrc->envp);

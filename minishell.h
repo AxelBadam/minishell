@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/22 12:32:09 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/11 13:17:14 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ int		print_error(char *str, int exit_status, char *filename);
 int		is_a_directory(char *filename);
 char	*str_to_lower(char *tmp);
 void	wait_child(t_list *list);
-char	*check_access(char *full_path, int *ctr, int *len);
+char	*check_access(char *full_path, int *ctr);
 int		ft_is_white_space(char d);
 /*
 ** SPLIT_COMMAND
@@ -192,7 +192,7 @@ char	**get_new_command(t_resrc *resource);
 int		get_len_without_redirects(t_resrc *rs, char **ar, int *fd);
 int		count(char **array, int *ctr, int strings);
 int		len_ctr(char *line);
-char	*create_full_path(char *cmd, char *path, int start, int len);
+char	*create_full_path(char *cmd, char *path, int start, int *len);
 char	**array_dup(char **array);
 /*
 ** PIPES
@@ -223,6 +223,6 @@ void	get_double_quotes(char **ar, int *ctr, int *d_quote);
 */
 void	*init_resources(char **envp);
 void	minishell(t_resrc *resrc);
-void	command_line(t_resrc *resrc, char *line);
+void	command_line(struct termios *t, t_resrc *resrc, char *line);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:54:28 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/22 12:20:25 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/11 12:47:02 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,11 +106,9 @@ void	expand_double_quotes(char **ar, int *ctr)
 int	expand(char **ar, char **env)
 {
 	int		ctr[2];
-	char	*ptr;
 
 	ctr[0] = 0;
 	ctr[1] = -1;
-	ptr = NULL;
 	while (ar[ctr[0]])
 	{
 		while (ar[ctr[0]][++ctr[1]])
