@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atuliara <atuliara@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 17:51:25 by atuliara          #+#    #+#             */
-/*   Updated: 2023/06/22 11:46:45 by atuliara         ###   ########.fr       */
+/*   Updated: 2023/07/11 17:52:13 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,20 +58,18 @@ void	execute_builtin_echo(t_command cmd)
 	g_exit_status = 0;
 }
 
-void	execute_builtin_pwd(void)
+void	execute_builtin_pwd(t_resrc *rs)
 {
 	char	*cwd;
 
 	cwd = NULL;
 	cwd = getcwd(cwd, sizeof(cwd));
-	if (cwd != NULL)
-	{
-		write(STDOUT_FILENO, cwd, ft_strlen(cwd));
-		write(STDOUT_FILENO, "\n", 1);
-		g_exit_status = 0;
-	}
+	if (!cwd)
+		cwd = get_env("PWD", rs->envp);
+	if (!cwd)
+		print_error(": pwd failed\n", 1, "pwd");
 	else
-		print_error(": getcwd failed", 1, "pwd");
+		ft_putendl_fd(cwd, 1);
 	free(cwd);
 }
 

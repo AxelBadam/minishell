@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 12:50:33 by atuliara          #+#    #+#             */
-/*   Updated: 2023/07/11 13:30:44 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/11 17:48:37 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ void	execute_builtin(t_resrc *resrc, t_list *list)
 	if (*list->command.full_cmd)
 		len = ft_strlen(cmd);
 	if (!ft_strncmp(cmd, "pwd", len) && len == 3)
-		execute_builtin_pwd();
+		execute_builtin_pwd(resrc);
 	else if (!ft_strncmp(cmd, "echo", len) && len == 4)
 		execute_builtin_echo(list->command);
 	else if (!ft_strncmp(cmd, "env", len) && len == 3)
