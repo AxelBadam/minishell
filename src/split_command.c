@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 17:50:55 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/21 15:43:01 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/12 14:10:09 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,7 @@ char	**split_command(t_resrc *rs, char *line)
 	if (expand(array, rs->envp) == -1)
 		error_exit("minishell: fatal malloc error\n", rs);
 	array = split_by_operator(array);
+	array = split_pipes(array);
 	if (!array)
 		error_exit("minishell: fatal malloc error\n", rs);
 	return (array);

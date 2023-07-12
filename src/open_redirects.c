@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:11:26 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/07/11 12:46:49 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/12 12:50:04 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ int	open_output_redirect(char *redirect, char *filename, int *fd)
 	if (ft_strncmp(redirect, ">", SIZE_MAX) == 0 \
 	|| ft_strncmp(redirect, ">|", SIZE_MAX) == 0)
 		fd[1] = open(filename, O_CREAT | O_WRONLY, 0644);
-	else if (ft_strncmp(redirect, ">>", SIZE_MAX) == 0)
+	else if (ft_strncmp(redirect, ">>", SIZE_MAX) == 0
+		|| ft_strncmp(redirect, "|>>", SIZE_MAX) == 0)
 		fd[1] = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
 	if (fd[1] == -1 || fd[0] == -1)
 		if (!print_error("fatal: open fail\n", 1, NULL))

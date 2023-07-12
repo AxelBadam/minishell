@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:27:29 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/07/10 12:36:57 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/12 14:00:10 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	check_pipe_syntax(char **array, int *ctr)
 	int	error;
 
 	error = 0;
-	if (array[ctr[0]][1] || ctr[0] == 0)
+	if (ft_strlen(array[ctr[0]]) > 1 || ctr[0] == 0)
 		error = 258;
 	if (error)
 		if (!print_error("syntax error near unexpected token `|'\n", 258, NULL))

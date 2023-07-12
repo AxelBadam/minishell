@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/07/11 17:48:47 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/12 14:36:02 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,6 +218,12 @@ void	check_for_quotes(char **o_arr, int *c);
 void	expand_string(char *src, char *new_str, int *ctr, int rm_len);
 char	*get_string(char **ar, int *ctr, int *len);
 void	get_double_quotes(char **ar, int *ctr, int *d_quote);
+/*
+** SPLIT_PIPES
+*/
+char	**split_pipes(char **array);
+int		count_pipes(char **array);
+char	**fill_pipe_array(char **n_arr, char **o_arr);
 /*
 ** MAIN
 */
