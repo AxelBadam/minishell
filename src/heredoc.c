@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:30:05 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/07/11 12:46:50 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/13 18:34:44 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ char	**get_new_command(t_resrc *resource)
 		free(line);
 		return (pipe_command);
 	}
-	free_all_nodes(&resource->list);
+	free_all_nodes(resource);
 	return (NULL);
 }
 

@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:30:16 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/07/12 14:36:02 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/14 13:20:12 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ int		is_in_env(char *str, char **envp);
 int		get_2d_array_size(char **array);
 char	**append_2d(char **twod, char *str_to_add);
 char	**replace_str(char *str, char **envp);
-void	free_all_nodes(t_list **head);
 int		is_builtin(char *str);
 int		print_error(char *str, int exit_status, char *filename);
 int		is_a_directory(char *filename);
@@ -140,7 +139,7 @@ char	*get_filename(t_resrc *rs, char *filename);
 /*
 ** MAKE_LIST
 */
-void	make_list(t_resrc *rs, char **array);
+int		make_list(t_resrc *rs, char **array);
 void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len);
 t_list	*create_node(char **full_cmd, int *fd, t_resrc *rs);
 char	*get_full_path(t_resrc *rs, char *cmd, char *path);
@@ -162,7 +161,7 @@ char	*make_new_str(char *old_str, int len);
 /*
 ** FREE
 */
-void	free_all_nodes(t_list **head);
+void	free_all_nodes(t_resrc *rs);
 void	free_string_array(char **array);
 void	error_exit(char *str, t_resrc *resource);
 int		print_error(char *str, int exit_status, char *filename);

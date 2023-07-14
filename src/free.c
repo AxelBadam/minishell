@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:25:27 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/06/20 15:54:20 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/14 13:15:39 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	error_exit(char *str, t_resrc *resource)
 	if (resource)
 	{
 		if (resource->list)
-			free_all_nodes(&resource->list);
+			free_all_nodes(resource);
 		if (resource->array)
 			free_string_array(resource->array);
 		free(resource);
@@ -38,29 +38,32 @@ void	error_exit(char *str, t_resrc *resource)
 	exit(1);
 }
 
-void	free_all_nodes(t_list **head)
+void	free_all_nodes(t_resrc *rs)
 {
 	t_list	*tmp;
 
-	tmp = *head;
-	while (*head)
+	tmp = rs->list;
+	while (rs->list)
 	{
-		if ((*head)->command.full_cmd)
-			free_string_array((*head)->command.full_cmd);
-		if ((*head)->command.full_path)
-			free((*head)->command.full_path);
-		if ((*head)->command.input_fd != 0)
-			close((*head)->command.input_fd);
-		if ((*head)->command.output_fd != 1)
-			close((*head)->command.output_fd);
-		*head = (*head)->next;
+		if (rs->list->command.full_cmd)
+			free_string_array(rs->list->command.full_cmd);
+		if (rs->list->command.full_path)
+			free(rs->list->command.full_path);
+		if (rs->list->command.input_fd != 0)
+			close(rs->list->command.input_fd);
+		if (rs->list->command.output_fd != 1)
+			close(rs->list->command.output_fd);
+		rs->list = rs->list->next;
 		if (tmp)
 			free(tmp);
-		tmp = *head;
+		tmp = rs->list;
 	}
-	if (*head)
-		free(*head);
-	*head = NULL;
+	if (rs->list)
+		free(rs->list);
+	if (rs->array)
+		free_string_array(rs->array);
+	rs->array = NULL;
+	rs->list = NULL;
 }
 
 void	free_string_array(char **array)

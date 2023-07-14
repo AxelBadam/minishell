@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 13:20:59 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/07/11 12:46:47 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/14 13:15:41 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,16 @@ void	command_line(struct termios *t, t_resrc *resrc, char *line)
 		add_history(line);
 		if (resrc->array)
 		{
-			make_list(resrc, resrc->array);
-			open_echo_control(t);
-			if (resrc->list)
+			if (!make_list(resrc, resrc->array))
 			{
-				set_env(resrc);
-				execution(resrc, resrc->list);
+				open_echo_control(t);
+				if (resrc->list)
+				{
+					set_env(resrc);
+					execution(resrc, resrc->list);
+					free_all_nodes(resrc);
+				}
 			}
-			free_string_array(resrc->array);
-			free_all_nodes(&resrc->list);
 		}
 	}
 }

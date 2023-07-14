@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/12 13:43:52 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/07/12 14:55:28 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/14 13:15:40 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ char	**fill_pipe_array(char **n_arr, char **o_arr)
 	i = 0;
 	while (o_arr[ctr[0]])
 	{
-		if (o_arr[ctr[0]][ctr[1]] == '|')
+		if (o_arr[ctr[0]][ctr[1]] == '|' && ft_strlen(o_arr[ctr[0]]) > 1)
 		{
 			while (o_arr[ctr[0]][ctr[1]] == '|')
 				ctr[1]++;

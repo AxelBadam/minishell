@@ -6,7 +6,7 @@
 /*   By: ekoljone <ekoljone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/09 18:15:36 by ekoljone          #+#    #+#             */
-/*   Updated: 2023/07/12 13:58:27 by ekoljone         ###   ########.fr       */
+/*   Updated: 2023/07/14 13:15:31 by ekoljone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,20 +87,22 @@ void	create_full_cmd(char **full_cmd, char **array, int *ctr, int len)
 
 void	get_next_node(t_resrc *rs, char **array, int *ctr)
 {
+	char	**new_array;
+
 	if (array[ctr[1]] && array[ctr[1]][0] == '|')
 	{
 		if (!array[ctr[1] + 1])
-			array = get_new_command(rs);
+			new_array = get_new_command(rs);
 		else
-			array = array_dup(&array[ctr[1] + 1]);
-		if (!array)
+			new_array = array_dup(&array[ctr[1] + 1]);
+		if (!new_array)
 			return ;
-		make_list(rs, array);
-		free_string_array(array);
+		make_list(rs, new_array);
+		free_string_array(new_array);
 	}
 }
 
-void	make_list(t_resrc *rs, char **array)
+int	make_list(t_resrc *rs, char **array)
 {
 	int		ctr[2];
 	int		fd[2];
@@ -114,8 +116,8 @@ void	make_list(t_resrc *rs, char **array)
 	len = get_len_without_redirects(rs, array, fd);
 	if (!len)
 	{
-		free_all_nodes(&rs->list);
-		return ;
+		free_all_nodes(rs);
+		return (1);
 	}
 	full_cmd = (char **)malloc(sizeof(char *) * (len + 1));
 	if (!full_cmd)
@@ -126,4 +128,5 @@ void	make_list(t_resrc *rs, char **array)
 	remove_quotes(rs, full_cmd);
 	ft_lstadd_back(&rs->list, create_node(full_cmd, fd, rs));
 	get_next_node(rs, array, ctr);
+	return (0);
 }
