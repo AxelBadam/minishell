@@ -1,4 +1,4 @@
-# minishelll
+# Minishell
 
 Welcome to Minishell, a simplified shell program inspired by bash. This project focuses on heavy parsing, expansion, environment variables, pipes, redirections, heredoc, double quotes, and single quotes.
 
