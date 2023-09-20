@@ -1,8 +1,9 @@
-# Minishell
+# minishell
 
-Welcome to Minishell, a simplified shell program inspired by bash. This project focuses on heavy parsing, expansion, environment variables, pipes, redirections, heredoc, double quotes, and single quotes.
+Welcome to minishell, a simplified shell program inspired by bash. This project focuses on heavy parsing, expansion, environment variables, pipes, redirections, heredoc, double quotes, and single quotes.
+![minishell](https://github.com/AxelBadam/minishell/assets/110740560/c946ab91-be47-487a-8106-9fd843a2e10c)
 
-Features:
+## features:
 
 • Basic command execution <br />
 • Parsing and tokenization of user input <br />
@@ -12,15 +13,15 @@ Features:
 • Command pipelines (| symbol) <br />
 • Heredoc functionality <br />
 
-Getting Started: <br />
+## getting started: <br />
 
-Clone the repository: git clone https://github.com/AxelBadam/minishelll.git <br />
-Build the Minishell executable: make <br />
-Run Minishell: ./minishell <br />
+Clone the repository: ```git clone https://github.com/AxelBadam/minishelll.git``` <br />
+Build the Minishell executable: ```make``` <br />
+Run Minishell: ```./minishell``` <br />
 
-Usage: <br />
+## usage: <br />
 
-After compiling the Minishell executable, run it from the command line. Enter shell commands, and Minishell will interpret and execute them.
+After compiling the minishell executable, run it from the command line. Enter shell commands, and minishell will interpret and execute them.
 
 
 Examples:
